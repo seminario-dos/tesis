@@ -1,0 +1,179 @@
+\documentclass[12pt, twoside]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{inconsolata}
+\usepackage[spanish]{babel}
+\usepackage[letterpaper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+\usepackage{utopia}
+\usepackage{pdfpages}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{color}
+\usepackage[font=small,labelfont=bf]{caption}
+%\hypersetup{
+%    colorlinks=true,
+%    linkcolor=blue,
+%    filecolor=magenta,      
+%    urlcolor=cyan
+%}
+
+
+
+\usepackage{setspace}
+\doublespacing
+
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+
+\usepackage{graphicx}
+\graphicspath{ {imagenes/} }
+
+\usepackage[]{gitinfo2}
+%\renewcommand{\gitMark}{\centering{Branch: \gitBranch,@\,\gitAbbrevHash{} \textbullet{} Release:\gitReln{} (\gitAuthorIsoDate)\\ Commiter:\gitCommitterName, Head tags:\gitTags} \textbullet{} References: \gitReferences}
+
+\setcounter{tocdepth}{4}
+\setlength{\parskip}{1em}
+
+% Estilo para formato de codigo fuente
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\linespread{1.0}\footnotesize\ttfamily,breaklines=true
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,
+    stepnumber=1,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    language=Java,
+%    frame=single,
+    columns=fixed
+}
+ 
+\lstset{style=mystyle}
+
+
+\begin{document}
+
+\thispagestyle{plain}
+\begin{titlepage}
+	\begin{center}
+        {\fontsize{24}{28}\fontfamily{phv}\selectfont \textbf{Instituto Tecnológico de Costa Rica}\\}
+        \vspace{1cm}
+        {\fontsize{20}{24}\fontfamily{phv}\selectfont \textbf{Escuela de Ingeniería en Computación}\\}
+        {\fontsize{18}{22}\fontfamily{phv}\selectfont \textbf{Programa de Maestría en Computación}\\}
+        \vspace{2cm}
+        {\fontsize{20}{24}\fontfamily{phv}\selectfont \textbf{Modelado y simulación de funciones en la nube en plataformas \textit{Function-as-a-Service}}}    
+    
+    
+        \vspace{2cm}
+        {\fontsize{14}{17}\fontfamily{phv}\selectfont \textbf{Tesis para optar por el grado de \emph{Magíster Scientiae} en Computación, con énfasis en Ciencias de la Computación
+}}
+        
+       \vspace{1.5cm}
+       {\fontsize{14}{17}\fontfamily{phv}\selectfont \textbf{Estudiante\\ Carlos Martín Flores González}} 
+       
+       \vspace{1cm}
+       {\fontsize{14}{17}\fontfamily{phv}\selectfont \textbf{Profesor Asesor\\ Ignacio Trejos Zelaya}}
+       
+       \vspace{1.5cm}
+       {\fontsize{14}{17}\fontfamily{phv}\selectfont \textbf{Mayo, 2019}}                       
+        
+    \end{center}
+\end{titlepage}
+
+%\maketitle
+\pagenumbering{roman} 
+\renewcommand*\contentsname{Índice}
+
+
+\newpage
+{\footnotesize
+\noindent
+\texttt{
+Git: \gitReferences \\
+Branch: \gitBranch \\
+Tag: \gitVtag \\
+Release: \gitReln{} \\
+Commit: \gitAbbrevHash \\
+Date: \gitAuthorIsoDate \\
+Author: \gitAuthorName\\
+Email: \gitAuthorEmail\\
+Committer: \gitCommitterName\\
+Committer email: \gitCommitterEmail
+}}
+\newpage
+\input{capitulos/dedicatoria}
+\input{capitulos/agradecimientos}
+\input{capitulos/resumen}
+\input{capitulos/abstract}
+
+\tableofcontents
+\listoffigures
+%\listoftables
+
+\chapter{Introducción}
+\pagenumbering{arabic}
+\input{capitulos/introduccion}
+
+\chapter[Implementación de una \emph{FaaS}: manejador de imágnenes]{Implementación de una función en la nube: manejador de imágenes}
+\label{cap:manejador-imagenes}
+\input{capitulos/manejador-imagenes}
+
+%
+%\chapter{Antecedentes}
+%\label{cap:antecedentes}
+%\input{capitulos/antecedentes}
+%
+%\chapter{Definición del problema}
+%\label{cap:problema}
+%\input{capitulos/problema}
+%
+%\chapter{Justificación}
+%\label{cap:justificacion}
+%\input{capitulos/justificacion}
+%
+%\chapter{Hipótesis}
+%\label{cap:hipotesis}
+%\input{capitulos/hipotesis}
+%
+%\chapter{Objetivos}
+%\label{cap:objetivos}
+%\input{capitulos/objetivos}
+%
+%\chapter{Alcance}
+%\label{cap:alcance}
+%\input{capitulos/alcance}
+%
+%\chapter{Entregables}
+%\label{cap:entregables}
+%\input{capitulos/entregables}
+%
+%\chapter{Metodología}
+%\label{cap:metodologia}
+%\input{capitulos/metodologia}
+%
+%\chapter{Cronograma de actividades}
+%\label{cap:cronograma}
+%\input{capitulos/cronograma}
+
+\addcontentsline{toc}{chapter}{Bibliografía}
+\bibliographystyle{ieeetr}
+\bibliography{referencias}
+
+\end{document}
+%

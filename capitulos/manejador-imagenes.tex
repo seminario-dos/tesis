@@ -1,0 +1,235 @@
+Uno de los principales problemas de hacer ingeniería de rendimiento para software en la nube es que no existen aplicaciones de referencia que hayan ganado popularidad o cuyo desarrollo se encuentre activo. A pesar de esto y de su reciente adopción, la industria ha empezado a reconocer casos de uso en donde las aplicaciones \emph{serverless} encajan mejor. Amazon Web Services(AWS)\cite{serverless-architecture-patterns} reconoce cinco patrones de uso predominantes en su servicio AWS Lambda:
+\begin{enumerate}
+    \item Procesamiento de datos dirigidos por eventos.
+    \item Aplicaciones Web.
+    \item Aplicaciones móviles e Internet las cosas (IoT).
+    \item Ecosistemas de aplicaciones \emph{serverless}.
+    \item Flujos de trabajo dirigidos por eventos.
+\end{enumerate}
+ 
+Uno de las aplicaciones más comunes en \emph{serverless} es desencadenar acciones luego de que ocurre un evento (1), por ejemplo luego de la modificación de un registro en una base de datos o bien luego de que se publica un mensaje en una cola de mensajería. Esto puede provocar que se active una función Lambda\footnote{En la plataforma AWS Lambda } que toma como entrada el evento recién publicado para su posterior procesamiento. Este estilo de caso de uso encaja bien en ambientes híbridos: ambientes en donde tecnologías \emph{serverless} se aprovechan para realizar funciones específicas dentro de una aplicación (o aplicaciones) más grande.
+
+AWS ha publicado una serie de arquitecturas de referencia\cite{aws-lambda-ref-arch} para su plataforma FaaS, AWS Lambda. Dentro de estas arquitecturas se destaca el caso de uso de un manejador de imágenes (\emph{Image Handler})\cite{aws-lambda-image-handler}. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=15cm]{serverless-image-handler-architecture}
+  \caption[Arquitectura del manejador de imágenes]{Arquitectura del manejador de imágenes. Tomado de \protect\cite{aws-lambda-image-handler}}
+  \label{fig:serverless-image-handler-architecture}
+\end{figure}
+
+\section{\emph{Manejador de imágenes}} \label{sec:manejador-imagenes-1}
+Sitios Web con imágenes grandes pueden experimentar tiempos de carga prolongados, es por esto que los desarrolladores proporcionan diferentes versiones de cada imagen para que se acomoden a distintos anchos de banda o diseños de página. Para brindar tiempos de respuesta cortos y disminuir el costo de la optimización, manipulación y procesamiento de las imágenes, AWS propone un manejador de imágenes \emph{serverless}, al cual se le pueda delegar tal trabajo como una función Lambda sobre la plataforma FaaS.
+
+
+A continuación se describe la arquitectura de la figura \ref{fig:serverless-image-handler-architecture}:
+\begin{enumerate}
+    \item Amazon CloudFront provee una capa de \emph{cache} para reducir el costo del procesamiento de la imagen
+    \item Amazon API Gateway brinda acceso por medio de HTTP a las funciones Lambda
+    \item AWS Lambda obtiene la imagen de un repositorio de Amazon Simple Storage Service (Amazon S3) y por medio de la implementación de la función se retorna una versión modificada de la imagen al API Gateway
+    \item El API Gateway retorna una nueva imagen a CloudFront para su posterior entrega a los usuarios finales
+\end{enumerate}
+
+Cabe mencionar que, en este contexto, una versión modificada de una imagen será cualquier imagen que haya presentado algún tipo de alteración con respeto de una imagen original como, por ejemplo, cambios de tamaño, color, metadatos, etc.
+
+\subsection{Manejador de imágenes para SPE} \label{sec:manejador-imagenes-spe}
+Para este estudio se proponemos implementar una variación del manejador de imágenes de la sección \ref{sec:manejador-imagenes-1}, que se muestra en la figura \ref{fig:serverless-image-handler-architecture-spe}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=15cm]{serverless-image-handler-architecture-spe}
+  \caption[Arquitectura del manejador de imágenes propuesto para el estudio]{Arquitectura del manejador de imágenes propuesto para el estudio.}
+  \label{fig:serverless-image-handler-architecture-spe}
+\end{figure}
+
+Se han dejado por fuera intencionalmente el AWS CloudFront y el AWS API Gateway. La razón de esto es porque se pretende ejercitar la función Lambda directamente. Se implementará una función Lambda que entregue a partir de una solicitud de redimensionamiento de una imagen almacenada, otra con dimensiones diferentes producida ``al vuelo'' como respuesta a la solicitud. Por ejemplo, si la imagen original mide 500 pixeles de ancho y alto, entregar una con dimensiones de 100 pixeles de ancho y alto. 
+
+Las actividades involucradas en el proceso de redimensionamientos de imágenes se muestran en la figura \ref{fig:serverless-image-handler-architecture-workflow}
+\begin{enumerate}
+    \item Se envía una solicitud de redimensionamiento de imagen en formato \texttt{JSON} a la función Lambda con los datos acerca de la localización de la imagen y su nuevo tamaño.
+    \item La solicitud de redimensionamiento llega a la función Lambda.
+    \item La función Lambda solicita al servicio de almacemiento AWS S3 la imagen.
+    \item AWS S3 entrega a la función Lambda la imagen solicitada.
+    \item La función Lambda inicia el redimensionamiento de la imagen de acuerdo a los parámetros solicitados.
+    \item La nueva imagen modificada se entrega al cliente(s).
+\end{enumerate}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{serverless-image-handler-architecture-workflow-2}
+  \caption[Carga de trabajo sugerida para el manejador de imágenes]{Carga de trabajo sugerida para el manejador de imágenes}
+  \label{fig:serverless-image-handler-architecture-workflow}
+\end{figure}
+
+
+A la función Lambda se le realizarán pruebas con imágenes de entrada de distinto tamaño y cargas de trabajo variables para evaluar su comportamiento bajo estos escenarios. Se desea observar el impacto de las pruebas en el tiempo de respuesta de la función. Los resultados obtenidos a partir de estas pruebas van a servir como un punto de referencia para experimentos futuros, como los que se indican en la Sección \ref{sec:experimentos-propuestos}. La figura \ref{fig:serverless-image-handler-architecture-workflow} muestra una sugerencia de dos posibles cargas de trabajo: 
+
+\begin{enumerate}
+    \item 100 solicitudes de cambio de tamaño de una imagen grande. En la figura \ref{fig:serverless-image-handler-architecture-workflow}, \texttt{imagen-2.jpg} de tamaño de 5Mb, representa una imagen grande.
+    \item 100 solicitudes de cambio de tamaño de una imagen pequeña. En la figura \ref{fig:serverless-image-handler-architecture-workflow}, \texttt{imagen-1.jpg} de tamaño menor o igual a 500Kb, representa una imagen pequeña.
+\end{enumerate}
+
+En principio las cargas de trabajo generadas serían \emph{cerradas}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto ayudará en principio a tener mejor trazabilidad de lo que ocurre con la función.
+
+\paragraph{¿Por qué este caso de uso se considera relevante?}
+A continuación se listan las características que hacen este caso de uso representativo e interesante:
+\begin{itemize}
+    \item Sencillo de entender e implementar: se cuenta únicamente con una función la cual lleva a cabo una tarea muy específica.
+    \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y lógica asociadas a estas.
+    \item Replicable en otros proveedores de servicios en la nube: varias de las arquitecturas de referencia para \emph{serverless} propuestas por Amazon, están compuestas por herramientas y servicios muy propios de su plataforma, lo cual hace muy difícil su reproducibilidad utilizando otros proveedores. Aunque en principio este trabajo plantea ser elaborado en la plataforma FaaS de Amazon Web Services, AWS Lambda, otros proveedores de servicios (ver sección \ref{sec:proveedores-faas}) en la nube cuentan con sus propias plataformas de FaaS y de almacenamiento, lo cual permitiría replicar lo aquí propuesto en ellos.
+    \item Replicable en los lenguajes de programación soportados por plataformas FaaS: actualmente JavaScript, Java (y lenguajes basados en la \emph{Java Virtual Machine}), Python, C\# y Go son los principales lenguajes de programación soportados por las plataformas FaaS. El caso de uso propuesto, no presenta ningún tipo de característica que lo ate a un lenguaje de programación en particular. En todos ellos se cuentan con bibliotecas para manejo de imágenes tanto de forma nativa como por medio de soluciones de terceros. 
+\end{itemize}
+
+
+\section{Implementación del \emph{manejador de imágenes}}
+Existen soluciones disponibles que se pueden estudiar para implementar un manejador de imágenes. Amazon proporciona dos ejemplos que siguen la arquitectura de la figura \ref{fig:serverless-image-handler-architecture}:
+\begin{enumerate}
+    \item \textbf{{serverless-image-resizing}}\footnote{\url{https://github.com/amazon-archives/serverless-image-resizing}}: escrita en lenguaje JavaScript. Utiliza el modulo \emph{sharp}\footnote{\url{https://github.com/lovell/sharp}} de NodeJS para aplicar operaciones de conversión en imágenes tales como redimensionamiento, rotación y corrección gamma.
+    \item \textbf{{serverless-image-handler}}\footnote{\url{https://github.com/awslabs/serverless-image-handler}}: escrita en lenguaje Python. Hace uso del paquete \emph{Thumbor}\footnote{\url{http://thumbor.org}} de código abierto para realizar operaciones de redimensionamiento, rotación, recorte y aplicación de filtros en imágenes.
+\end{enumerate}
+
+A pesar que Amazon recomienda el uso de \emph{serverless-image-handler} sobre \emph{serverless-image-resizing}, ambas soluciones siguen un patrón sumamente similar en su codificación e instalación. 
+
+Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redimensionamiento en imágenes, es la \emph{Course\_LambdaResizer}, una función lambda usada como referencia en el curso \emph{``Serverless API on AWS for Java developers''} ofrecido en el sitio Web Udemy\footnote{\url{https://www.udemy.com/serverless-api-aws-lambda-for-java-developers}}. Está función está escrita en lenguaje Java y utiliza la biblioteca \emph{imgscalr}\footnote{\url{https://github.com/rkalla/imgscalr}} para redimensionar imágenes.
+
+Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
+
+\subsection{\emph{Image-Handler}}
+La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
+
+\begin{enumerate}
+    \item Procesar la solicitud de redimiensionamiento (la entrada) que viende dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
+    \begin{itemize}
+        \item El nombre de la imagen original que reside en el servicio Amazon S3.
+        \item Los parámetros de altura y ancho a los que se desea redimensional la imagen original.
+    \end{itemize}
+    \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicar la operación de redimiensionamiento sobre la misma de acuerdo a los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
+    \item Tomar la imagen redimensionada, codificarla en \texttt{Base64} y escribir el resultado en el flujo(\emph{stream}) de salida de la función Lambda.
+\end{enumerate}
+ 
+Un extracto de la clase \texttt{ImageHandler.java} se muestra en el listado \ref{lst:lambda-1}. En la línea \texttt{22} se procesa el evento de entrada que viene dado en formato JSON. Como resultado de esto se entrega un objeto \texttt{ImageRequest} el cual contiene la información de la solicitud de la imagen que se desea redimensionar y que se encuentra alojada en el servicio Amazon S3.
+
+En la línea \texttt{24} se llama al servicio \texttt{ImageService} con el fin de obtener la imagen   original (de acuerdo a la información presente en el \texttt{ImageRequest} proporcionado) y se aplica la operación de redimensionamiento.
+
+Por último, en la línea \texttt{26}, \texttt{ImageHandlerResponseWriter.writeResponse()} toma la nueva imagen, con nuevas dimensiones de alto y ancho, la codifica en \texttt{Base64} y escribe el resultado en el \emph{stream} de salida de la función. 
+
+\begin{lstlisting}[linewidth=16.5cm, caption={Clase \texttt{ImageHandler.java}}, label={lst:lambda-1}]
+public class ImageHandler implements RequestStreamHandler {
+
+    private static final AppConfig APP_CONFIG;
+    private final AppConfig appConfig;
+
+    static {
+        APP_CONFIG = AppConfig.getInstance();
+    }
+
+    public ImageHandler() {
+        this(APP_CONFIG);
+    }
+
+    public ImageHandler(AppConfig appConfig) {
+        this.appConfig = appConfig;
+    }
+
+    @Override
+    public void handleRequest(InputStream inputStream, 
+                              OutputStream outputStream, 
+                              Context context) throws IOException {
+        ImageRequest imageRequest = 
+            this.inputEventParser().processInputEvent(inputStream);
+        InputStream imageResized = 
+            this.imageService().getImageFrom(imageRequest);
+        this.imageHandlerResponseWriter()
+            .writeResponse(imageResized, outputStream, imageRequest);
+    }
+
+    private InputEventParser inputEventParser() {
+        return this.appConfig.getInputEventParser();
+    }
+
+    private ImageService imageService() {
+        return this.appConfig.getImageService();
+    }
+
+    private ImageHandlerResponseWriter imageHandlerResponseWriter() {
+        return this.appConfig.getImageHandlerResponseWriter();
+    }
+}    
+\end{lstlisting}
+
+
+Las funciones Lambda en AWS reciben como entrada un objeto JSON. Este objeto puede contener distintos campos dependiendo del servicio que haya invocado previamente la ejecución de la función Lambda. Debido a que la función \emph{Image-Handler} pretende ser invocada por medio de solicitudes \texttt{HTTP}, esta configuró para que trabajara en conjunto con el servicio \texttt{API Gateway}. Dentro de este servicio se creó un recurso Web que entrega solicitudes de tipo \texttt{HTTP GET} a la función Lambda para su posterior procesamiento.
+
+En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al \texttt{API Gateway} con el siguiente formato \texttt{https://\{host\}/image/\{image\}?width=\&height=}, se tomarán el nombre de la imagen original que viene en el parámetro \texttt{image} y los parámetros de ancho y alto, \texttt{width} y \texttt{height} respectivamente, y se pasarán como parámetros de entrada a la función Lambda como parte de un objeto JSON. Este objeto JSON contiene otros campos que dan a conocer a la función Lambda información acerca de la solicitud \texttt{HTTP}.
+
+\paragraph{Ejemplo:} para la siguiente solicitud \texttt{HTTP GET}:
+\begin{verbatim}
+GET https://{host}/images/original-pic.jpg?width=50&height=66
+\end{verbatim}
+
+\noindent \texttt{API Gateway} produce el objeto JSON listado en \ref{lst:lambda-api-gateway-input}. A pesar que el objeto JSON contiene muchas campos, para efectos del \emph{Image-Handler} solamente tres de ellos serán utilizados:
+\begin{enumerate}
+    \item \texttt{pathParameters}: contiene el nombre de la imagen original a ser redimensionada.
+    \item \texttt{isBase64Encoded}: señala si la solicitud necesita ser codificada en \texttt{Base64} o no. 
+    \item \texttt{queryStringParameters}: bajo esta propiedad se listan los parámetros de ancho(\texttt{width}) y alto(\texttt{height}).
+\end{enumerate}
+
+
+\begin{lstlisting}[caption={Clase \texttt{ImageHandler.java}}, label={lst:lambda-api-gateway-input}]
+{
+  "headers": {
+    "Accept": "*/*",
+    "User-Agent": "HTTPie/1.0.2",
+    "Connection": "keep-alive",
+    "X-Forwarded-Proto": "http",
+    "Host": "localhost:3000",
+    "Accept-Encoding": "gzip, deflate",
+    "X-Forwarded-Port": "3000"
+  },
+  "pathParameters": {
+    "image": "original-pic.jpg"
+  },
+  "path": "/images/original-pic.jpg",
+  "isBase64Encoded": true,
+  "requestContext": {
+    "accountId": "123456789012",
+    "path": "/images/{image+}",
+    "resourceId": "123456",
+    "stage": "prod",
+    "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+    "identity": {
+      "cognitoIdentityPoolId": null,
+      "accountId": null,
+      "caller": null,
+      "apiKey": null,
+      "sourceIp": "127.0.0.1",
+      "cognitoAuthenticationType": null,
+      "cognitoAuthenticationProvider": null,
+      "userArn": null,
+      "userAgent": "Custom User Agent String",
+      "user": null
+    },
+    "resourcePath": "/images/{image+}",
+    "httpMethod": "GET",
+    "extendedRequestId": null,
+    "apiId": "1234567890"
+  },
+  "resource": "/images/{image+}",
+  "httpMethod": "GET",
+  "body": null,
+  "queryStringParameters": {
+    "width": "50",
+    "height": "66"
+  },
+  "stageVariables": null
+}
+\end{lstlisting}
+
+\subsubsection{Principales interacciones dentro de \emph{Image-Handler}}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=16.5cm]{secuencia-image-handler}
+  \caption[Carga de trabajo sugerida para el manejador de imágenes]{Carga de trabajo sugerida para el manejador de imágenes}
+  \label{fig:secuencia-image-handler}
+\end{figure}
+
