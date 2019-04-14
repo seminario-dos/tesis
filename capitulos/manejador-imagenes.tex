@@ -94,7 +94,7 @@ Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redi
 
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
-\subsection{\emph{Image-Handler}}
+\subsection{\emph{Image-Handler}}\label{sec:image-handler}
 La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
@@ -158,7 +158,7 @@ public class ImageHandler implements RequestStreamHandler {
 \end{lstlisting}
 
 
-Las funciones Lambda en AWS reciben como entrada un objeto JSON. Este objeto puede contener distintos campos dependiendo del servicio que haya invocado previamente la ejecución de la función Lambda. Debido a que la función \emph{Image-Handler} pretende ser invocada por medio de solicitudes \texttt{HTTP}, esta configuró para que trabajara en conjunto con el servicio \texttt{API Gateway}. Dentro de este servicio se creó un recurso Web que entrega solicitudes de tipo \texttt{HTTP GET} a la función Lambda para su posterior procesamiento.
+Las funciones Lambda en AWS reciben como entrada un objeto JSON. Este objeto puede contener distintos campos dependiendo del servicio que haya invocado previamente la ejecución de la función Lambda. Debido a que la función \emph{Image-Handler} pretende ser invocada por medio de solicitudes \texttt{HTTP}, esta se configuró para que trabajara en conjunto con el servicio \texttt{API Gateway}. Dentro de este servicio se creó un recurso Web que entrega solicitudes de tipo \texttt{HTTP GET} a la función Lambda para su posterior procesamiento.
 
 En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al \texttt{API Gateway} con el siguiente formato \texttt{https://\{host\}/image/\{image\}?width=\&height=}, se tomarán el nombre de la imagen original que viene en el parámetro \texttt{image} y los parámetros de ancho y alto, \texttt{width} y \texttt{height} respectivamente, y se pasarán como parámetros de entrada a la función Lambda como parte de un objeto JSON. Este objeto JSON contiene otros campos que dan a conocer a la función Lambda información acerca de la solicitud \texttt{HTTP}.
 
@@ -167,7 +167,7 @@ En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al 
 GET https://{host}/images/original-pic.jpg?width=50&height=66
 \end{verbatim}
 
-\noindent \texttt{API Gateway} produce el objeto JSON listado en \ref{lst:lambda-api-gateway-input}. A pesar que el objeto JSON contiene muchas campos, para efectos del \emph{Image-Handler} solamente tres de ellos serán utilizados:
+\noindent \texttt{API Gateway} produce el objeto JSON listado en \ref{lst:lambda-api-gateway-input}. A pesar que el objeto JSON incluye otros campos, para efectos del \emph{Image-Handler} solamente tres de ellos serán utilizados:
 \begin{enumerate}
     \item \texttt{pathParameters}: contiene el nombre de la imagen original a ser redimensionada.
     \item \texttt{isBase64Encoded}: señala si la solicitud necesita ser codificada en \texttt{Base64} o no. 
@@ -226,10 +226,11 @@ GET https://{host}/images/original-pic.jpg?width=50&height=66
 \end{lstlisting}
 
 \subsubsection{Principales interacciones dentro de \emph{Image-Handler}}
+La figura \ref{fig:secuencia-image-handler} muestra las principales interacciones que lleva a cabo la función \emph{Image-Handler}. Tanto las acciones como los actores involucrados, concuerdan con lo descrito en la Sección \ref{sec:image-handler} aunque, a diferencia de los descrito en la Sección \ref{sec:image-handler}, se presenta la clase \texttt{S3Dao} que es la que se encarga de buscar y traer la imagen original del servicio Amazon S3. 
 \begin{figure}[h]
   \centering
   \includegraphics[width=16.5cm]{secuencia-image-handler}
-  \caption[Carga de trabajo sugerida para el manejador de imágenes]{Carga de trabajo sugerida para el manejador de imágenes}
+  \caption{Secuencia de acciones llevadas a cabo por \emph{Image-Handler}}
   \label{fig:secuencia-image-handler}
 \end{figure}
 
