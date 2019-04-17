@@ -94,7 +94,7 @@ Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redi
 
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
-\subsection{\emph{Image-Handler}}\label{sec:image-handler}
+\subsection{Función Lambda: \emph{Image-Handler}}\label{sec:image-handler}
 La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
@@ -162,7 +162,7 @@ Las funciones Lambda en AWS reciben como entrada un objeto JSON. Este objeto pue
 
 En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al \texttt{API Gateway} con el siguiente formato \texttt{https://\{host\}/image/\{image\}?width=\&height=}, se tomarán el nombre de la imagen original que viene en el parámetro \texttt{image} y los parámetros de ancho y alto, \texttt{width} y \texttt{height} respectivamente, y se pasarán como parámetros de entrada a la función Lambda como parte de un objeto JSON. Este objeto JSON contiene otros campos que dan a conocer a la función Lambda información acerca de la solicitud \texttt{HTTP}.
 
-\paragraph{Ejemplo:} para la siguiente solicitud \texttt{HTTP GET}:
+\paragraph{Ejemplo:} para la siguiente solicitud \texttt{HTTP}:
 \begin{verbatim}
 GET https://{host}/images/original-pic.jpg?width=50&height=66
 \end{verbatim}
@@ -226,11 +226,110 @@ GET https://{host}/images/original-pic.jpg?width=50&height=66
 \end{lstlisting}
 
 \subsubsection{Principales interacciones dentro de \emph{Image-Handler}}
-La figura \ref{fig:secuencia-image-handler} muestra las principales interacciones que lleva a cabo la función \emph{Image-Handler}. Tanto las acciones como los actores involucrados, concuerdan con lo descrito en la Sección \ref{sec:image-handler} aunque, a diferencia de los descrito en la Sección \ref{sec:image-handler}, se presenta la clase \texttt{S3Dao} que es la que se encarga de buscar y traer la imagen original del servicio Amazon S3. 
+La figura \ref{fig:secuencia-image-handler} muestra las principales interacciones que lleva a cabo la función \emph{Image-Handler}. Tanto las acciones como los actores involucrados, concuerdan con lo descrito en la Sección \ref{sec:image-handler} aunque, a diferencia de lo descrito allí, aquí se presenta la clase \texttt{S3Dao} que es la que se encarga de buscar y traer la imagen original del servicio Amazon S3. 
 \begin{figure}[h]
   \centering
   \includegraphics[width=16.5cm]{secuencia-image-handler}
   \caption{Secuencia de acciones llevadas a cabo por \emph{Image-Handler}}
   \label{fig:secuencia-image-handler}
 \end{figure}
+
+\subsection{Versiones alternas de \emph{Image-Handler}}
+
+Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. 
+
+\subsubsection{Versión instrumentalizada para Kieker y PMX}
+
+Uno de los principales objetivos de este trabajo es el de obtener un modelo de rendmiento a partir 
+del código en ejecución de una función en la nube. A pesar que, el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación de un modelo que pueda incluir mayores niveles de detalle en cuanto a la estructura y estimaciones del comportamiento de un software. Además, debido a que se están dando los primeros pasos en el campo del modelado y simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a una herramienta(s) con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y propensa a errores. 
+
+Kieker es la herramienta seleccionada para el estudiar el comportamiento del rendimiento del sistema a partir de las entradas/rastros que se registran en una bitácora. Creada y mantenida por el grupo de ingeniería de software de la Universidad de Kiel en conjunto con el grupo de sistemas de software de la Universidad de Stuttgart, Kieker se define como una herramienta para monitoreo del rendimiento y análisis dinámico de aplicaciones y se desarolló como parte de las actividades de enseñanza e investigación de ambas universidades. Otras instituciones académicas y de la industria también han realizado contribuciones.
+
+Kieker ofrece adaptadores de monitoreo (\emph{monitoring adapters}) escritos en lenguaje Java, aunque también ofrece adaptadores en otros lenguajes. Los dos principales componentes de Kieker son: \texttt{Kieker.Monitoring} y \texttt{Kieker.Analysis}. \texttt{Kieker.Monitoring} es el responsable de la instrumentación del código, recolección de datos y registro(\emph{logging}). El componente \texttt{Kieker.Analysis} es el responsable de leer, analizar y visualizar los datos monitoreados.
+
+\emph{Performance Model Extractor} (PMX), es una herramienta que automatiza la extracción de modelos de rendmiento a partir de mediciones. PMX utiliza como entrada las bitácoras basadas en Kieker y es capaz de crear modelos basados en \emph{Palladio Component Model} a partir de estas. Esta es una herramienta creada y mantenida por el grupo de ingeniería de software de la Universidad Würzburg en Alemania.
+
+En conjunto, Kieker y PMX, proporcionan un marco de trabajo por medio del cual se puede obtener mediciones del rendimiento de una aplicación y luego, a partir de estas, extraer un modelo de rendimiento basado en PCM. La selección de estas herramientas y el enfoque de medición y extracciòn de modelos de rendimiento se seleccionó luego de estudiar el \emph{enfoque de ingeniería de rendimiento declarativo} propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
+
+\paragraph{Estrategia de extracción de modelo de rendmiento para \emph{Image-Handler}} Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, estrategias tradicionales en donde se crean bitácoras en la misma computadora que ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o mediante \emph{Secure Socket Channel}(\texttt{SSH}) deben ser replanteadas. Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora que se tenga control. 
+
+Para lograr esto, se instrumentalizó el código fuente para que:
+\begin{enumerate}
+    \item Generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales contienen información acerca del rendimiento de una invocación sobre alguna parte del código, y luego estos objetos se publican a una cola de mensajería para su posterior tratamiento. En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos  \texttt{OperationExecutionRecord}.
+    \item En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS).
+    \item Una vez que arriban los mensajes a la cola JMS, otra aplicación, un consumidor de mensajes, procesa los mensajes de la cola y los va almacenando en una bitácora.
+\end{enumerate}
+
+\begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con Kieker}, label={lst:image-handler-kieker}]
+public class ImageHandlerKieker implements RequestStreamHandler {
+    private static final IMonitoringController MONITORING_CONTROLLER;
+    static {
+        MONITORING_CONTROLLER = MonitoringController.getInstance();
+    }
+    .
+    .
+    .
+    
+    @Override
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+
+        final long tin = MONITORING_CONTROLLER.getTimeSource().getTime();
+        handleRequestInternal(inputStream, outputStream, context);
+        final long tout = MONITORING_CONTROLLER.getTimeSource().getTime();
+        final OperationExecutionRecord e = new OperationExecutionRecord("public void "+ this.getClass().getName()+".handleRequest(InputStream, OutputStream, Context)",
+                OperationExecutionRecord.NO_SESSION_ID,
+                OperationExecutionRecord.NO_TRACE_ID,
+                tin, tout,
+                InetAddress.getLocalHost().getHostName(),
+                0,
+                0);
+        MONITORING_CONTROLLER.newMonitoringRecord(e);
+    }
+    .
+    .
+    .
+\end{lstlisting}
+
+% generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS). Una vez que arriban los mensajes a la cola JMS, otra aplicación empieza a consumir los mensajes y los va almacenando en una bitácora. 
+
+La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-kieker}
+  \caption{Publicando mediciones del rendimiento de la función Lambda.}
+  \label{fig:image-handler-kieker}
+\end{figure}
+
+Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espero que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-pmx}
+  \caption{Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX.}
+  \label{fig:image-handler-pmx}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
