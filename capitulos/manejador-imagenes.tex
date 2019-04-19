@@ -236,9 +236,9 @@ La figura \ref{fig:secuencia-image-handler} muestra las principales interaccione
 
 \subsection{Versiones alternas de \emph{Image-Handler}}
 
-Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. 
+Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. En una version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. De igual forma, la otra versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
 
-\subsubsection{Versión instrumentalizada para Kieker y PMX}
+\subsubsection{Versión instrumentalizada para Kieker y PMX} \label{sec:image-handler-kieker-pmx}
 
 Uno de los principales objetivos de este trabajo es el de obtener un modelo de rendmiento a partir 
 del código en ejecución de una función en la nube. A pesar que, el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación de un modelo que pueda incluir mayores niveles de detalle en cuanto a la estructura y estimaciones del comportamiento de un software. Además, debido a que se están dando los primeros pasos en el campo del modelado y simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a una herramienta(s) con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y propensa a errores. 
@@ -288,11 +288,14 @@ public class ImageHandlerKieker implements RequestStreamHandler {
     .
     .
     .
+}    
 \end{lstlisting}
 
 % generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS). Una vez que arriban los mensajes a la cola JMS, otra aplicación empieza a consumir los mensajes y los va almacenando en una bitácora. 
 
 La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+
+Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espero que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
 
 \begin{figure}[h]
   \centering
@@ -301,8 +304,6 @@ La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso 
   \label{fig:image-handler-kieker}
 \end{figure}
 
-Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espero que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
-
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{image-handler-pmx}
@@ -310,15 +311,66 @@ Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora d
   \label{fig:image-handler-pmx}
 \end{figure}
 
+\subsubsection{Versión instrumentalizada para AWS X-Ray}
+Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software. 
+
+Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker iba a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban en la ejecución de la función Lambda y sin esos datos se podía llegar a generar un modelo poco preciso.
+
+Por esta razón se empezaron a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS XRay ayuda a los desarrolladores a analizar y depurar aplicaciones en producción distribuidas, tal y como lo son las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando para identificar y resolver problemas de rendimiento y errores en general.
+
+AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y meta datos para analizar el comportamiento o identificar problemas.
+
+\paragraph{Estrategia de instrumentación de \emph{Image-Handler} para la obtención de métricas de rendimiento con AWS X-Ray} Se siguió un enfoque similar al de la Sección \ref{sec:image-handler-kieker-pmx} pero en lugar de utilizar la biblioteca de Kieker, se utilizó la biblioteca (\emph{Software Development Kit, SDK}) para crear las trazas y \emph{subsegmentos} de trazas, que son vistas más específicas del comportamiento de la aplicación. Con el uso AWS X-Ray se busca: 
+\begin{enumerate}
+    \item Obtener datos específicos del rendimiento de la función.
+    \item Averiguar si las nuevas mediciones logran brindar información acerca de la infraestructura AWS Lambda y su impacto en la ejecución de \emph{Image-Handler}.
+    \item Exportar los datos de rendimiento a algún formato conocido para su manipulación.
+\end{enumerate}
+
+Se modificó la función \emph{Image-Handler} para que puede generar trazas de AWS Ray en los mismos puntos en el código en los que se agregó la instrumentalización para Kieker. Un extracto de este código se muestra en el listado \ref{lst:image-handler-xray}. Cada invocación a las operaciones de procesamiento de la entrada, redimensionamiento y entrega de la respuesta se realizan utilizando el método \texttt{AWSRay.createSubsegment}.
+
+\begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con AWS X-Ray}, label={lst:image-handler-xray}]
+public class ImageHandlerXRay implements RequestStreamHandler {
+    .
+    .
+    .
+    @Override
+    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+        ImageRequest imageRequest = AWSXRay.createSubsegment("input event", new Function<Subsegment, ImageRequest>() {
+            @Override
+            public ImageRequest apply(Subsegment subsegment) {
+                return inputEventParser().processInputEvent(inputStream);
+            }
+        });
+
+        InputStream imageResized = AWSXRay.createSubsegment("resize event", new Function<Subsegment, InputStream>() {
+            @Override
+            public InputStream apply(Subsegment subsegment) {
+                return imageService().getImageFrom(imageRequest);
+            }
+        });
+
+        AWSXRay.createSubsegment("write response", () -> {
+            imageHandlerResponseWriter().writeResponse(imageResized, outputStream, imageRequest);
+        });
+    }
+    .
+    .
+    .
+}
+\end{lstlisting}
 
 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-xray}
+  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
+  \label{fig:image-handler-xray}
+\end{figure}
 
+En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que es el recolecta estas trazas y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloces de los subsegmentos que componen la traza.
 
-
-
-
-
-
+\subsubsection{}
 
 
 
