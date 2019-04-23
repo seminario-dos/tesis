@@ -311,7 +311,7 @@ Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora d
   \label{fig:image-handler-pmx}
 \end{figure}
 
-\subsubsection{Versión instrumentalizada para AWS X-Ray}
+\subsubsection{Versión instrumentalizada para AWS X-Ray}\label{sec:image-handler-xray}
 Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software. 
 
 Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker iba a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban en la ejecución de la función Lambda y sin esos datos se podía llegar a generar un modelo poco preciso.
@@ -370,13 +370,67 @@ public class ImageHandlerXRay implements RequestStreamHandler {
 
 En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que es el recolecta estas trazas y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloces de los subsegmentos que componen la traza.
 
-\subsubsection{}
+\section{Diseño Experimental}
+En esta sección se detallan los experimentos realizados para validar si el modelo y la simulaciones sobre el mismo, logran dar caracterizaciones relevantes del comportamiento de la función \emph{Image Handler} en distintos escenarios. 
+
+\subsection{Utilizando \emph{Image-Handler} para redimensionar imágenes de distintos tamaños}
+Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se probó la función Lambda con dos imágines: una de tamaño pequeño ($\sim$100Kb) y otra de tamaño grande ($\sim$5Mb). El objetivo es comprobar cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
+
+Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menos tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
+
+\subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
+
+Este, al ser el primer experimento realizado, sentó las bases del marco de trabajo en modelaje y simulación que se aplicaron en otros experimentos. 
+
+Se utilizó la siguiente configuración para la ejecución del experimento:
+
+\begin{enumerate}
+    \item Se utilizó una imagen de tamaño de 19Kb y de 295 pixeles de ancho y alto.
+    \item La función \emph{Image-Handler} se ejercitó con 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
+    \begin{enumerate}
+        \item En primera instancia, las 100 solicitudes se hicieron usado la versión de la función \emph{Image-Handler} instrumentalizada con Kieker (Sección \ref{sec:image-handler-kieker-pmx}), para obtener una bitácora con las operaciones realizada
+        \item Posteriormente, esta bitácora fue procesada por PMX para obtener una instancia de PCM.
+    \end{enumerate}
+    \item Una vez obtenido la instancia de PCM, se realizaron otras 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
+    \begin{enumerate}
+        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar cómo se distribuían las cargas de trabajo en cada componente.
+    \end{enumerate}
+    \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
+    \item Se ejecutaron 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
+    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para saber si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
+\end{enumerate}
 
 
+Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los componentes mostrados en la figura \ref{fig:image-handler-pcm-model}. En PCM a este diagrama se le conoce como diagrama de repositorio.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-small-img-extracted-repository-diagram.png}
+  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
+  \label{fig:image-handler-pcm-model}
+\end{figure}
+
+A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
+\begin{enumerate}
+    \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
+    \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
+    \item \texttt{S3ImageService}: Contiene la lógica de:
+        \begin{enumerate}
+            \item Cómo obtener una imagen y
+            \item Cómo aplicar la redimiensión sobre la misma.
+        \end{enumerate}
+    \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
+    \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
+    \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
+\end{enumerate}
 
 
+Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
 
 
+Durante el análisis del modelo generado por PMX, se pudo notar que si bien el modelo generado representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de trabajo, estado e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
+
+Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los SEFFs del modelo como distribuciones de frecuencia.
 
 
 
