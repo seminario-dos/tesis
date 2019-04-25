@@ -378,6 +378,8 @@ Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} 
 
 Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menos tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
 
+Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
+
 \subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
 
 Este, al ser el primer experimento realizado, sentó las bases del marco de trabajo en modelaje y simulación que se aplicaron en otros experimentos. 
@@ -386,18 +388,18 @@ Se utilizó la siguiente configuración para la ejecución del experimento:
 
 \begin{enumerate}
     \item Se utilizó una imagen de tamaño de 19Kb y de 295 pixeles de ancho y alto.
-    \item La función \emph{Image-Handler} se ejercitó con 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
+    \item La función \emph{Image-Handler} se ejercitó con una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
     \begin{enumerate}
         \item En primera instancia, las 100 solicitudes se hicieron usado la versión de la función \emph{Image-Handler} instrumentalizada con Kieker (Sección \ref{sec:image-handler-kieker-pmx}), para obtener una bitácora con las operaciones realizada
         \item Posteriormente, esta bitácora fue procesada por PMX para obtener una instancia de PCM.
     \end{enumerate}
-    \item Una vez obtenido la instancia de PCM, se realizaron otras 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
+    \item Una vez obtenido la instancia de PCM, se ejecutó otra carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
     \begin{enumerate}
         \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar cómo se distribuían las cargas de trabajo en cada componente.
     \end{enumerate}
     \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
-    \item Se ejecutaron 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
-    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para saber si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
+    \item Se ejecutó una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
+    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para determinar si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
 \end{enumerate}
 
 
@@ -411,7 +413,7 @@ Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los com
 \end{figure}
 
 A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
-\begin{enumerate}
+\begin{itemize}
     \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
     \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
     \item \texttt{S3ImageService}: Contiene la lógica de:
@@ -422,16 +424,82 @@ A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 co
     \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
     \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
     \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
-\end{enumerate}
+\end{itemize}
 
 
-Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
+Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
 
 
 Durante el análisis del modelo generado por PMX, se pudo notar que si bien el modelo generado representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de trabajo, estado e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
 
-Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los SEFFs del modelo como distribuciones de frecuencia.
+Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
 
+
+\begin{tikzpicture}
+\begin{axis}[
+    width=15cm, height=10cm,
+    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+    xlabel={Temperature [\textcelsius]},
+    ylabel={Solubility [g per 100 g water]},
+    xmin=0, xmax=7.4,
+    ymin=0, ymax=1.1,
+    extra y ticks = {0.9,0.95},
+    legend pos=north west,
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+
+\coordinate (a) at (axis cs:0.88, 0.95);
+\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+
+\coordinate (b) at (axis cs:0.72, 0.90);
+\draw[red, dashed, thick](b -| current plot begin) -- (b);
+\draw[red, dashed, thick](b |- current plot begin) -- (b);
+ 
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[
+    width=15cm, height=10cm,
+    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+    xlabel={Temperature [\textcelsius]},
+    ylabel={Solubility [g per 100 g water]},
+    xmin=0, xmax=2,
+    ymin=0, ymax=1.1,
+%    xtick={0,20,40,60,80,100},
+%    ytick={0,20,40,60,80,100,120},
+%    extra x ticks = {0.72,0.88},
+    extra x ticks = {0.72,0.88},
+    extra x tick style={
+        xtick align=outside,
+        tick style={thick,black,},
+        xticklabel style={
+			font=\tiny,
+		}
+    },
+    extra y ticks = {0.9,0.95},
+    legend pos=north west,
+%    ymajorgrids=true,
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+
+\coordinate (a) at (axis cs:0.88, 0.95);
+\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+
+\coordinate (b) at (axis cs:0.72, 0.90);
+\draw[red, dashed, thick](b -| current plot begin) -- (b);
+\draw[red, dashed, thick](b |- current plot begin) -- (b);
+ 
+\end{axis}
+\end{tikzpicture}
 
 
 
