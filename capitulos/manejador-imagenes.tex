@@ -90,7 +90,7 @@ Existen soluciones disponibles que se pueden estudiar para implementar un maneja
 
 A pesar que Amazon recomienda el uso de \emph{serverless-image-handler} sobre \emph{serverless-image-resizing}, ambas soluciones siguen un patrón sumamente similar en su codificación e instalación. 
 
-Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redimensionamiento en imágenes, es la \emph{Course\_LambdaResizer}, una función lambda usada como referencia en el curso \emph{``Serverless API on AWS for Java developers''} ofrecido en el sitio Web Udemy\footnote{\url{https://www.udemy.com/serverless-api-aws-lambda-for-java-developers}}. Está función está escrita en lenguaje Java y utiliza la biblioteca \emph{imgscalr}\footnote{\url{https://github.com/rkalla/imgscalr}} para redimensionar imágenes.
+Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redimensionamiento en imágenes, es la \emph{Course\_LambdaResizer}, una función lambda usada como referencia en el curso \emph{``Serverless API on AWS for Java developers''} ofrecido en el sitio Web Udemy\footnote{\url{https://www.udemy.com/serverless-api-aws-lambda-for-java-developers}}. Esta función está escrita en lenguaje Java y utiliza la biblioteca \emph{imgscalr}\footnote{\url{https://github.com/rkalla/imgscalr}} para redimensionar imágenes.
 
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
@@ -98,10 +98,10 @@ Para este estudio, se implementó una función escrita en lenguaje Java. Esto mo
 La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
-    \item Procesar la solicitud de redimiensionamiento (la entrada) que viende dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
+    \item Procesar la solicitud de redimiensionamiento (la entrada) que viene dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
     \begin{itemize}
         \item El nombre de la imagen original que reside en el servicio Amazon S3.
-        \item Los parámetros de altura y ancho a los que se desea redimensional la imagen original.
+        \item Los parámetros de altura y ancho a los que se desea redimensionar la imagen original.
     \end{itemize}
     \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicar la operación de redimiensionamiento sobre la misma de acuerdo a los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
     \item Tomar la imagen redimensionada, codificarla en \texttt{Base64} y escribir el resultado en el flujo(\emph{stream}) de salida de la función Lambda.
@@ -405,12 +405,15 @@ Se utilizó la siguiente configuración para la ejecución del experimento:
 
 Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los componentes mostrados en la figura \ref{fig:image-handler-pcm-model}. En PCM a este diagrama se le conoce como diagrama de repositorio.
 
+\begin{landscape}
 \begin{figure}[h]
+  \vspace*{-3cm}  
   \centering
-  \includegraphics[width=17cm]{image-handler-small-img-extracted-repository-diagram.png}
+  \includegraphics[width=20cm]{image-handler-extracted-repository-diagram.png}
   \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
   \label{fig:image-handler-pcm-model}
 \end{figure}
+\end{landscape}
 
 A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
 \begin{itemize}
@@ -435,71 +438,190 @@ Durante el análisis del modelo generado por PMX, se pudo notar que si bien el m
 Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
 
 
+\hspace{-3cm}
 \begin{tikzpicture}
 \begin{axis}[
-    width=15cm, height=10cm,
-    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
-    xlabel={Temperature [\textcelsius]},
-    ylabel={Solubility [g per 100 g water]},
-    xmin=0, xmax=7.4,
-    ymin=0, ymax=1.1,
+    width=18cm, height=15cm,
+    title={\textbf{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas }},
+    xlabel={Segundos},
+    ylabel={Probabilidad acumulada]},
+    xmin=0, xmax=12,
+    ymin=0, ymax=1.25,
     extra y ticks = {0.9,0.95},
-    legend pos=north west,
+    extra x ticks = {1.6, 10.135},
+    extra x tick style={tick label style={font=\footnotesize}},    
+    legend pos=north east,
     grid=major,
     grid style=dashed,
 ]
 
-\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+\addplot[mark=none,orange,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
 
-\coordinate (a) at (axis cs:0.88, 0.95);
-\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+\coordinate (a) at (axis cs:1.6, 0.95);
+%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
 \draw[blue, dashed, thick](a |- current plot begin) -- (a);
 
-\coordinate (b) at (axis cs:0.72, 0.90);
-\draw[red, dashed, thick](b -| current plot begin) -- (b);
-\draw[red, dashed, thick](b |- current plot begin) -- (b);
+\coordinate (b) at (axis cs:8.0, 0.95);
+%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+\draw[green, dashed, thick](b |- current plot begin) -- (b);
+
+\coordinate (b) at (axis cs:10.135, 0.95);
+%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+\draw[orange, dashed, thick](b |- current plot begin) -- (b);
+ 
+\legend{Hasta 500Kb, Hasta 1Mb, Mayor a 1Mb} 
  
 \end{axis}
 \end{tikzpicture}
 
+
+\hspace{-3cm}
 \begin{tikzpicture}
-\begin{axis}[
-    width=15cm, height=10cm,
-    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
-    xlabel={Temperature [\textcelsius]},
-    ylabel={Solubility [g per 100 g water]},
-    xmin=0, xmax=2,
-    ymin=0, ymax=1.1,
-%    xtick={0,20,40,60,80,100},
-%    ytick={0,20,40,60,80,100,120},
+	\begin{axis}[
+	width=19cm, height=15cm, xmin=0, ymin=0,
+	xmax=1010, ymax=4500,
+	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
+	xlabel={Número de ejecución de solicitud de redimensionamiento},
+	ylabel={Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	extra y ticks={400,600},
+	extra y tick labels={PP, PIM},
+   extra y tick style={%
+     color=green,
+    },	
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-data-hasta-500kb.csv};
+	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+	\end{axis}
+\end{tikzpicture}
+
+\hspace{-2cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=18cm, height=15cm, xmin=0, ymin=0,
+	xmax=1010, 
+	ymax=9500,
+	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+	xlabel={Número de ejecución de solicitud de redimensionamiento},
+	ylabel={Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+%	extra y ticks={400,600},
+%	extra y tick labels={PP, PIM},
+%   extra y tick style={%
+%     color=green,
+%    },	
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-data-hasta-1mb.csv};
+	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+	\end{axis}
+\end{tikzpicture}
+
+
+\hspace{-3cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=19cm, height=15cm, xmin=0, ymin=0,
+	xmax=1010, 
+	ymax=14500,
+	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $\geq 1Mb$}},
+	xlabel={Número de ejecución de solicitud de redimensionamiento},
+	ylabel={Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-data-mas-de-1mb.csv};
+	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+	\end{axis}
+\end{tikzpicture}
+
+
+
+
+
+%\begin{tikzpicture}
+%\begin{axis}[
+%    width=15cm, height=10cm,
+%    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+%    xlabel={Temperature [\textcelsius]},
+%    ylabel={Solubility [g per 100 g water]},
+%    xmin=0, xmax=7.4,
+%    ymin=0, ymax=1.1,
+%    extra y ticks = {0.9,0.95},
+%    legend pos=north west,
+%    grid=major,
+%    grid style=dashed,
+%]
+%
+%\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+%
+%\coordinate (a) at (axis cs:0.88, 0.95);
+%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+%
+%\coordinate (b) at (axis cs:0.72, 0.90);
+%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+%\draw[red, dashed, thick](b |- current plot begin) -- (b);
+% 
+%\end{axis}
+%\end{tikzpicture}
+
+%\begin{tikzpicture}
+%\begin{axis}[
+%    width=15cm, height=10cm,
+%    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
+%    xlabel={Temperature [\textcelsius]},
+%    ylabel={Solubility [g per 100 g water]},
+%    xmin=0, xmax=2,
+%    ymin=0, ymax=1.1,
+%%    xtick={0,20,40,60,80,100},
+%%    ytick={0,20,40,60,80,100,120},f
+%%    extra x ticks = {0.72,0.88},
 %    extra x ticks = {0.72,0.88},
-    extra x ticks = {0.72,0.88},
-    extra x tick style={
-        xtick align=outside,
-        tick style={thick,black,},
-        xticklabel style={
-			font=\tiny,
-		}
-    },
-    extra y ticks = {0.9,0.95},
-    legend pos=north west,
-%    ymajorgrids=true,
-    grid=major,
-    grid style=dashed,
-]
-
-\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
-
-\coordinate (a) at (axis cs:0.88, 0.95);
-\draw[blue, dashed, thick](a -| current plot begin) -- (a);
-\draw[blue, dashed, thick](a |- current plot begin) -- (a);
-
-\coordinate (b) at (axis cs:0.72, 0.90);
-\draw[red, dashed, thick](b -| current plot begin) -- (b);
-\draw[red, dashed, thick](b |- current plot begin) -- (b);
- 
-\end{axis}
-\end{tikzpicture}
+%    extra x tick style={
+%        xtick align=outside,
+%        tick style={thick,black,},
+%        xticklabel style={
+%			font=\tiny,
+%		}
+%    },
+%    extra y ticks = {0.9,0.95},
+%    legend pos=north west,
+%%    ymajorgrids=true,
+%    grid=major,
+%    grid style=dashed,
+%]
+%
+%\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+%
+%\coordinate (a) at (axis cs:0.88, 0.95);
+%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+%
+%\coordinate (b) at (axis cs:0.72, 0.90);
+%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+%\draw[red, dashed, thick](b |- current plot begin) -- (b);
+% 
+%\end{axis}
+%\end{tikzpicture}
 
 
 
