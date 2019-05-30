@@ -94,7 +94,7 @@ Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redi
 
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
-\subsection{Función Lambda: \emph{Image-Handler}}\label{sec:image-handler}
+\subsection{Función Lambda: \emph{Image-Handler} (IM-Simple)}\label{sec:image-handler}
 La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
@@ -160,7 +160,7 @@ public class ImageHandler implements RequestStreamHandler {
 
 Las funciones Lambda en AWS reciben como entrada un objeto JSON. Este objeto puede contener distintos campos dependiendo del servicio que haya invocado previamente la ejecución de la función Lambda. Debido a que la función \emph{Image-Handler} pretende ser invocada por medio de solicitudes \texttt{HTTP}, esta se configuró para que trabajara en conjunto con el servicio \texttt{API Gateway}. Dentro de este servicio se creó un recurso Web que entrega solicitudes de tipo \texttt{HTTP GET} a la función Lambda para su posterior procesamiento.
 
-En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al \texttt{API Gateway} con el siguiente formato \texttt{https://\{host\}/image/\{image\}?width=\&height=}, se tomarán el nombre de la imagen original que viene en el parámetro \texttt{image} y los parámetros de ancho y alto, \texttt{width} y \texttt{height} respectivamente, y se pasarán como parámetros de entrada a la función Lambda como parte de un objeto JSON. Este objeto JSON contiene otros campos que dan a conocer a la función Lambda información acerca de la solicitud \texttt{HTTP}.
+En términos generales, cada vez que una solicitud \texttt{HTTP GET} ingresa al \texttt{API Gateway} con el siguiente formato:\\ \texttt{https://\{host\}/image/\{image\}?width=\{value\}\&height=\{value\}}\\ se tomarán el nombre de la imagen original que viene en el parámetro \texttt{image} y los parámetros de ancho y alto, \texttt{width} y \texttt{height} respectivamente, y se pasarán como parámetros de entrada a la función Lambda como parte de un objeto JSON. Este objeto JSON contiene otros campos que dan a conocer a la función Lambda información acerca de la solicitud \texttt{HTTP}.
 
 \paragraph{Ejemplo:} para la siguiente solicitud \texttt{HTTP}:
 \begin{verbatim}
@@ -236,29 +236,25 @@ La figura \ref{fig:secuencia-image-handler} muestra las principales interaccione
 
 \subsection{Versiones alternas de \emph{Image-Handler}}
 
-Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. En una version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. De igual forma, la otra versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
+Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. 
 
-\subsubsection{Versión instrumentalizada para Kieker y PMX} \label{sec:image-handler-kieker-pmx}
+En la primer version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. La segunda versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
 
-Uno de los principales objetivos de este trabajo es el de obtener un modelo de rendmiento a partir 
-del código en ejecución de una función en la nube. A pesar que, el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación de un modelo que pueda incluir mayores niveles de detalle en cuanto a la estructura y estimaciones del comportamiento de un software. Además, debido a que se están dando los primeros pasos en el campo del modelado y simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a una herramienta(s) con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y propensa a errores. 
+\subsubsection{Versión instrumentalizada para Kieker y PMX (IM-KP)} \label{sec:image-handler-kieker-pmx}
 
-Kieker es la herramienta seleccionada para el estudiar el comportamiento del rendimiento del sistema a partir de las entradas/rastros que se registran en una bitácora. Creada y mantenida por el grupo de ingeniería de software de la Universidad de Kiel en conjunto con el grupo de sistemas de software de la Universidad de Stuttgart, Kieker se define como una herramienta para monitoreo del rendimiento y análisis dinámico de aplicaciones y se desarolló como parte de las actividades de enseñanza e investigación de ambas universidades. Otras instituciones académicas y de la industria también han realizado contribuciones.
+Uno de los principales objetivos de este trabajo es el de obtener un modelo de rendimiento a partir 
+del código en ejecución de una función en la nube. A pesar que, el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación de un modelo que pueda incluir mayores niveles de detalle en cuanto a la estructura y estimaciones del comportamiento de un software. Además, debido a que se están dando los primeros pasos en el campo del modelado y simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a una herramienta(s) con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y ser propensa a errores. 
 
-Kieker ofrece adaptadores de monitoreo (\emph{monitoring adapters}) escritos en lenguaje Java, aunque también ofrece adaptadores en otros lenguajes. Los dos principales componentes de Kieker son: \texttt{Kieker.Monitoring} y \texttt{Kieker.Analysis}. \texttt{Kieker.Monitoring} es el responsable de la instrumentación del código, recolección de datos y registro(\emph{logging}). El componente \texttt{Kieker.Analysis} es el responsable de leer, analizar y visualizar los datos monitoreados.
+Para lograr esto, se seleccionaron dos herramientas, Kieker y PMX, las cuales en conjunto proporcionan un marco de trabajo por medio del cual se puede obtener mediciones del rendimiento de una aplicación y luego, a partir de estas, extraer un modelo de rendimiento basado en PCM. La selección de estas herramientas y el enfoque de medición y extracción de modelos de rendimiento se seleccionó luego de estudiar el \emph{enfoque de ingeniería de rendimiento declarativo} propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
 
-\emph{Performance Model Extractor} (PMX), es una herramienta que automatiza la extracción de modelos de rendmiento a partir de mediciones. PMX utiliza como entrada las bitácoras basadas en Kieker y es capaz de crear modelos basados en \emph{Palladio Component Model} a partir de estas. Esta es una herramienta creada y mantenida por el grupo de ingeniería de software de la Universidad Würzburg en Alemania.
 
-En conjunto, Kieker y PMX, proporcionan un marco de trabajo por medio del cual se puede obtener mediciones del rendimiento de una aplicación y luego, a partir de estas, extraer un modelo de rendimiento basado en PCM. La selección de estas herramientas y el enfoque de medición y extracciòn de modelos de rendimiento se seleccionó luego de estudiar el \emph{enfoque de ingeniería de rendimiento declarativo} propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
+%Kieker se utiliza para el estudiar el comportamiento del rendimiento del sistema a partir de las entradas/rastros que se registran en una bitácora. Creada y mantenida por el grupo de ingeniería de software de la Universidad de Kiel en conjunto con el grupo de sistemas de software de la Universidad de Stuttgart, Kieker se define como una herramienta para monitoreo del rendimiento y análisis dinámico de aplicaciones y se desarolló como parte de las actividades de enseñanza e investigación de ambas universidades. Otras instituciones académicas y de la industria también han realizado contribuciones.
 
-\paragraph{Estrategia de extracción de modelo de rendmiento para \emph{Image-Handler}} Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, estrategias tradicionales en donde se crean bitácoras en la misma computadora que ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o mediante \emph{Secure Socket Channel}(\texttt{SSH}) deben ser replanteadas. Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora que se tenga control. 
+Kieker se utiliza para el estudiar el comportamiento del rendimiento del sistema a partir de las entradas/rastros que se registran en una bitácora. Kieker ofrece adaptadores de monitoreo (\emph{monitoring adapters}) escritos en lenguaje Java (también ofrece adaptadores en otros lenguajes). Los dos principales componentes de Kieker son: \texttt{Kieker.Monitoring} y \texttt{Kieker.Analysis}. \texttt{Kieker.Monitoring} es el responsable de la instrumentación del código, recolección de datos y registro(\emph{logging}). El componente \texttt{Kieker.Analysis} es el responsable de leer, analizar y visualizar los datos monitoreados.
 
-Para lograr esto, se instrumentalizó el código fuente para que:
-\begin{enumerate}
-    \item Generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales contienen información acerca del rendimiento de una invocación sobre alguna parte del código, y luego estos objetos se publican a una cola de mensajería para su posterior tratamiento. En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos  \texttt{OperationExecutionRecord}.
-    \item En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS).
-    \item Una vez que arriban los mensajes a la cola JMS, otra aplicación, un consumidor de mensajes, procesa los mensajes de la cola y los va almacenando en una bitácora.
-\end{enumerate}
+En esta versión de \emph{Image-Handler} se modificó el código original para generar registros del rendimiento de la ejecución de la función utilizando las bibliotecas proporcionadas por Kieker, utilizando como referencia lo especificado en el manual de usuario de Kieker\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales son los que contienen la información acerca del rendimiento de una invocación sobre alguna parte del código.  En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos\\ \texttt{OperationExecutionRecord}.
+
+Adicionalmente se configuró la biblioteca para que publique los objetos\\ \texttt{OperationExecutionRecord} a modo eventos a una cola de mensajería \emph{Java Message Service} (JMS), en lugar de una bitácora local.
 
 \begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con Kieker}, label={lst:image-handler-kieker}]
 public class ImageHandlerKieker implements RequestStreamHandler {
@@ -291,43 +287,28 @@ public class ImageHandlerKieker implements RequestStreamHandler {
 }    
 \end{lstlisting}
 
-% generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS). Una vez que arriban los mensajes a la cola JMS, otra aplicación empieza a consumir los mensajes y los va almacenando en una bitácora. 
 
-La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+\emph{Performance Model Extractor} (PMX), es una herramienta que automatiza la extracción de modelos de rendmiento a partir de mediciones. PMX utiliza como entrada las bitácoras basadas en Kieker y es capaz de crear modelos basados en \emph{Palladio Component Model} a partir de estas. 
 
-Una vez que la función Lambda haya sido ejercitada y se obtenga una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espero que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
+%Esta es una herramienta creada y mantenida por el grupo de ingeniería de software de la Universidad Würzburg en Alemania.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=17cm]{image-handler-kieker}
-  \caption{Publicando mediciones del rendimiento de la función Lambda.}
-  \label{fig:image-handler-kieker}
-\end{figure}
+%En conjunto, Kieker y PMX, proporcionan un marco de trabajo por medio del cual se puede obtener mediciones del rendimiento de una aplicación y luego, a partir de estas, extraer un modelo de rendimiento basado en PCM. La selección de estas herramientas y el enfoque de medición y extracción de modelos de rendimiento se seleccionó luego de estudiar el \emph{enfoque de ingeniería de rendimiento declarativo} propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
+%
+%Esta versión de \emph{Image-Handler} fue la que se utilizó para obtener un modelo de rendimiento en \emph{Palladio Component Model} a partir de la bitácora basada en Kieker que se generó luego de múltiples invocaciones a la función Lambda. El proceso de extracción se detalla en la Sección \ref{sec:estrategia-de-extraccion-de-modelo}.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=17cm]{image-handler-pmx}
-  \caption{Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX.}
-  \label{fig:image-handler-pmx}
-\end{figure}
+Los aspectos relacionados con la estrategia de cómo se obtuvo un modelo de rendimiento a partir de las bitácoras de Kieker y PMX se dan a conocer en la Sección \ref{sec:estrategia-de-extraccion-de-modelo}.
 
-\subsubsection{Versión instrumentalizada para AWS X-Ray}\label{sec:image-handler-xray}
-Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software. 
-
-Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker iba a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban en la ejecución de la función Lambda y sin esos datos se podía llegar a generar un modelo poco preciso.
-
-Por esta razón se empezaron a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS XRay ayuda a los desarrolladores a analizar y depurar aplicaciones en producción distribuidas, tal y como lo son las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando para identificar y resolver problemas de rendimiento y errores en general.
-
-AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y meta datos para analizar el comportamiento o identificar problemas.
-
-\paragraph{Estrategia de instrumentación de \emph{Image-Handler} para la obtención de métricas de rendimiento con AWS X-Ray} Se siguió un enfoque similar al de la Sección \ref{sec:image-handler-kieker-pmx} pero en lugar de utilizar la biblioteca de Kieker, se utilizó la biblioteca (\emph{Software Development Kit, SDK}) para crear las trazas y \emph{subsegmentos} de trazas, que son vistas más específicas del comportamiento de la aplicación. Con el uso AWS X-Ray se busca: 
+\subsubsection{Versión instrumentalizada para AWS X-Ray (IM-XRay)}
+La principal motivación detrás de esta nueva versión de \emph{Image-Handler} es la de contar con datos del rendimiento de la función Lambda que no pudieron llegar a ser estimados durante el proceso de extracción del modelo utilizando PMX. En la Sección \ref{sec:estrategia-de-extraccion-de-modelo} se brindan los detalles de lo observado durante el proceso de extracción del modelo con PMX y en dónde encajan los resultados arrojados por esta nueva versión en el modelo.
+ 
+Para esta versión, Se siguió un enfoque similar al de la Sección \ref{sec:image-handler-kieker-pmx} pero en lugar de utilizar la biblioteca de Kieker, se utilizó la biblioteca AWS SDK (\emph{Software Development Kit, SDK}) para crear las trazas y \emph{subsegmentos} de trazas, que son vistas más específicas del comportamiento de la aplicación. Con el uso AWS X-Ray se busca: 
 \begin{enumerate}
     \item Obtener datos específicos del rendimiento de la función.
     \item Averiguar si las nuevas mediciones logran brindar información acerca de la infraestructura AWS Lambda y su impacto en la ejecución de \emph{Image-Handler}.
     \item Exportar los datos de rendimiento a algún formato conocido para su manipulación.
 \end{enumerate}
 
-Se modificó la función \emph{Image-Handler} para que puede generar trazas de AWS Ray en los mismos puntos en el código en los que se agregó la instrumentalización para Kieker. Un extracto de este código se muestra en el listado \ref{lst:image-handler-xray}. Cada invocación a las operaciones de procesamiento de la entrada, redimensionamiento y entrega de la respuesta se realizan utilizando el método \texttt{AWSRay.createSubsegment}.
+Se modificó la función \emph{Image-Handler} para que puede generar trazas de AWS X-Ray en los mismos puntos en el código en los que se agregó la instrumentalización para Kieker. Un extracto de este código se muestra en el listado \ref{lst:image-handler-xray}. Cada invocación a las operaciones de procesamiento de la entrada, redimensionamiento y entrega de la respuesta se realizan utilizando el método \texttt{AWSRay.createSubsegment}.
 
 \begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con AWS X-Ray}, label={lst:image-handler-xray}]
 public class ImageHandlerXRay implements RequestStreamHandler {
@@ -370,6 +351,90 @@ public class ImageHandlerXRay implements RequestStreamHandler {
 
 En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que es el recolecta estas trazas y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloces de los subsegmentos que componen la traza.
 
+
+\section{Estrategia de extracción de modelo de rendmiento para \emph{Image-Handler}} \label{sec:estrategia-de-extraccion-de-modelo}
+ 
+Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y, sobre los cuales no se tiene ningún control, estrategias tradicionales en donde se crean bitácoras en la misma computadora en donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}) deben ser replanteadas. Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo en el cual se tenga control para acceder a los resultados y manipularlos.
+
+Para lograr extraer un modelo PCM a partir de las bitácoras de Kieker, se llevaron a cabo las siguientes actividades:
+\begin{enumerate}
+    \item Creación de la versión Image-PK (Sección \ref{sec:image-handler-kieker-pmx}): Versión de \emph{Image-Handler} instrumentalizar el código fuente con las bibliotecas de Kieker para generar bitácoras del rendimiento de la función.    
+%    de acuerdo con su manual de usuario\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales contienen información acerca del rendimiento de una invocación sobre alguna parte del código, y luego estos objetos se publican a una cola de mensajería para su posterior tratamiento. En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos  \texttt{OperationExecutionRecord}.
+    \item Provisionar una nueva máquina virtual en AWS la cual se va a:
+    \begin{itemize}
+        \item Ejecutar una cola JMS.
+        \item Ejecutar una aplicación consumidora de mensajes de la cola JMS.
+        \item Almacenar la bitácora de registros de rendimiento de la función Lambda.
+    \end{itemize}
+
+
+    \item Configurar la biblioteca de Kieker para señalar que la publicación de los registros de rendimiento de la función se hagan a través de la cola JMS en la máquina virtual del punto \#2.
+    \item Creación de una aplicación consumidora de mensajes para que una vez que arriben los mensajes a la cola JMS, esta procese los mensajes de la cola y los almacene en una bitácora.
+\end{enumerate}
+
+%\begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con Kieker}, label={lst:image-handler-kieker}]
+%public class ImageHandlerKieker implements RequestStreamHandler {
+%    private static final IMonitoringController MONITORING_CONTROLLER;
+%    static {
+%        MONITORING_CONTROLLER = MonitoringController.getInstance();
+%    }
+%    .
+%    .
+%    .
+%    
+%    @Override
+%    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+%
+%        final long tin = MONITORING_CONTROLLER.getTimeSource().getTime();
+%        handleRequestInternal(inputStream, outputStream, context);
+%        final long tout = MONITORING_CONTROLLER.getTimeSource().getTime();
+%        final OperationExecutionRecord e = new OperationExecutionRecord("public void "+ this.getClass().getName()+".handleRequest(InputStream, OutputStream, Context)",
+%                OperationExecutionRecord.NO_SESSION_ID,
+%                OperationExecutionRecord.NO_TRACE_ID,
+%                tin, tout,
+%                InetAddress.getLocalHost().getHostName(),
+%                0,
+%                0);
+%        MONITORING_CONTROLLER.newMonitoringRecord(e);
+%    }
+%    .
+%    .
+%    .
+%}    
+%\end{lstlisting}
+
+% generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS). Una vez que arriban los mensajes a la cola JMS, otra aplicación empieza a consumir los mensajes y los va almacenando en una bitácora. 
+
+La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+
+Una vez que la función Lambda se ejercitó y se haya obtenido una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espera que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-kieker}
+  \caption{Publicando mediciones del rendimiento de la función Lambda.}
+  \label{fig:image-handler-kieker}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{image-handler-pmx}
+  \caption{Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX.}
+  \label{fig:image-handler-pmx}
+\end{figure}
+
+\subsubsection{Versión instrumentalizada para AWS X-Ray}\label{sec:image-handler-xray}
+Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software en escenarios reales. 
+
+Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker iba a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
+
+Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS XRay ayuda a los desarrolladores a analizar y depurar aplicaciones en producción distribuidas, tal y como lo son las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando para identificar y resolver problemas de rendimiento y errores en general.
+
+AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y meta datos para analizar el comportamiento o identificar problemas.
+
+
+
+
 \section{Diseño Experimental}
 En esta sección se detallan los experimentos realizados para validar si el modelo y la simulaciones sobre el mismo, logran dar caracterizaciones relevantes del comportamiento de la función \emph{Image Handler} en distintos escenarios. 
 
@@ -395,7 +460,7 @@ Se utilizó la siguiente configuración para la ejecución del experimento:
     \end{enumerate}
     \item Una vez obtenido la instancia de PCM, se ejecutó otra carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
     \begin{enumerate}
-        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar cómo se distribuían las cargas de trabajo en cada componente.
+        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar la distribución de las cargas de trabajo en cada componente.
     \end{enumerate}
     \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
     \item Se ejecutó una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
@@ -446,11 +511,13 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
     xlabel={Segundos},
     ylabel={Probabilidad acumulada]},
     xmin=0, xmax=12,
-    ymin=0, ymax=1.25,
+    ymin=0, ymax=1.05,
     extra y ticks = {0.9,0.95},
     extra x ticks = {1.6, 10.135},
     extra x tick style={tick label style={font=\footnotesize}},    
-    legend pos=north east,
+%    legend pos=north east,
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
     grid=major,
     grid style=dashed,
 ]
@@ -471,12 +538,90 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 %\draw[red, dashed, thick](b -| current plot begin) -- (b);
 \draw[orange, dashed, thick](b |- current plot begin) -- (b);
  
-\legend{Hasta 500Kb, Hasta 1Mb, Mayor a 1Mb} 
+\legend{Hasta 500Kb, De 500Kb a 1Mb, Mayor a 1Mb} 
  
 \end{axis}
 \end{tikzpicture}
 
 
+%\hspace{-3cm}
+%\begin{tikzpicture}
+%	\begin{axis}[
+%	width=19cm, height=15cm, xmin=0, ymin=0,
+%	xmax=1010, ymax=4500,
+%	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
+%	xlabel={Número de ejecución de solicitud de redimensionamiento},
+%	ylabel={Milisegundos},
+%	grid=major, grid style=dashed, label style={font=\small},
+%	ybar interval,
+%	tick label style={font=\footnotesize}
+%	]			
+%    \addplot+[hist={bins=10}]
+%		table[x, col sep=comma] {datos/xy-data-hasta-500kb.csv};
+%	
+%	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+%	\end{axis}
+%\end{tikzpicture}
+
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en las simulaciones de Palladio},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=0, ymin=0, xmax=4000,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-palladio.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en \emph{Image Handler}},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=0, ymin=0, xmax=4020,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[fill=red!70!white,hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-simple.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=15cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $\leq 500Kb$}},
+  ylabel={Cantidad de imágenes},
+  xmin=0, ymin=0, xmax=550,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-a.csv};
+\legend{Tamaño de imágenes (En Kb)}
+\end{axis}
+\end{tikzpicture}
+
+% XY PLOT 1
 \hspace{-3cm}
 \begin{tikzpicture}
 	\begin{axis}[
@@ -496,11 +641,58 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 		a={mark=square*,blue},%
 		b={mark=square*,red},%
 		c={mark=o,draw=black}}]			
+		
+  \addplot[green,sharp plot,update limits=false] 
+	coordinates {(0,500) (500,500) (1000,500)} 
+	node[above] at (axis cs:400,500) {Houses};		
+		
 	\addplot[scatter,only marks,%
 		scatter src=explicit symbolic]%
 	table[meta=label, col sep=comma] {datos/xy-data-hasta-500kb.csv};
+	
+	
 	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
 	\end{axis}
+\end{tikzpicture}
+
+%% --------------------------------------------------
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=0, ymin=0, xmax=9300,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en \emph{Image Handler}},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=0, ymin=0, xmax=8500,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[fill=red!70!white,hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
 \end{tikzpicture}
 
 \hspace{-2cm}
@@ -530,14 +722,73 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 	\end{axis}
 \end{tikzpicture}
 
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=15cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+  ylabel={Cantidad de imágenes},
+  xmin=0, ymin=0, xmin=500, xmax=1024,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}  
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-b.csv};
+\legend{Tamaño de imágenes}
+\end{axis}
+\end{tikzpicture}
 
+%% --------------------------------------------------
+
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=3700, ymin=0, xmax=14000,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+
+\hspace{-2.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en \emph{Image Handler}},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=3900, ymin=0, xmax=10000,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[fill=red!70!white,hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-simple.csv};
+\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+
+
+% XY Plot 3
 \hspace{-3cm}
 \begin{tikzpicture}
 	\begin{axis}[
 	width=19cm, height=15cm, xmin=0, ymin=0,
 	xmax=1010, 
 	ymax=14500,
-	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $\geq 1Mb$}},
+	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
 	xlabel={Número de ejecución de solicitud de redimensionamiento},
 	ylabel={Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
@@ -553,7 +804,60 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 	\end{axis}
 \end{tikzpicture}
 
+\hspace{-3.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=15cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
+  ylabel={Cantidad de imágenes},
+  xmin=0, ymin=0, xmin=1000, xmax=2048,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}  
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
+\legend{Tamaño de imágenes}
+\end{axis}
+\end{tikzpicture}
 
+%% --------------------------------------------------
+
+\hspace{-4cm}
+\begin{table}
+    \centering
+    \begin{tabular}{l|r|r|r}
+        \toprule[1.5pt]
+        \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
+        \midrule
+        Solicitud de redimensionamiento  & Image Handler & Palladio & Diferencia\\
+        \midrule
+        Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
+        Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
+        Varianza & 212206.961 & 216635 & -- \\
+        Mediana & 466.715ms & 680.482ms &. -- \\
+        Coeficiente de variación & 0.987 & 0.683 & -- \\
+        \toprule[1.5pt]
+         \multicolumn{4}{c}{\textbf{Entre 500Kb a 1Mb}} \\
+         \midrule 
+        Tiempo promedio  & 4073.600ms & 4348.029ms & 274.428ms\\
+        Desviación estándar & 1731.974ms & 1844.893ms & 112.919ms\\
+        Varianza & 2999736.844 & 3403633.84 & --\\
+        Mediana & 3658.825ms & 3989.406ms & -- \\
+        Coeficiente de variación & 0.473 & 0.462 & -- \\
+        \toprule[1.5pt]
+         \multicolumn{4}{c}{\textbf{Entre 1Mb y 2Mb}} \\
+         \midrule 
+        Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
+        Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
+        Varianza & 3298410.017 & 3664385 & -- \\
+        Mediana & 8200.875ms & 8310.293ms & -- \\
+        Coeficiente de variación & 0.221 & 0.230 & -- \\                        
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Resumen de datos estadísticos}
+\end{table}
 
 
 
