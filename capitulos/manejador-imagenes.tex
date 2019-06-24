@@ -356,21 +356,48 @@ En la figura \ref{fig:image-handler-xray} se muestran los principales involucrad
  
 Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y, sobre los cuales no se tiene ningún control, estrategias tradicionales en donde se crean bitácoras en la misma computadora en donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}) deben ser replanteadas. Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo en el cual se tenga control para acceder a los resultados y manipularlos.
 
-Para lograr extraer un modelo PCM a partir de las bitácoras de Kieker, se llevaron a cabo las siguientes actividades:
+Para la extracción del modelo PCM a partir de las bitácoras de Kieker, se llevaron a cabo las siguientes actividades:
 \begin{enumerate}
-    \item Creación de la versión Image-PK (Sección \ref{sec:image-handler-kieker-pmx}): Versión de \emph{Image-Handler} instrumentalizar el código fuente con las bibliotecas de Kieker para generar bitácoras del rendimiento de la función.    
+    \item Creación de la versión Image-PK (Sección \ref{sec:image-handler-kieker-pmx}): Versión de \emph{Image-Handler} con las bibliotecas de Kieker para generar bitácoras del rendimiento de la función.    
 %    de acuerdo con su manual de usuario\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales contienen información acerca del rendimiento de una invocación sobre alguna parte del código, y luego estos objetos se publican a una cola de mensajería para su posterior tratamiento. En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos  \texttt{OperationExecutionRecord}.
-    \item Provisionar una nueva máquina virtual en AWS la cual se va a:
+    \item Provisionar una nueva máquina virtual en AWS, en la cual se va a:
     \begin{itemize}
         \item Ejecutar una cola JMS.
         \item Ejecutar una aplicación consumidora de mensajes de la cola JMS.
         \item Almacenar la bitácora de registros de rendimiento de la función Lambda.
     \end{itemize}
 
-
-    \item Configurar la biblioteca de Kieker para señalar que la publicación de los registros de rendimiento de la función se hagan a través de la cola JMS en la máquina virtual del punto \#2.
-    \item Creación de una aplicación consumidora de mensajes para que una vez que arriben los mensajes a la cola JMS, esta procese los mensajes de la cola y los almacene en una bitácora.
+    \item Configurar la biblioteca de Kieker para indicar que la publicación de los registros de rendimiento de la función se hagan a través de la cola JMS en la máquina virtual del punto \#2.
+    \item Creación de una aplicación consumidora de mensajes para que una vez que arriben los mensajes a la cola JMS, esta procese los mensajes de la cola y los almacene en una bitácora en la máquina virtual creada en el punto \#2. La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+    \item Una vez obtenida una bitácora en formato Kieker, esta se usó como entrada para PMX. PMX inspecciona la bitácora, la procesa y retorna un archivo \texttt{.zip} con los archivos correspondientes a una instancia de PCM. Lo anterior se aprecia en la figura \ref{fig:image-handler-pmx}.
 \end{enumerate}
+
+\subsection{Modelo obtenido}
+A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
+\begin{itemize}
+    \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
+    \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
+    \item \texttt{S3ImageService}: Contiene la lógica de:
+        \begin{enumerate}
+            \item Cómo obtener una imagen y
+            \item Cómo aplicar la redimiensión sobre la misma.
+        \end{enumerate}
+    \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
+    \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
+    \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
+\end{itemize}
+
+
+Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simulación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
+
+
+Durante las pruebas realizadas al modelo generado por PMX, se percató que si bien el modelo representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de acciones, estimaciones de rendimiento e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
+
+En principio, las estimaciones incluidas en los SEFFs generados por PMX no lograron ser de utilidad para obtener predicciones representativas de lo observado en las ejecuciones de la función Lambda: mientras que en las invocaciones a \emph{Image-Handler} se entregaban tiempos de respuesta distintos, las simulaciones sobre el modelo entregan siempre un dato fijo. Las estimaciones de rendimiento de los SEFFs se basaban en tiempos de cómputo constantes lo que hacía que el motor de simulaciones generara una predicción del tiempo de respuesta que era el mismo para todos los casos.
+
+%Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
+
+
 
 %\begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con Kieker}, label={lst:image-handler-kieker}]
 %public class ImageHandlerKieker implements RequestStreamHandler {
@@ -405,9 +432,9 @@ Para lograr extraer un modelo PCM a partir de las bitácoras de Kieker, se lleva
 
 % generara registros del rendimiento de la ejecución utilizando las bibliotecas proporcionadas por Kieker, de acuerdo con su manual de usuario\cite{kieker-user-guide}. En lugar de publicar los registros en alguna bitácora local, los registros del rendimiento se publican en una cola \emph{Java Message Service}(JMS). Una vez que arriban los mensajes a la cola JMS, otra aplicación empieza a consumir los mensajes y los va almacenando en una bitácora. 
 
-La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
+%La figura \ref{fig:image-handler-kieker} muestra los involucrados en el proceso de publicación de mediciones de rendimiento del código de \emph{Image-Handler} hacia una bitácora externa.
 
-Una vez que la función Lambda se ejercitó y se haya obtenido una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espera que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
+%Una vez que la función Lambda se ejercitó y se haya obtenido una bitácora de Kieker, se toma esta bitácora como entrada para PMX, con el fin de obtener una instancia de PCM. Esto se aprecia en la figura \ref{fig:image-handler-pmx}. Se espera que, al utilizarse datos de mediciones directas del rendimiento de la función Lambda, PMX pueda generar una instacia de PCM que sea confiable y de la que se puedan obtener simulaciones que representativas del comportamiento de la función Lambda.
 
 \begin{figure}[h]
   \centering
@@ -423,52 +450,268 @@ Una vez que la función Lambda se ejercitó y se haya obtenido una bitácora de 
   \label{fig:image-handler-pmx}
 \end{figure}
 
-\subsubsection{Versión instrumentalizada para AWS X-Ray}\label{sec:image-handler-xray}
+\subsubsection{Aporte de la versión IM-XRay a las simulaciones}\label{sec:image-handler-xray}
 Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software en escenarios reales. 
 
-Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker iba a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
+Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker podría llegar a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
 
 Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS XRay ayuda a los desarrolladores a analizar y depurar aplicaciones en producción distribuidas, tal y como lo son las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando para identificar y resolver problemas de rendimiento y errores en general.
 
-AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y meta datos para analizar el comportamiento o identificar problemas.
+AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y metadatos para analizar el comportamiento o identificar problemas.
 
 
+Las trazas recolectadas en AWS X-Ray fueron de gran utilidad para refinar las estimaciones de rendimiento que cada uno de los componentes identificados realizaba. En el experimento \#1, en la Sección \ref{sec:experimento-1}, se tomaron los datos de rendimiento de cada componente y se realizaron sobre los mismos análisis de frencuencias con el fin de conocer cómo se distribuían estos datos con respecto a sus probabilidades. \textbf{Revisar párrafo con ITZ}. Las probabilidades fueron introducidas en los \emph{SEFFs} de cada componente para la ejecución de simulaciones.   
 
 
 \section{Diseño Experimental}
-En esta sección se detallan los experimentos realizados para validar si el modelo y la simulaciones sobre el mismo, logran dar caracterizaciones relevantes del comportamiento de la función \emph{Image Handler} en distintos escenarios. 
+En esta sección se detallan los experimentos realizados para:
+\begin{itemize}
+    \item Validar si el modelo y la simulaciones sobre el mismo, logran caracterizar el comportamiento de la función \emph{Image Handler} en distintos escenarios. 
+    \item Estudiar el comportamiento de la función Lambda cuando es invocada con cargas de trabajo y
+    \item Comparar los resultados de las invocaciones de la función Lambda con los de la herramienta SAM CLI.
+\end{itemize}
 
-\subsection{Utilizando \emph{Image-Handler} para redimensionar imágenes de distintos tamaños}
-Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se probó la función Lambda con dos imágines: una de tamaño pequeño ($\sim$100Kb) y otra de tamaño grande ($\sim$5Mb). El objetivo es comprobar cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
+\subsection{Utilizando \emph{Image-Handler} para redimensionar imágenes de distintos tamaños} \label{sec:experimento-1}
+%Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se probó la función Lambda con dos imágines: una de tamaño pequeño ($\sim$100Kb) y otra de tamaño grande ($\sim$5Mb). El objetivo es comprobar cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
+
+Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se realizaron invocaciones a la función Lambda con tres grupos de imágenes:
+\begin{enumerate}
+    \item Imágenes de tamaño menor o igual a 500Kb.
+    \item Imágenes de tamaño mayor a 500Kb y menor a 1Mb.
+    \item Imágenes de tamaño mayor a 1Mb y menor a 2Mb.
+\end{enumerate}
+En este experimento, el objetivo es comprobar por medio de mediciones directas y de simulaciones en un modelo, cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
 
 Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menos tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
 
 Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
 
-\subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
+\subsubsection{Invocaciones con imágenes menores a 500Kb}
+Para la realización de este experimento se contó con la siguiente configuración base:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor a 500Kb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch
+\end{itemize}
 
-Este, al ser el primer experimento realizado, sentó las bases del marco de trabajo en modelaje y simulación que se aplicaron en otros experimentos. 
+Configuración para la obtención de datos de rendimiento
 
-Se utilizó la siguiente configuración para la ejecución del experimento:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} Las funciones Lambda IM-KP y IM-XRay
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor a 500Kb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-PK y IM-XRay.
+    \item \emph{Herramientas de medición:} Kieker, PMX y Amazon X-Ray
+\end{itemize}
 
-\begin{enumerate}
-    \item Se utilizó una imagen de tamaño de 19Kb y de 295 pixeles de ancho y alto.
-    \item La función \emph{Image-Handler} se ejercitó con una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
-    \begin{enumerate}
-        \item En primera instancia, las 100 solicitudes se hicieron usado la versión de la función \emph{Image-Handler} instrumentalizada con Kieker (Sección \ref{sec:image-handler-kieker-pmx}), para obtener una bitácora con las operaciones realizada
-        \item Posteriormente, esta bitácora fue procesada por PMX para obtener una instancia de PCM.
-    \end{enumerate}
-    \item Una vez obtenido la instancia de PCM, se ejecutó otra carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
-    \begin{enumerate}
-        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar la distribución de las cargas de trabajo en cada componente.
-    \end{enumerate}
-    \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
-    \item Se ejecutó una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
-    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para determinar si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
-\end{enumerate}
+Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño menor a 500Kb del servicio \emph{Lorem Picsum}\footnote{\url{https://picsum.photos}}. Se creó un \emph{script} en \texttt{Bash} para acceder a la interfaz de programación (API) proporcionada por \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño era menor a los 500Kb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple, IM-KP y IM-XRay.
 
+%\hspace{-3.0cm}
+\begin{figure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=17cm, height=15cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $\leq 500Kb$}},
+  ylabel={Cantidad de imágenes},
+  x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+  xlabel={Tamaño de las imágenes (En $Kb$)},
+  xmin=0, ymin=0, xmax=550,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=30,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-a.csv};
+%\legend{Tamaño de imágenes (En Kb)}
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución del tamaño de imágenes de tamaño $\leq 500Kb$}
+\label{fig:distribucion-tamanno-imagenes-hasta-500kb}
+\end{figure}
 
-Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los componentes mostrados en la figura \ref{fig:image-handler-pcm-model}. En PCM a este diagrama se le conoce como diagrama de repositorio.
+\paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
+Se creó un \emph{script} en \texttt{Bash} para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño menor a 500Kb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura (\emph{thumbnails}) \textbf{AGREGAR APARTADO SOBRE LA ELECCION LOS THUMBNAILS}.
+
+\begin{figure}[h]
+\hspace{-2.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de\\ redimensionamiento de imágenes de tamaño $\leq 500Kb$ en IM-Simple},
+  ylabel={Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
+  xlabel={Tiempos de respuesta (En $ms$)},
+  xmin=0, ymin=0, xmax=4020,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=30,anchor=east}
+  ],
+	\addplot+[fill=red!70!white,hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-simple.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en IM-Simple}
+\label{fig:distribucion-solicitudes-imagenes-hasta-500kb}
+\end{figure}
+
+En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb} se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las imágenes de tamaño menor a 500Kb. Con excepción de la primera invocación, la cual tuvo una duración de 4 segundos, más del 97,5\% de las invocaciones no superó los 1,6 segundos.
+
+\paragraph{Mediciones para obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-PK y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
+
+En primera instancia se ejecutaron 1000 invocaciones a IM-PK para generar una bitácora de Kieker y a partir de la misma extraer un modelo de rendimiento PCM usando PMX. Tal y como se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Fue por esta razón que, para contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las  métricas de rendimiento, se introdujo IM-XRay.
+
+Al igual que en caso anterior, se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
+\begin{itemize}
+    \item Generación de 1000 mediciones.
+    \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
+\end{itemize}
+
+\begin{figure}[h]
+\hspace{-2.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=19cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en las simulaciones de Palladio},
+  ylabel={Solicitudes de redimensionamiento},
+  xmin=0, ymin=0, xmax=4000,
+  ybar interval,
+  xtick=data,
+  x label style={at={(axis description cs:0.5,-0.2)},anchor=north},
+  xlabel={Tiempos de respuesta (En $ms$)},  
+  xticklabel interval boundaries,
+  x tick label style={rotate=30,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-palladio.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en las simulaciones de \emph{Palladio Workbench}}
+\label{fig:distribucion-simulacion-imagenes-hasta-500kb}
+\end{figure}
+
+En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-500kb}, se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las simulaciones de \emph{Palladio Workbench} para imágenes de tamaño $\leq 500Kb$. En los resultados de las simulaciones, el 95\% de las invocaciones no superó los 1,6 segundos procesar la solicitud de redimensionamiento.
+
+En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo al que se le simularon 1000 invocaciones. En la figura \ref{fig:comparacion-imsimple-palladio-500kb} se comparan los tiempos de respuesta obtenidos en IM-Simple y los de las simulaciones, y, en el Cuadro \ref{table:datos-estadisticos-hasta-500kb}, un resumen de los datos estadísticos de los tiempos de respuesta en ambos sujetos de prueba.
+
+\begin{figure}[h]
+\hspace{-3cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=19cm, height=15cm, xmin=0, ymin=0,
+	xmax=1010, ymax=4500,
+	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
+	xlabel={Número de ejecución de solicitud de redimensionamiento},
+	ylabel={Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+%	extra y ticks={400,600},
+%	extra y tick labels={PP, PIM},
+   extra y tick style={%
+     color=green,
+    },	
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]					
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-data-hasta-500kb.csv};
+	
+	\legend{Simulaciones de Palladio, Solicitudes a IM-Simple}
+	\end{axis}
+\end{tikzpicture}
+\caption{IM-Simple \emph{vs} simulaciones en PCM: 1000 solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$.}
+\label{fig:comparacion-imsimple-palladio-500kb}
+\end{figure}
+
+\hspace{-4cm}
+\begin{table}
+    \centering
+    \begin{tabular}{l|r|r|r}
+        \toprule[1.5pt]
+        \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
+        \midrule
+        Solicitud de redimensionamiento  & IM-Simple & PCM & Diferencia\\
+        \midrule
+        Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
+        Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
+        Varianza & 212206.961 & 216635 & -- \\
+        Mediana & 466.715ms & 680.482ms &. -- \\
+        Coeficiente de variación & 0.987 & 0.683 & -- \\                       
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Resumen de datos estadísticos}
+    \label{table:datos-estadisticos-hasta-500kb}
+\end{table}
+
+\begin{figure}[h]
+\hspace{-2cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=18cm, height=12cm,
+%    title={Función de probabilidad acumulada en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}},
+    xlabel={Segundos},
+    ylabel={Probabilidad acumulada},
+    xmin=0, xmax=4.2,
+    ymin=0, ymax=1.05,
+    extra y ticks = {0.9,0.95},
+    extra x tick style={tick label style={font=\footnotesize}},    
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+
+\coordinate (a) at (axis cs:1.6, 0.95);
+\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{1000 simulaciones en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
+\label{fig:funcion-acumulada-palladio-500kb}
+\end{figure}
+
+\subsubsection{Análisis de resultados} 
+La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alentador. Las ejecuciones de las simulaciones en PCM presentas tiempos de respuesta muy similares a los que entrega IM-Simple. Hay una diferencia de 209,965ms en el tiempo promedio de los tiempos de respuesta de las simulaciones en PCM con respecto a los tiempos de IM-Simple. Preliminarmente, se valora que, debido a que la versión IM-XRay tiene activado el servicio de monitoreo AWS X-Ray y que fue esta versión de \emph{Image Handler} utilizada como referencia para generar los tiempos procesamiento estimados para cada componente del modelo, instrumentalizar la función Lambda con el servicio de monitoreo AWS X-Ray genera un \emph{overhead} en el procesamiento de la función.
+
+Los resultados muestran desviaciones estándar de 460,569ms y 465.445ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es solamente 4,782ms mayor que la de IM-Simple, lo que sugiere que la agrupación de los datos con respecto a su media aritmética serán muy semejantes.
+
+Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados, apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500 veces, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5kb será más rápido que una de tamaño de 490Kb.
+
+Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $\leq 500Kb$ tome 1,6 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-500kb}). En IM-Simple, se obtuvo un 97,5\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb}). Para este caso en particular y, debido a la variabilidad de los tiempos de respuesta, es que se considera que el uso de esta probabilidad acumulada sea más representativo a la hora de describir el comportamiento de la función Lambda.
+
+%\subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
+%
+%Este, al ser el primer experimento realizado, sentó las bases del marco de trabajo en modelaje y simulación que se aplicaron en otros experimentos. 
+%
+%Se utilizó la siguiente configuración para la ejecución del experimento:
+%
+%\begin{enumerate}
+%    \item Se utilizó una imagen de tamaño de 19Kb y de 295 pixeles de ancho y alto.
+%    \item La función \emph{Image-Handler} se ejercitó con una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
+%    \begin{enumerate}
+%        \item En primera instancia, las 100 solicitudes se hicieron usado la versión de la función \emph{Image-Handler} instrumentalizada con Kieker (Sección \ref{sec:image-handler-kieker-pmx}), para obtener una bitácora con las operaciones realizada
+%        \item Posteriormente, esta bitácora fue procesada por PMX para obtener una instancia de PCM.
+%    \end{enumerate}
+%    \item Una vez obtenido la instancia de PCM, se ejecutó otra carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
+%    \begin{enumerate}
+%        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar la distribución de las cargas de trabajo en cada componente.
+%    \end{enumerate}
+%    \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
+%    \item Se ejecutó una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
+%    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para determinar si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
+%\end{enumerate}
+%
+%
+%Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los componentes mostrados en la figura \ref{fig:image-handler-pcm-model}. En PCM a este diagrama se le conoce como diagrama de repositorio.
 
 \begin{landscape}
 \begin{figure}[h]
@@ -480,27 +723,27 @@ Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los com
 \end{figure}
 \end{landscape}
 
-A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
-\begin{itemize}
-    \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
-    \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
-    \item \texttt{S3ImageService}: Contiene la lógica de:
-        \begin{enumerate}
-            \item Cómo obtener una imagen y
-            \item Cómo aplicar la redimiensión sobre la misma.
-        \end{enumerate}
-    \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
-    \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
-    \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
-\end{itemize}
-
-
-Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
-
-
-Durante el análisis del modelo generado por PMX, se pudo notar que si bien el modelo generado representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de trabajo, estado e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
-
-Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
+%A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
+%\begin{itemize}
+%    \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
+%    \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
+%    \item \texttt{S3ImageService}: Contiene la lógica de:
+%        \begin{enumerate}
+%            \item Cómo obtener una imagen y
+%            \item Cómo aplicar la redimiensión sobre la misma.
+%        \end{enumerate}
+%    \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
+%    \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
+%    \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
+%\end{itemize}
+%
+%
+%Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
+%
+%
+%Durante el análisis del modelo generado por PMX, se pudo notar que si bien el modelo generado representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de trabajo, estado e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
+%
+%Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
 
 
 \hspace{-3cm}
@@ -509,7 +752,7 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
     width=18cm, height=15cm,
     title={\textbf{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas }},
     xlabel={Segundos},
-    ylabel={Probabilidad acumulada]},
+    ylabel={Probabilidad acumulada},
     xmin=0, xmax=12,
     ymin=0, ymax=1.05,
     extra y ticks = {0.9,0.95},
@@ -603,24 +846,6 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 \end{tikzpicture}
 
 
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=15cm,
-  title={\textbf{Distribución del tamaño de imágenes de tamaño $\leq 500Kb$}},
-  ylabel={Cantidad de imágenes},
-  xmin=0, ymin=0, xmax=550,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tamannos-cluster-a.csv};
-\legend{Tamaño de imágenes (En Kb)}
-\end{axis}
-\end{tikzpicture}
-
 % XY PLOT 1
 \hspace{-3cm}
 \begin{tikzpicture}
@@ -631,8 +856,8 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 	xlabel={Número de ejecución de solicitud de redimensionamiento},
 	ylabel={Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
-	extra y ticks={400,600},
-	extra y tick labels={PP, PIM},
+%	extra y ticks={400,600},
+%	extra y tick labels={PP, PIM},
    extra y tick style={%
      color=green,
     },	
@@ -642,9 +867,9 @@ Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se re
 		b={mark=square*,red},%
 		c={mark=o,draw=black}}]			
 		
-  \addplot[green,sharp plot,update limits=false] 
-	coordinates {(0,500) (500,500) (1000,500)} 
-	node[above] at (axis cs:400,500) {Houses};		
+%  \addplot[green,sharp plot,update limits=false] 
+%	coordinates {(0,500) (500,500) (1000,500)} 
+%	node[above] at (axis cs:400,500) {Houses};		
 		
 	\addplot[scatter,only marks,%
 		scatter src=explicit symbolic]%
