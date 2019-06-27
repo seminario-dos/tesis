@@ -492,7 +492,7 @@ Para la realización de este experimento se contó con la siguiente configuraci�
     \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor a 500Kb alojadas en Amazon S3.     
     \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
-    \item \emph{Herramientas de medición:} Amazon Cloudwatch
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
 
 Configuración para la obtención de datos de rendimiento
@@ -501,7 +501,7 @@ Configuración para la obtención de datos de rendimiento
     \item \emph{Sujeto de prueba:} Las funciones Lambda IM-KP y IM-XRay
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor a 500Kb alojadas en Amazon S3.     
     \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-PK y IM-XRay.
-    \item \emph{Herramientas de medición:} Kieker, PMX y Amazon X-Ray
+    \item \emph{Herramientas de medición:} Kieker, PMX y Amazon X-Ray.
 \end{itemize}
 
 Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño menor a 500Kb del servicio \emph{Lorem Picsum}\footnote{\url{https://picsum.photos}}. Se creó un \emph{script} en \texttt{Bash} para acceder a la interfaz de programación (API) proporcionada por \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño era menor a los 500Kb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple, IM-KP y IM-XRay.
@@ -526,7 +526,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 %\legend{Tamaño de imágenes (En Kb)}
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución del tamaño de imágenes de tamaño $\leq 500Kb$}
+\caption{Distribución del tamaño de imágenes $\leq 500Kb$}
 \label{fig:distribucion-tamanno-imagenes-hasta-500kb}
 \end{figure}
 
@@ -595,7 +595,7 @@ Al igual que en caso anterior, se ejecutaron 1000 invocaciones a IM-XRay, y por 
 \label{fig:distribucion-simulacion-imagenes-hasta-500kb}
 \end{figure}
 
-En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-500kb}, se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las simulaciones de \emph{Palladio Workbench} para imágenes de tamaño $\leq 500Kb$. En los resultados de las simulaciones, el 95\% de las invocaciones no superó los 1,6 segundos procesar la solicitud de redimensionamiento.
+En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-500kb}, se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las simulaciones de \emph{Palladio Workbench} para imágenes de tamaño $\leq 500Kb$. En los resultados de las simulaciones, el 95\% de las invocaciones no superó los 1,6 segundos en procesar la solicitud de redimensionamiento.
 
 En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo al que se le simularon 1000 invocaciones. En la figura \ref{fig:comparacion-imsimple-palladio-500kb} se comparan los tiempos de respuesta obtenidos en IM-Simple y los de las simulaciones, y, en el Cuadro \ref{table:datos-estadisticos-hasta-500kb}, un resumen de los datos estadísticos de los tiempos de respuesta en ambos sujetos de prueba.
 
@@ -680,13 +680,182 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 \end{figure}
 
 \subsubsection{Análisis de resultados} 
-La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alentador. Las ejecuciones de las simulaciones en PCM presentas tiempos de respuesta muy similares a los que entrega IM-Simple. Hay una diferencia de 209,965ms en el tiempo promedio de los tiempos de respuesta de las simulaciones en PCM con respecto a los tiempos de IM-Simple. Preliminarmente, se valora que, debido a que la versión IM-XRay tiene activado el servicio de monitoreo AWS X-Ray y que fue esta versión de \emph{Image Handler} utilizada como referencia para generar los tiempos procesamiento estimados para cada componente del modelo, instrumentalizar la función Lambda con el servicio de monitoreo AWS X-Ray genera un \emph{overhead} en el procesamiento de la función.
+La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alentador. Las ejecuciones de las simulaciones en PCM presentan tiempos de respuesta muy similares a los que entrega IM-Simple. Hay una diferencia de 209,965ms en el tiempo promedio de los tiempos de respuesta de las simulaciones en PCM con respecto a los tiempos de IM-Simple. Preliminarmente, se valora que, debido a que la versión IM-XRay tiene activado el servicio de monitoreo AWS X-Ray y que fue esta versión de \emph{Image Handler} utilizada como referencia para generar los tiempos procesamiento estimados para cada componente del modelo, instrumentalizar la función Lambda con el servicio de monitoreo AWS X-Ray genera un \emph{overhead} en el procesamiento de la función. Cabe mencionar que, la estrategia de monitoreo utilizada fue muy agresiva debido a que para obtener nuevas métricas para los componentes del modelo PCM, se habilitaron muchos puntos de monitoreo dentro del código fuente. Además, se configuró la función Lambda para que monitoreara el 100\% de las invocaciones a solicitudes de redimensionamiento. Esta configuración de monitoreo no es la habitual que se utiliza para las funciones Lambda en producción, pero, para el caso de este estudio se necesitó contar con mayores niveles de detalle en las mediciones por lo que fue necesario sacar el mayor provecho al monitoreo. Entre menor sea utilizado las opciones de monitoreo de AWS X-Ray en la función Lambda, menor será el \emph{overhead} experimentado, tal y como pasa con IM-Simple en donde no se experiementa \emph{overhead} por concepto de monitoreo.
 
 Los resultados muestran desviaciones estándar de 460,569ms y 465.445ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es solamente 4,782ms mayor que la de IM-Simple, lo que sugiere que la agrupación de los datos con respecto a su media aritmética serán muy semejantes.
 
 Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados, apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500 veces, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5kb será más rápido que una de tamaño de 490Kb.
 
-Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $\leq 500Kb$ tome 1,6 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-500kb}). En IM-Simple, se obtuvo un 97,5\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb}). Para este caso en particular y, debido a la variabilidad de los tiempos de respuesta, es que se considera que el uso de esta probabilidad acumulada sea más representativo a la hora de describir el comportamiento de la función Lambda.
+Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $\leq 500Kb$ tome 1,6 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-500kb}). En IM-Simple, se obtuvo un 97,5\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb}). Para este caso en particular y, debido a la variabilidad de los tiempos de respuesta, se considera que el uso de esta probabilidad acumulada es más representativa a la hora de describir el comportamiento de la función Lambda.
+
+\subsubsection{Invocaciones con imágenes mayores a 500Kb y menores o igual a 1Mb}
+Para la realización de este experimento se contó con la siguiente configuración base:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
+\end{itemize}
+
+Configuración para la obtención de datos de rendimiento
+
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función IM-XRay
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-XRay.
+    \item \emph{Herramientas de medición:} Amazon X-Ray.
+\end{itemize}
+
+Para este experimento no realizó ningún trabajo sobre la versión IM-PK porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay. 
+
+Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anteior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
+
+\begin{figure}[h]
+\hspace{-2.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=17cm, height=15cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+  ylabel={Cantidad de imágenes},
+  x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
+  xlabel={Tamaño de las imágenes (En $Kb$)},
+  xmin=0, ymin=0, xmin=500, xmax=1024,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}  
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-b.csv};
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución del tamaño de imágenes $500Kb \leq x \leq 1Mb$}
+\label{fig:distribucion-tamanno-imagenes-hasta-1mb}
+\end{figure}
+
+\paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
+Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura.
+
+\begin{figure}[h]
+\hspace{-2.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=18cm, height=8.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en \emph{Image Handler}},
+  ylabel={Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
+  xlabel={Tiempos de respuesta (En $ms$)},
+  xmin=0, ymin=0, xmax=8500,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[fill=red!70!white,hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple}
+\label{fig:distribucion-solicitudes-imagenes-hasta-1mb}
+\end{figure}
+
+
+En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-1mb} se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. Más del 98\% de las invocaciones no superó los 8 segundos.
+
+\paragraph{Mediciones para la calibración de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
+
+Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
+\begin{itemize}
+    \item Generación de 1000 mediciones.
+    \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
+\end{itemize}
+
+\hspace{-3.0cm}
+\begin{figure}
+\begin{tikzpicture}
+\begin{axis}[
+  width=17cm, height=7.3cm,
+  title style={align=center},
+  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio},
+  ylabel={Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.36)},anchor=north},
+  xlabel={Tiempos de respuesta (En $ms$)},  
+  xmin=0, ymin=0, xmax=9300,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=45,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio}
+\label{fig:distribucion-simulacion-imagenes-hasta-1mb}
+\end{figure}
+
+En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-1mb}, se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las simulaciones de \emph{Palladio Workbench} para imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. En los resultados de las simulaciones, el 95\% de las invocaciones no superó los 8 segundos en procesar la solicitud de redimensionamiento.
+
+En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo al que se le simularon 1000 invocaciones. En la figura \ref{fig:comparacion-imsimple-palladio-1mb} se comparan los tiempos de respuesta obtenidos en IM-Simple y los de las simulaciones, y, en el Cuadro \ref{table:datos-estadisticos-hasta-1mb}, un resumen de los datos estadísticos de los tiempos de respuesta en ambos sujetos de prueba.
+
+
+\hspace{-2cm}
+\begin{figure}[h]
+\begin{tikzpicture}
+	\begin{axis}[
+	width=18cm, height=15cm, xmin=0, ymin=0,
+	xmax=1010, 
+	ymax=9500,
+	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+	xlabel={Número de ejecución de solicitud de redimensionamiento},
+	ylabel={Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-data-hasta-1mb.csv};
+	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+	\end{axis}
+\end{tikzpicture}
+\caption{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}
+\label{fig:comparacion-imsimple-palladio-1mb}
+\end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|r|r|r}
+        \toprule[1.5pt]
+         \multicolumn{4}{c}{\textbf{Entre 500Kb a 1Mb}} \\
+        \midrule
+        Solicitud de redimensionamiento  & Image Handler & Palladio & Diferencia\\  
+        \midrule        
+        Tiempo promedio  & 4073.600ms & 4348.029ms & 274.428ms\\
+        Desviación estándar & 1731.974ms & 1844.893ms & 112.919ms\\
+        Varianza & 2999736.844 & 3403633.84 & --\\
+        Mediana & 3658.825ms & 3989.406ms & -- \\
+        Coeficiente de variación & 0.473 & 0.462 & -- \\                      
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Resumen de datos estadísticos}
+    \label{table:datos-estadisticos-hasta-1mb}
+\end{table}
+
+\subsubsection{Análisis de resultados}
+A primera vista, la comparación de los tiempos de respuesta de IM-Simple y las simulaciones en PCM mostradas en la Figura \ref{fig:comparacion-imsimple-palladio-1mb} muestran gran similitud. Hay una diferencia de 274,428ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto a los tiempos de IM-Simple. En este experimento también se intuye que la estrategia de monitoreo de AWS X-Ray es la resposable de agregar este \emph{overhead} en el procesamiento.
+
+Los resultados muestran desviaciones estándar de 1731.974ms y 1844.893ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es 112.919ms mayor que la de IM-Simple. Esto indica que la agrupación de los datos con respecto a su media aritmética es muy similar entre ambas muestras.
+
+Los coeficientes de variación de ambas muestras bajaron con respecto a los obtenidos en el primer experimento, aún así, los valores de 0,473 para IM-Simple y de 0,462 para las simulaciones de PCM se consideran heterogéneos, no muy similares entre si. Esto hace que el tiempo promedio de una solicitud pueda considerarse no tan representativo a la hora de caracterizar el comportamiento de la función Lambda bajo esta carga de trabajo. La variabilidad en los tiempos de respuesta bajó debido a que en los tamaños de las imágenes utilizadas (Figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}) tienen una diferencia de hasta 2 veces: es decir, en este conjunto, la imagen más grande es el doble de grande que la imagen más pequeña.
+
+Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $500Kb \leq x \leq 1Mb$ tome 8 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-1mb}). En IM-Simple, se obtuvo un 98\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-1mb}). Para este caso, como en el experimento anterior, se considera más adecuado el uso de la probabilidad acumulada para describir el comportamiento de la función Lambda.
+
 
 %\subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
 %
