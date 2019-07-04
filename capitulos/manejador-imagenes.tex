@@ -486,6 +486,8 @@ Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento
 
 Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
 
+%%%%%%%%%%%%%%%%%%% 1
+
 \subsubsection{Invocaciones con imágenes menores a 500Kb}
 Para la realización de este experimento se contó con la siguiente configuración base:
 \begin{itemize}
@@ -653,7 +655,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
-    title={\small \textbf{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
     xlabel={\small Segundos},
     ylabel={\small Probabilidad acumulada},
     xmin=0, xmax=4.2,
@@ -682,9 +684,11 @@ La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alen
 
 Los resultados muestran desviaciones estándar de 460,569ms y 465.445ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es solamente 4,782ms mayor que la de IM-Simple, lo que sugiere que la agrupación de los datos con respecto a su media aritmética serán muy semejantes.
 
-Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados, apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500 veces, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5kb será más rápido que una de tamaño de 490Kb.
+Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados, apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500x, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5kb será más rápido que una de tamaño de 490Kb.
 
 Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $\leq 500Kb$ tome 1,6 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-500kb}). En IM-Simple, se obtuvo un 97,5\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb}). Para este caso en particular y, debido a la variabilidad de los tiempos de respuesta, se considera que el uso de esta probabilidad acumulada es más representativa a la hora de describir el comportamiento de la función Lambda.
+
+%%%%%%%%%%%%%%%%%%% 2
 
 \subsubsection{Invocaciones con imágenes mayores a 500Kb y menores o igual a 1Mb}
 Para la realización de este experimento se contó con la siguiente configuración base:
@@ -704,19 +708,19 @@ Configuración para la obtención de datos de rendimiento
     \item \emph{Herramientas de medición:} Amazon X-Ray.
 \end{itemize}
 
-Para este experimento no realizó ningún trabajo sobre la versión IM-PK porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay. 
+Para este experimento no realizó ningún trabajo sobre la versión IM-KP porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay. 
 
-Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anteior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
+Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
 
-\begin{figure}[h]
-\hspace{-2.0cm}
+\begin{figure}
+\hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
-  width=17cm, height=15cm,
+  width=15cm, height=10cm,
   title={\textbf{Distribución del tamaño de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
-  ylabel={Cantidad de imágenes},
-  x label style={at={(axis description cs:0.5,-0.1)},anchor=north},
-  xlabel={Tamaño de las imágenes (En $Kb$)},
+  ylabel={\small Cantidad de imágenes},
+  x label style={at={(axis description cs:0.5,-0.2)},anchor=north},
+  xlabel={\small Tamaño de las imágenes (En $Kb$)},
   xmin=0, ymin=0, xmin=500, xmax=1024,
   ybar interval,
   xtick=data,
@@ -734,25 +738,24 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 \paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
 Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura.
 
-\begin{figure}[h]
-\hspace{-2.0cm}
+\begin{figure}
+\hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
-  width=18cm, height=8.3cm,
+  width=16cm, height=8cm,
   title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en \emph{Image Handler}},
-  ylabel={Solicitudes de redimensionamiento},
+  title={\textbf{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento}\\\textbf{de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple}},
+  ylabel={\small Solicitudes de redimensionamiento},
   x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
-  xlabel={Tiempos de respuesta (En $ms$)},
+  xlabel={\small Tiempos de respuesta (En $ms$)},
   xmin=0, ymin=0, xmax=8500,
   ybar interval,
   xtick=data,
   xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
+  x tick label style={rotate=30,anchor=east}
   ],
 	\addplot+[fill=red!70!white,hist={bins=10}]
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
-%\legend{Tiempos de respuesta (En $ms$)}
 \end{axis}
 \end{tikzpicture}
 \caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple}
@@ -770,25 +773,24 @@ Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \t
     \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
 \end{itemize}
 
-\hspace{-3.0cm}
+\hspace{-2.0cm}
 \begin{figure}
 \begin{tikzpicture}
 \begin{axis}[
-  width=17cm, height=7.3cm,
+  width=16cm, height=8cm,
   title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio},
-  ylabel={Solicitudes de redimensionamiento},
-  x label style={at={(axis description cs:0.5,-0.36)},anchor=north},
-  xlabel={Tiempos de respuesta (En $ms$)},  
+  title={\textbf{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento}\\\textbf{de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio}},
+  ylabel={\small Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
+  xlabel={\small Tiempos de respuesta (En $ms$)},  
   xmin=0, ymin=0, xmax=9300,
   ybar interval,
   xtick=data,
   xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
+  x tick label style={rotate=30,anchor=east}
   ],
 	\addplot+[hist={bins=10}]
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
-%\legend{Tiempos de respuesta (En $ms$)}
 \end{axis}
 \end{tikzpicture}
 \caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio}
@@ -799,12 +801,11 @@ En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-1mb}, se muestra la
 
 En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo al que se le simularon 1000 invocaciones. En la figura \ref{fig:comparacion-imsimple-palladio-1mb} se comparan los tiempos de respuesta obtenidos en IM-Simple y los de las simulaciones, y, en el Cuadro \ref{table:datos-estadisticos-hasta-1mb}, un resumen de los datos estadísticos de los tiempos de respuesta en ambos sujetos de prueba.
 
-
-\hspace{-2cm}
 \begin{figure}[h]
+\hspace{-1cm}
 \begin{tikzpicture}
 	\begin{axis}[
-	width=18cm, height=15cm, xmin=0, ymin=0,
+	width=16cm, height=12cm, xmin=0, ymin=0,
 	xmax=1010, 
 	ymax=9500,
 	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
@@ -854,14 +855,14 @@ Los coeficientes de variación de ambas muestras bajaron con respecto a los obte
 
 Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $500Kb \leq x \leq 1Mb$ tome 8 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-1mb}). En IM-Simple, se obtuvo un 98\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-1mb}). Para este caso, como en el experimento anterior, se considera más adecuado el uso de la probabilidad acumulada para describir el comportamiento de la función Lambda.
 
-\hspace{-3cm}
-\begin{figure}[h]
+\begin{figure}
+\hspace{-2cm}
 \begin{tikzpicture}
 \begin{axis}[
-    width=18cm, height=12cm,
-    title={\textbf{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}},
-    xlabel={Segundos},
-    ylabel={Probabilidad acumulada},
+    width=16cm, height=12cm,
+    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM}},
+    xlabel={\small Segundos},
+    ylabel={\small Probabilidad acumulada},
     xmin=0, xmax=10,
     ymin=0, ymax=1.05,
     extra y ticks = {0.9,0.95},
@@ -871,321 +872,76 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
     grid=major,
     grid style=dashed,
 ]
-\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
 \coordinate (b) at (axis cs:8.0, 0.95);
-\draw[green, dashed, thick](b |- current plot begin) -- (b);
+\draw[blue, dashed, thick](b |- current plot begin) -- (b);
 \end{axis}
 \end{tikzpicture}
-\caption{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}
+\caption{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM}
 \label{fig:funcion-acumulada-palladio-1mb}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%% 3
 
-%\subsubsection{Ejercitando la función Lambda con solicitudes de redimensionamiento en una imagen pequeña($\sim$100Kb)}
-%
-%Este, al ser el primer experimento realizado, sentó las bases del marco de trabajo en modelaje y simulación que se aplicaron en otros experimentos. 
-%
-%Se utilizó la siguiente configuración para la ejecución del experimento:
-%
-%\begin{enumerate}
-%    \item Se utilizó una imagen de tamaño de 19Kb y de 295 pixeles de ancho y alto.
-%    \item La función \emph{Image-Handler} se ejercitó con una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento para convertir la imagen del punto \#1 a una imagen de 50 pixeles de ancho y 60 de alto.
-%    \begin{enumerate}
-%        \item En primera instancia, las 100 solicitudes se hicieron usado la versión de la función \emph{Image-Handler} instrumentalizada con Kieker (Sección \ref{sec:image-handler-kieker-pmx}), para obtener una bitácora con las operaciones realizada
-%        \item Posteriormente, esta bitácora fue procesada por PMX para obtener una instancia de PCM.
-%    \end{enumerate}
-%    \item Una vez obtenido la instancia de PCM, se ejecutó otra carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento pero esta vez utilizando la versión de la función \emph{Image-Handler} instrumentalizada con AWS X-Ray (Sección \ref{sec:image-handler-xray}). Esto para obtener métricas más detalladas sobre el uso de la función y así para afinar las estimaciones de los componentes que conforman la instancia de PCM.
-%    \begin{enumerate}
-%        \item Una vez obtenidas estas mediciones, se realizaron análisis de frecuencias para determinar la distribución de las cargas de trabajo en cada componente.
-%    \end{enumerate}
-%    \item Se realizaron simulaciones sobre la instancia de PCM utilizando el motor de simulaciones provisto por \emph{Palladio Workbench}. 
-%    \item Se ejecutó una carga de trabajo \emph{cerrada} de 100 solicitudes de redimensionamiento utilizando la versión original de la función \emph{Image-Handler}.
-%    \item Por último se compararon y analizaron los resultados del punto \#4 y \#5 para determinar si, de acuerdo a lo obtenido, las simulaciones hechas sobre el modelo lograban caracterizar el rendimiento de la función Lambda.
-%\end{enumerate}
-%
-%
-%Como resultado del trabajo llevado a cabo en el punto \#2, se obtuvieron los componentes mostrados en la figura \ref{fig:image-handler-pcm-model}. En PCM a este diagrama se le conoce como diagrama de repositorio.
+\subsubsection{Invocaciones con imágenes mayores a 1Mb y menores o igual a 2Mb}
+Para la realización de este experimento se contó con la siguiente configuración base:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
+\end{itemize}
 
-\begin{landscape}
-\begin{figure}[h]
-  \vspace*{-3cm}  
-  \centering
-  \includegraphics[width=20cm]{image-handler-extracted-repository-diagram.png}
-  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
-  \label{fig:image-handler-pcm-model}
+Configuración para la obtención de datos de rendimiento
+
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función IM-XRay
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 1Mb y menor o igual a 2mb alojadas en Amazon S3.     
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-XRay.
+    \item \emph{Herramientas de medición:} Amazon X-Ray.
+\end{itemize}
+
+Al igual que en el experimento de la sección anterior, no se realizó ningún trabajo sobre la versión IM-KP debido a que no era necesario la extracción de un nuevo modelo, sino de, calibrar el modelo existente con los resultados de las mediciones para generar nuevas simulaciones.
+
+Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 1Mb y menor o igual a 2Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a 1Mb y menor o igual a 2Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-2mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
+
+\begin{figure}
+\hspace{-1.0cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=15cm, height=10cm,
+  title={\textbf{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
+  ylabel={\small Cantidad de imágenes},
+  x label style={at={(axis description cs:0.5,-0.2)},anchor=north},
+  xlabel={\small Tamaño de las imágenes (En $Kb$)},  
+  xmin=0, ymin=0, xmin=1000, xmax=2048,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=30,anchor=east}  
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\label{fig:distribucion-tamanno-imagenes-hasta-2mb}
 \end{figure}
-\end{landscape}
 
-%A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
-%\begin{itemize}
-%    \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
-%    \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
-%    \item \texttt{S3ImageService}: Contiene la lógica de:
-%        \begin{enumerate}
-%            \item Cómo obtener una imagen y
-%            \item Cómo aplicar la redimiensión sobre la misma.
-%        \end{enumerate}
-%    \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
-%    \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
-%    \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
-%\end{itemize}
-%
-%
-%Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simlación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
-%
-%
-%Durante el análisis del modelo generado por PMX, se pudo notar que si bien el modelo generado representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de trabajo, estado e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
-%
-%Los SEFFs generados por PMX no eran lo suficientemente detallados y cuando se realizaban simulaciones, los resultados no lograban acercarse a la observado en la función Lambda. Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
+\paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
+Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura.
 
 
-\hspace{-3cm}
+\begin{figure}
+\hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
-    width=18cm, height=15cm,
-    title={\textbf{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas }},
-    xlabel={Segundos},
-    ylabel={Probabilidad acumulada},
-    xmin=0, xmax=12,
-    ymin=0, ymax=1.05,
-    extra y ticks = {0.9,0.95},
-    extra x ticks = {1.6, 10.135},
-    extra x tick style={tick label style={font=\footnotesize}},    
-%    legend pos=north east,
-	legend style={at={(0.5,-0.15)},
-		anchor=north,legend columns=-1},
-    grid=major,
-    grid style=dashed,
-]
-
-\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
-\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
-\addplot[mark=none,orange,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
-
-\coordinate (a) at (axis cs:1.6, 0.95);
-%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
-\draw[blue, dashed, thick](a |- current plot begin) -- (a);
-
-\coordinate (b) at (axis cs:8.0, 0.95);
-%\draw[red, dashed, thick](b -| current plot begin) -- (b);
-\draw[green, dashed, thick](b |- current plot begin) -- (b);
-
-\coordinate (b) at (axis cs:10.135, 0.95);
-%\draw[red, dashed, thick](b -| current plot begin) -- (b);
-\draw[orange, dashed, thick](b |- current plot begin) -- (b);
- 
-\legend{Hasta 500Kb, De 500Kb a 1Mb, Mayor a 1Mb} 
- 
-\end{axis}
-\end{tikzpicture}
-
-
-%\hspace{-3cm}
-%\begin{tikzpicture}
-%	\begin{axis}[
-%	width=19cm, height=15cm, xmin=0, ymin=0,
-%	xmax=1010, ymax=4500,
-%	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
-%	xlabel={Número de ejecución de solicitud de redimensionamiento},
-%	ylabel={Milisegundos},
-%	grid=major, grid style=dashed, label style={font=\small},
-%	ybar interval,
-%	tick label style={font=\footnotesize}
-%	]			
-%    \addplot+[hist={bins=10}]
-%		table[x, col sep=comma] {datos/xy-data-hasta-500kb.csv};
-%	
-%	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
-%	\end{axis}
-%\end{tikzpicture}
-
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
+  width=16cm, height=8cm,
   title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en las simulaciones de Palladio},
-  ylabel={Solicitudes de redimensionamiento},
-  xmin=0, ymin=0, xmax=4000,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-palladio.csv};
-\legend{Tiempos de respuesta (En $ms$)}
-\end{axis}
-\end{tikzpicture}
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
-  title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en \emph{Image Handler}},
-  ylabel={Solicitudes de redimensionamiento},
-  xmin=0, ymin=0, xmax=4020,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[fill=red!70!white,hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-simple.csv};
-\legend{Tiempos de respuesta (En $ms$)}
-\end{axis}
-\end{tikzpicture}
-
-
-% XY PLOT 1
-\hspace{-3cm}
-\begin{tikzpicture}
-	\begin{axis}[
-	width=19cm, height=15cm, xmin=0, ymin=0,
-	xmax=1010, ymax=4500,
-	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
-	xlabel={Número de ejecución de solicitud de redimensionamiento},
-	ylabel={Milisegundos},
-	grid=major, grid style=dashed, label style={font=\small},
-%	extra y ticks={400,600},
-%	extra y tick labels={PP, PIM},
-   extra y tick style={%
-     color=green,
-    },	
-	tick label style={font=\footnotesize},
-	scatter/classes={%
-		a={mark=square*,blue},%
-		b={mark=square*,red},%
-		c={mark=o,draw=black}}]			
-		
-%  \addplot[green,sharp plot,update limits=false] 
-%	coordinates {(0,500) (500,500) (1000,500)} 
-%	node[above] at (axis cs:400,500) {Houses};		
-		
-	\addplot[scatter,only marks,%
-		scatter src=explicit symbolic]%
-	table[meta=label, col sep=comma] {datos/xy-data-hasta-500kb.csv};
-	
-	
-	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
-	\end{axis}
-\end{tikzpicture}
-
-%% --------------------------------------------------
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
-  title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio},
-  ylabel={Solicitudes de redimensionamiento},
-  xmin=0, ymin=0, xmax=9300,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
-\legend{Tiempos de respuesta (En $ms$)}
-\end{axis}
-\end{tikzpicture}
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
-  title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en \emph{Image Handler}},
-  ylabel={Solicitudes de redimensionamiento},
-  xmin=0, ymin=0, xmax=8500,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[fill=red!70!white,hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
-\legend{Tiempos de respuesta (En $ms$)}
-\end{axis}
-\end{tikzpicture}
-
-\hspace{-2cm}
-\begin{tikzpicture}
-	\begin{axis}[
-	width=18cm, height=15cm, xmin=0, ymin=0,
-	xmax=1010, 
-	ymax=9500,
-	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
-	xlabel={Número de ejecución de solicitud de redimensionamiento},
-	ylabel={Milisegundos},
-	grid=major, grid style=dashed, label style={font=\small},
-%	extra y ticks={400,600},
-%	extra y tick labels={PP, PIM},
-%   extra y tick style={%
-%     color=green,
-%    },	
-	tick label style={font=\footnotesize},
-	scatter/classes={%
-		a={mark=square*,blue},%
-		b={mark=square*,red},%
-		c={mark=o,draw=black}}]			
-	\addplot[scatter,only marks,%
-		scatter src=explicit symbolic]%
-	table[meta=label, col sep=comma] {datos/xy-data-hasta-1mb.csv};
-	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
-	\end{axis}
-\end{tikzpicture}
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=15cm,
-  title={\textbf{Distribución del tamaño de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
-  ylabel={Cantidad de imágenes},
-  xmin=0, ymin=0, xmin=500, xmax=1024,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}  
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tamannos-cluster-b.csv};
-\legend{Tamaño de imágenes}
-\end{axis}
-\end{tikzpicture}
-
-%% --------------------------------------------------
-
-\hspace{-3.0cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
-  title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio},
-  ylabel={Solicitudes de redimensionamiento},
-  xmin=3700, ymin=0, xmax=14000,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
-\legend{Tiempos de respuesta (En $ms$)}
-\end{axis}
-\end{tikzpicture}
-
-\hspace{-2.5cm}
-\begin{tikzpicture}
-\begin{axis}[
-  width=19cm, height=8.3cm,
-  title style={align=center},
-  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en \emph{Image Handler}},
-  ylabel={Solicitudes de redimensionamiento},
+  title={\textbf{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento}\\\textbf{de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple}},
+  ylabel={\small Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
+  xlabel={\small Tamaño de las imágenes (En $Kb$)},   
   xmin=3900, ymin=0, xmax=10000,
   ybar interval,
   xtick=data,
@@ -1194,21 +950,61 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
   ],
 	\addplot+[fill=red!70!white,hist={bins=10}]
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-simple.csv};
-\legend{Tiempos de respuesta (En $ms$)}
 \end{axis}
 \end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple}
+\label{fig:distribucion-solicitudes-imagenes-hasta-2mb}
+\end{figure}
 
 
-% XY Plot 3
-\hspace{-3cm}
+En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-2mb} se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. Más del 92,5\% de las invocaciones no superó los 9,7 segundos.
+
+\paragraph{Mediciones para la calibración de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
+
+Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
+\begin{itemize}
+    \item Generación de 1000 mediciones.
+    \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
+\end{itemize}
+
+\begin{figure}
+\hspace{-1cm}
+\begin{tikzpicture}
+\begin{axis}[
+  width=16cm, height=8cm,
+  title style={align=center},
+  title={\textbf{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento}\\\textbf{de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio}},
+  ylabel={\small Solicitudes de redimensionamiento},
+  x label style={at={(axis description cs:0.5,-0.21)},anchor=north},
+  xlabel={\small Tamaño de las imágenes (En $Kb$)}, 
+  xmin=3700, ymin=0, xmax=14000,
+  ybar interval,
+  xtick=data,
+  xticklabel interval boundaries,
+  x tick label style={rotate=30,anchor=east}
+  ],
+	\addplot+[hist={bins=10}]
+		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
+\end{axis}
+\end{tikzpicture}
+\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio}
+\label{fig:distribucion-simulacion-imagenes-hasta-2mb}
+\end{figure}
+
+En la figura \ref{fig:distribucion-simulacion-imagenes-hasta-2mb}, se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las simulaciones de \emph{Palladio Workbench} para imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. En los resultados de las simulaciones, el 95\% de las invocaciones no superó los 8 segundos en procesar la solicitud de redimensionamiento.
+
+En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo al que se le simularon 1000 invocaciones. En la figura \ref{fig:comparacion-imsimple-palladio-2mb} se comparan los tiempos de respuesta obtenidos en IM-Simple y los de las simulaciones, y, en el Cuadro \ref{table:datos-estadisticos-hasta-2mb}, un resumen de los datos estadísticos de los tiempos de respuesta en ambos sujetos de prueba.
+
+\begin{figure}
+\hspace{-1cm}
 \begin{tikzpicture}
 	\begin{axis}[
-	width=19cm, height=15cm, xmin=0, ymin=0,
+	width=16cm, height=12cm, xmin=0, ymin=0,
 	xmax=1010, 
 	ymax=14500,
 	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
-	xlabel={Número de ejecución de solicitud de redimensionamiento},
-	ylabel={Milisegundos},
+	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
+	ylabel={\small Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
 	tick label style={font=\footnotesize},
 	scatter/classes={%
@@ -1221,26 +1017,125 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
 	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
 	\end{axis}
 \end{tikzpicture}
+\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\label{fig:comparacion-imsimple-palladio-2mb}
+\end{figure}
 
-\hspace{-3.0cm}
+\begin{table}
+    \centering
+    \begin{tabular}{l|r|r|r}
+        \toprule[1.5pt]
+         \multicolumn{4}{c}{\textbf{Entre 1Mb y 2Mb}} \\
+         \midrule 
+        Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
+        Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
+        Varianza & 3298410.017 & 3664385 & -- \\
+        Mediana & 8200.875ms & 8310.293ms & -- \\
+        Coeficiente de variación & 0.221 & 0.230 & -- \\                        
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Resumen de datos estadísticos}
+    \label{table:datos-estadisticos-hasta-2mb}
+\end{table}
+
+\subsubsection{Análisis de resultados}
+Bajo esta carga de trabajo es en donde se pueden apreciar mayor similitud en los tiempos de procesamiento de las solicitudes de redimensionamiento entregados por IM-Simple y las simulaciones de PCM. Hay una diferencia de 257,773ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto a los tiempos de IM-Simple. Al igual que en los experimientos anteriores, se considera que la influencia del servicio de monitoreo de AWS X-Ray es el responsable de causar la diferencia en el tiempo de procesamiento.
+
+Los resultados muestran desviaciones estándar de 1816,152ms y 1914.258ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es 98.106ms mayor que la de IM-Simple. Esto indica que la agrupación de los datos con respecto a su media aritmética es muy similar entre ambas muestras.
+
+Los coeficientes de variación de son de 0,221 para IM-Simple y de 0,230 para las simulaciones de PCM. Estos resultados son los menores de los tres experimentos y sugieren que los datos son homogéneos entre sí y que, para esta muestra se pueda considerar representativo utilizar el tiempo promedio de respuesta para caracterizar el comportamiento de la función Lambda.
+
+ se consideran heterogéneos, no muy similares entre si. Esto hace que el tiempo promedio de una solicitud pueda considerarse no tan representativo a la hora de caracterizar el comportamiento de la función Lambda bajo esta carga de trabajo. La variabilidad en los tiempos de respuesta bajó debido a que en los tamaños de las imágenes utilizadas (Figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}) tienen una diferencia de hasta 2 veces: es decir, en este conjunto, la imagen más grande es el doble de grande que la imagen más pequeña.
+
+Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $1Mb \leq x \leq 2Mb$ tome 10,14 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-2mb}). En IM-Simple, al 100\% de las solicitudes le tomó 10 segundos o menos (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-2mb}). Para este caso, el uso del tiempo promedio de procesamiento de solicitud de redimensionamiento podría ser utilizado para caracterizar el comporamiento de la función Lambda, pero, como en los dos casos anteriores, se considera que, el uso de la probabilidad acumulada sea más adecuado para brindar una predicciones más acertada.
+
+%
+\begin{figure}
+\hspace{-2cm}
 \begin{tikzpicture}
 \begin{axis}[
-  width=19cm, height=15cm,
-  title={\textbf{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
-  ylabel={Cantidad de imágenes},
-  xmin=0, ymin=0, xmin=1000, xmax=2048,
-  ybar interval,
-  xtick=data,
-  xticklabel interval boundaries,
-  x tick label style={rotate=45,anchor=east}  
-  ],
-	\addplot+[hist={bins=10}]
-		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
-\legend{Tamaño de imágenes}
+    width=16cm, height=12cm,
+    title={\textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM}},
+    xlabel={Segundos},
+    ylabel={Probabilidad acumulada},
+    xmin=0, xmax=12,
+    ymin=0, ymax=1.05,
+    extra y ticks = {0.9,0.95},
+    extra x tick style={tick label style={font=\footnotesize}},    
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
+
+\coordinate (b) at (axis cs:10.135, 0.95);
+\draw[blue, dashed, thick](b |- current plot begin) -- (b);
+
 \end{axis}
 \end{tikzpicture}
+\caption{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM}
+\label{fig:funcion-acumulada-palladio-2mb}
+\end{figure}
 
-%% --------------------------------------------------
+\subsubsection{Resultados Generales}
+En los tres experimentos propuestos, los resultados provenientes de las simulaciones lograron caracterizar en gran medida lo observado en IM-Simple. En \ref{fig-probabilidad-acumulada-3-casos} se muestran las 3000 simulaciones realizadas (1000 por cada caso). Las líneas punteadas verticales señalan en dónde se concentran el 95\% de los datos de las simulaciones: 1,6 segundos para las imágnes menores a 500Kb, 8 segundos para las imágenes de entre 500Kb a 1Mb y 10,14 segundos para las imágenes entre 1Mb y 2Mb. 
+
+\begin{figure}
+\hspace{-2cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\textbf{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}},
+    xlabel={\small Segundos},
+    ylabel={\small Probabilidad acumulada},
+    xmin=0, xmax=12,
+    ymin=0, ymax=1.05,
+    extra y ticks = {0.9,0.95},
+%    extra x ticks = {1.6, 10.135},
+    extra x tick style={tick label style={font=\footnotesize}},    
+%    legend pos=north east,
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+\addplot[mark=none,red,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
+
+\coordinate (a) at (axis cs:1.6, 0.95);
+\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+
+\coordinate (b) at (axis cs:8.0, 0.95);
+\draw[green, dashed, thick](b |- current plot begin) -- (b);
+
+\coordinate (b) at (axis cs:10.135, 0.95);
+\draw[red, dashed, thick](b |- current plot begin) -- (b);
+ 
+\legend{\small Hasta 500Kb, De 500Kb a 1Mb, De 1Mb a 2Mb} 
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}
+\label{fig-probabilidad-acumulada-3-casos}
+\end{figure}
+
+En el Cuadro \ref{table:resumen-estadistico-general} se muestra un resumen estadístico de los tres experimentos llevados a cabo. En este resumen se evidencia los efectos del monitoreo de Amazon X-Ray en la versión IM-XRay de \emph{Image Handler} en el tiempo promedio de procesamiento de una solicitud de redimensionamiento. Las diferencias entre el tiempo promedio de procesamiento en IM-Simple y IM-XRay fue de 209.965ms, 274.428ms y 257.773 para el experimento \#1, \#2 y \#3 respectivamente. En promedio 247.389ms de diferencia. La desviación estándar de estos tres valores es de 33.463ms y el coeficiente de variación es de 0,13. Estos datos son muy similares entre sí, y esto hace que para el caso de las simulaciones en PCM se pueda argumentar que en promedio se puede esperar diferencia de 247.389ms en el tiempo de respuesta de las simulaciones \emph{versus} los reportados por IM-Simple.
+
+Cabe destacar que, a pesar que la posición acerca de las diferencias observadas entre los tiempos de respuesta de las simulaciones con IM-Simple, se hizo con base en tres valores, estos valores fueron obtenidos a partir de 3000 mediciones bajo tres grupos distintos de imágenes.
+
+Desde el punto de vista de la arquitectura de software, \emph{Image Handler} muestra mejores rendimientos cuando se prueba con imágenes iguales o menores a 500Kb que con aquellas mayores a ese tamaño. Dentro de las mediciones a los componentes de \emph{Image Handler}, el que experimentó una mayor variablidad en los tiempos de procesamiento fue el componente de redimensionamiento. Aunque es el componente más importante dentro de esta arquitectura, es también el cuello de botella. Este es el principal componente a ser modificado en aras de probar diferentes comportamientos de \emph{Image Handler}. 
+
+Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valoras cambios en la biblioteca de redimensionamiento. Aunque puedan existir bibliotecas que logren disminuir en gran medida el redimensionamiento de una imagen, se hace útil también el considerar otras herramientas o estrategias para mejorar los tiempos de respuesta de la función por ejemplo:
+\begin{enumerate}
+    \item Limitar el tamaño de las imágenes a procesar: una vez conocido el rendimiento de la función, se podría en limitar las imágenes a procesar basado en su tamaño, por ejemplo, solamente imágenes menores a 500Kb.
+    \item Utilizar una memoria intermedia de acceso rápido, un \emph{caché}, para guardar copias de imágenes redimensionadas: luego de una primera solicitud de redimensionamiento, se guarda la imagen resultante en un \emph{caché} y luego, entregar esta imagen en subsecuentes solicitudes de redimensionamiento. De esta forma las solicitudes repetitivas no llegarían a ser procesadas por la función Lambda. Esta estrategia se muestra en la Figura \ref{fig:serverless-image-handler-architecture}.
+    \item Preprocesar imágenes de gran tamaño fuera de línea: en el caso en donde se cuente con las imágenes originales de antemano, podría ser muy útil ejecutar procesos fuera de línea para redimensionar estas imágenes a los tamaños requeridos y hacer que \emph{Image Handler} solamente sirva estas imágenes y no aplicar ningún tipo de lógica de redimensionamiento.
+\end{enumerate}
+
 
 \hspace{-4cm}
 \begin{table}
@@ -1249,7 +1144,7 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
         \toprule[1.5pt]
         \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
         \midrule
-        Solicitud de redimensionamiento  & Image Handler & Palladio & Diferencia\\
+        Solicitud de redimensionamiento  & IM-Simple & Palladio & Diferencia\\
         \midrule
         Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
         Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
@@ -1274,80 +1169,450 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption{Resumen de datos estadísticos de los tres experimentos propuestos}
+    \label{table:resumen-estadistico-general}
 \end{table}
 
+\begin{landscape}
+\begin{figure}[h]
+  \vspace*{-3cm}  
+  \centering
+  \includegraphics[width=20cm]{image-handler-extracted-repository-diagram.png}
+  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
+  \label{fig:image-handler-pcm-model}
+\end{figure}
+\end{landscape}
+
+%%%%%%%%%%%%%% Experimento 2
+
+\subsection{Ejecución Secuencial Ininterrumpida de solicitudes de redimensionamiento}
+
+En el experimento de la Sección \ref{sec:experimento-1} se realizaron múltiples solicitudes de redimensionamiento con el fin de extraer y crear un modelo de rendimiento, ejecutar simulaciones sobre este modelo y comparar los resultados con lo observado en una versión de \emph{Image Handler} real.
+
+Una de las principales inquietudes durante la ejecución de funciones en la nube es  de determinar si la velocidad en la que se procesa una solicitud resulta ser baja y muestren una tendencia predecible. Los desarrolladores e implementadores necesitan evaluar esto para afinar el código fuente yla arquitectura para evitar cobros elevados por el uso de la plataforma.
+De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados: uno ``fría'' y una ``caliente''. En el estado frío, la plataforma que soporta la función en la nube debe aprovisionar los recursos necesarios para ejecutar la función. Durante esta fase se pueden experimentar los tiempos de respuesta más prolongados. La fase caliente se da luego de que la plataforma que soporta la función reconoce que la función está siendo invocada constantemente y que, debido a este uso, necesita proporcionarle mayores recursos computacionales para brindar mejores tiempos de respuesta. Se espera que, en una función que se esté invocando constantemente, solamente un porcentaje muy bajo del tiempo se encuentre en estado frío y la mayor parte (mientras continúe siendo invocada) estará en estado caliente.
 
 
+\subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño menor a 500Kb}
+
+pic-14.jpeg (500Kb) 8:40 -> 9:05
+pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
+
+
+\begin{figure}[h]
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    xlabel={\small Invocaciones a IM-Simple},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=0, 
+    xmax=1005,
+    ymin=0, 
+%    ymax=4100,
+    %extra y ticks = {0.9,0.95},
+    extra x tick style={tick label style={font=\footnotesize}},    
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-500kb-simple-2.csv};
+
+\addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-500kb-simple-una-imagen.csv};
+
+%\coordinate (a) at (axis cs:1.6, 0.95);
+%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
+%\label{fig:funcion-acumulada-palladio-500kb}
+\end{figure}
+
+\begin{figure}[h]
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    xlabel={\small Invocaciones a IM-Simple},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=0, 
+    xmax=1005,
+    ymin=0, 
+%    ymax=4100,
+    %extra y ticks = {0.9,0.95},
+    extra x tick style={tick label style={font=\footnotesize}},    
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-1mb-simple-2.csv};
+
+\addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-1mb-simple-una-imagen.csv};
+
+%\coordinate (a) at (axis cs:1.6, 0.95);
+%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
+%\label{fig:funcion-acumulada-palladio-500kb}
+\end{figure}
+
+
+
+\begin{figure}[h]
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    xlabel={\small Invocaciones a IM-Simple},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=0, 
+    xmax=1005,
+    ymin=0, 
+%    ymax=4100,
+    %extra y ticks = {0.9,0.95},
+    extra x tick style={tick label style={font=\footnotesize}},    
+	legend style={at={(0.5,-0.15)},
+		anchor=north,legend columns=-1},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-2.csv};
+
+%\coordinate (a) at (axis cs:1.6, 0.95);
+%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
+%\label{fig:funcion-acumulada-palladio-500kb}
+\end{figure}
+
+
+%\hspace{-3cm}
 %\begin{tikzpicture}
 %\begin{axis}[
-%    width=15cm, height=10cm,
-%    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
-%    xlabel={Temperature [\textcelsius]},
-%    ylabel={Solubility [g per 100 g water]},
-%    xmin=0, xmax=7.4,
-%    ymin=0, ymax=1.1,
+%    width=18cm, height=15cm,
+%    title={\textbf{1000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas }},
+%    xlabel={Segundos},
+%    ylabel={Probabilidad acumulada},
+%    xmin=0, xmax=12,
+%    ymin=0, ymax=1.05,
 %    extra y ticks = {0.9,0.95},
-%    legend pos=north west,
+%    extra x ticks = {1.6, 10.135},
+%    extra x tick style={tick label style={font=\footnotesize}},    
+%%    legend pos=north east,
+%	legend style={at={(0.5,-0.15)},
+%		anchor=north,legend columns=-1},
 %    grid=major,
 %    grid style=dashed,
 %]
 %
-%\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
+%\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+%\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+%\addplot[mark=none,orange,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
 %
-%\coordinate (a) at (axis cs:0.88, 0.95);
-%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
+%\coordinate (a) at (axis cs:1.6, 0.95);
+%%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
 %\draw[blue, dashed, thick](a |- current plot begin) -- (a);
 %
-%\coordinate (b) at (axis cs:0.72, 0.90);
-%\draw[red, dashed, thick](b -| current plot begin) -- (b);
-%\draw[red, dashed, thick](b |- current plot begin) -- (b);
+%\coordinate (b) at (axis cs:8.0, 0.95);
+%%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+%\draw[green, dashed, thick](b |- current plot begin) -- (b);
+%
+%\coordinate (b) at (axis cs:10.135, 0.95);
+%%\draw[red, dashed, thick](b -| current plot begin) -- (b);
+%\draw[orange, dashed, thick](b |- current plot begin) -- (b);
+% 
+%\legend{Hasta 500Kb, De 500Kb a 1Mb, Mayor a 1Mb} 
 % 
 %\end{axis}
 %\end{tikzpicture}
-
+%
+%
+%\hspace{-3.0cm}
 %\begin{tikzpicture}
 %\begin{axis}[
-%    width=15cm, height=10cm,
-%    title={Temperature dependence of CuSO$_4\cdot$5H$_2$O solubility},
-%    xlabel={Temperature [\textcelsius]},
-%    ylabel={Solubility [g per 100 g water]},
-%    xmin=0, xmax=2,
-%    ymin=0, ymax=1.1,
-%%    xtick={0,20,40,60,80,100},
-%%    ytick={0,20,40,60,80,100,120},f
-%%    extra x ticks = {0.72,0.88},
-%    extra x ticks = {0.72,0.88},
-%    extra x tick style={
-%        xtick align=outside,
-%        tick style={thick,black,},
-%        xticklabel style={
-%			font=\tiny,
-%		}
-%    },
-%    extra y ticks = {0.9,0.95},
-%    legend pos=north west,
-%%    ymajorgrids=true,
-%    grid=major,
-%    grid style=dashed,
-%]
-%
-%\addplot[mark=none,blue,smooth] table [x=a, y=b, col sep=comma] {datos/exp1-imagen-pequena-5000-cdf.csv};
-%
-%\coordinate (a) at (axis cs:0.88, 0.95);
-%\draw[blue, dashed, thick](a -| current plot begin) -- (a);
-%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
-%
-%\coordinate (b) at (axis cs:0.72, 0.90);
-%\draw[red, dashed, thick](b -| current plot begin) -- (b);
-%\draw[red, dashed, thick](b |- current plot begin) -- (b);
-% 
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en las simulaciones de Palladio},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=0, ymin=0, xmax=4000,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-palladio.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
 %\end{axis}
 %\end{tikzpicture}
+%
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $\leq 500Kb$ en \emph{Image Handler}},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=0, ymin=0, xmax=4020,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[fill=red!70!white,hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-simple.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+%\end{axis}
+%\end{tikzpicture}
+%
+%
+%% XY PLOT 1
+%\hspace{-3cm}
+%\begin{tikzpicture}
+%	\begin{axis}[
+%	width=19cm, height=15cm, xmin=0, ymin=0,
+%	xmax=1010, ymax=4500,
+%	title={\textbf{1000 Solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$}},
+%	xlabel={Número de ejecución de solicitud de redimensionamiento},
+%	ylabel={Milisegundos},
+%	grid=major, grid style=dashed, label style={font=\small},
+%%	extra y ticks={400,600},
+%%	extra y tick labels={PP, PIM},
+%   extra y tick style={%
+%     color=green,
+%    },	
+%	tick label style={font=\footnotesize},
+%	scatter/classes={%
+%		a={mark=square*,blue},%
+%		b={mark=square*,red},%
+%		c={mark=o,draw=black}}]			
+%		
+%%  \addplot[green,sharp plot,update limits=false] 
+%%	coordinates {(0,500) (500,500) (1000,500)} 
+%%	node[above] at (axis cs:400,500) {Houses};		
+%		
+%	\addplot[scatter,only marks,%
+%		scatter src=explicit symbolic]%
+%	table[meta=label, col sep=comma] {datos/xy-data-hasta-500kb.csv};
+%	
+%	
+%	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+%	\end{axis}
+%\end{tikzpicture}
 
+%% --------------------------------------------------
 
-
-
-
-
-
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=0, ymin=0, xmax=9300,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+%\end{axis}
+%\end{tikzpicture}
+%
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en \emph{Image Handler}},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=0, ymin=0, xmax=8500,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[fill=red!70!white,hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+%\end{axis}
+%\end{tikzpicture}
+%
+%\hspace{-2cm}
+%\begin{tikzpicture}
+%	\begin{axis}[
+%	width=18cm, height=15cm, xmin=0, ymin=0,
+%	xmax=1010, 
+%	ymax=9500,
+%	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+%	xlabel={Número de ejecución de solicitud de redimensionamiento},
+%	ylabel={Milisegundos},
+%	grid=major, grid style=dashed, label style={font=\small},
+%%	extra y ticks={400,600},
+%%	extra y tick labels={PP, PIM},
+%%   extra y tick style={%
+%%     color=green,
+%%    },	
+%	tick label style={font=\footnotesize},
+%	scatter/classes={%
+%		a={mark=square*,blue},%
+%		b={mark=square*,red},%
+%		c={mark=o,draw=black}}]			
+%	\addplot[scatter,only marks,%
+%		scatter src=explicit symbolic]%
+%	table[meta=label, col sep=comma] {datos/xy-data-hasta-1mb.csv};
+%	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+%	\end{axis}
+%\end{tikzpicture}
+%
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=15cm,
+%  title={\textbf{Distribución del tamaño de imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+%  ylabel={Cantidad de imágenes},
+%  xmin=0, ymin=0, xmin=500, xmax=1024,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}  
+%  ],
+%	\addplot+[hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tamannos-cluster-b.csv};
+%\legend{Tamaño de imágenes}
+%\end{axis}
+%\end{tikzpicture}
+%
+%%% --------------------------------------------------
+%
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=3700, ymin=0, xmax=14000,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+%\end{axis}
+%\end{tikzpicture}
+%
+%\hspace{-2.5cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=8.3cm,
+%  title style={align=center},
+%  title={Distribución de los tiempos de respuesta en solicitudes de redimensionamiento\\de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en \emph{Image Handler}},
+%  ylabel={Solicitudes de redimensionamiento},
+%  xmin=3900, ymin=0, xmax=10000,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}
+%  ],
+%	\addplot+[fill=red!70!white,hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-simple.csv};
+%\legend{Tiempos de respuesta (En $ms$)}
+%\end{axis}
+%\end{tikzpicture}
+%
+%
+%% XY Plot 3
+%\hspace{-3cm}
+%\begin{tikzpicture}
+%	\begin{axis}[
+%	width=19cm, height=15cm, xmin=0, ymin=0,
+%	xmax=1010, 
+%	ymax=14500,
+%	title={\textbf{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
+%	xlabel={Número de ejecución de solicitud de redimensionamiento},
+%	ylabel={Milisegundos},
+%	grid=major, grid style=dashed, label style={font=\small},
+%	tick label style={font=\footnotesize},
+%	scatter/classes={%
+%		a={mark=square*,blue},%
+%		b={mark=square*,red},%
+%		c={mark=o,draw=black}}]			
+%	\addplot[scatter,only marks,%
+%		scatter src=explicit symbolic]%
+%	table[meta=label, col sep=comma] {datos/xy-data-mas-de-1mb.csv};
+%	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
+%	\end{axis}
+%\end{tikzpicture}
+%
+%\hspace{-3.0cm}
+%\begin{tikzpicture}
+%\begin{axis}[
+%  width=19cm, height=15cm,
+%  title={\textbf{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
+%  ylabel={Cantidad de imágenes},
+%  xmin=0, ymin=0, xmin=1000, xmax=2048,
+%  ybar interval,
+%  xtick=data,
+%  xticklabel interval boundaries,
+%  x tick label style={rotate=45,anchor=east}  
+%  ],
+%	\addplot+[hist={bins=10}]
+%		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
+%\legend{Tamaño de imágenes}
+%\end{axis}
+%\end{tikzpicture}
+%
+%%% --------------------------------------------------
+%
+%\hspace{-4cm}
+%\begin{table}
+%    \centering
+%    \begin{tabular}{l|r|r|r}
+%        \toprule[1.5pt]
+%        \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
+%        \midrule
+%        Solicitud de redimensionamiento  & Image Handler & Palladio & Diferencia\\
+%        \midrule
+%        Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
+%        Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
+%        Varianza & 212206.961 & 216635 & -- \\
+%        Mediana & 466.715ms & 680.482ms &. -- \\
+%        Coeficiente de variación & 0.987 & 0.683 & -- \\
+%        \toprule[1.5pt]
+%         \multicolumn{4}{c}{\textbf{Entre 500Kb a 1Mb}} \\
+%         \midrule 
+%        Tiempo promedio  & 4073.600ms & 4348.029ms & 274.428ms\\
+%        Desviación estándar & 1731.974ms & 1844.893ms & 112.919ms\\
+%        Varianza & 2999736.844 & 3403633.84 & --\\
+%        Mediana & 3658.825ms & 3989.406ms & -- \\
+%        Coeficiente de variación & 0.473 & 0.462 & -- \\
+%        \toprule[1.5pt]
+%         \multicolumn{4}{c}{\textbf{Entre 1Mb y 2Mb}} \\
+%         \midrule 
+%        Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
+%        Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
+%        Varianza & 3298410.017 & 3664385 & -- \\
+%        Mediana & 8200.875ms & 8310.293ms & -- \\
+%        Coeficiente de variación & 0.221 & 0.230 & -- \\                        
+%        \bottomrule[1.5pt]
+%    \end{tabular}
+%    \caption{Resumen de datos estadísticos}
+%\end{table}
