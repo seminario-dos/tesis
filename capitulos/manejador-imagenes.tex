@@ -1185,7 +1185,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valoras cam
 
 %%%%%%%%%%%%%% Experimento 2
 
-\subsection{Ejecución Secuencial Ininterrumpida de solicitudes de redimensionamiento}
+\subsection{Ejecución Secuencial Ininterrumpida de solicitudes de redimensionamiento}\label{sec:experimento-2}
 
 En el experimento de la Sección \ref{sec:experimento-1} se realizaron múltiples solicitudes de redimensionamiento con el fin de extraer y crear un modelo de rendimiento, ejecutar simulaciones sobre este modelo y comparar los resultados con lo observado en una versión de \emph{Image Handler} real.
 
@@ -1195,16 +1195,32 @@ De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados:
 
 \subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño menor a 500Kb}
 
-pic-14.jpeg (500Kb) 8:40 -> 9:05
-pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
+%pic-14.jpeg (500Kb) 8:40 -> 9:05
+%pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
+%pic-175.jpeg (1Mb - 2Mb) 2:16min
 
+Para la realización de este experimento se contó con la siguiente configuración:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor o igual a 500Kb alojadas en Amazon S3.
+    \item \emph{Carga de trabajo:} 
+    \begin{enumerate}
+        \item 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+        \item 1000 invocaciones secuenciales de redimensionamient de una sola imagen a IM-Simple.
+    \end{enumerate}
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
+\end{itemize}
+
+En la carga de trabajo \#1, utilizando imágenes aleatorias, la ejecución de las 1000 solicitudes de redimensionamiento fueron las mismas utilizadas para el experimento de la Sección \ref{sec:experimento-1}. 
+
+La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 minutos. Para la carga de trabajo \#2, utilizando una sola imagen, las 1000 solicitudes de redimensionamiento tomaron 25 minutos. Se modificó el \emph{script} en \texttt{Bash} del experimento de la Sección \ref{sec:experimento-1} para elegir aleatoriamente una imagen del \emph{cluster} de 1000 y generar 1000 solicitudes secuenciales a partir de esta con dimensiones de ancho y alto estáticas.
 
 \begin{figure}[h]
-\hspace{-1.5cm}
+\hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
-    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
     xmin=0, 
@@ -1212,9 +1228,7 @@ pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
     ymin=0, 
 %    ymax=4100,
     %extra y ticks = {0.9,0.95},
-    extra x tick style={tick label style={font=\footnotesize}},    
-	legend style={at={(0.5,-0.15)},
-		anchor=north,legend columns=-1},
+    extra x tick style={tick label style={font=\footnotesize}},
     grid=major,
     grid style=dashed,
 ]
@@ -1223,31 +1237,47 @@ pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
 
 \addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-500kb-simple-una-imagen.csv};
 
-%\coordinate (a) at (axis cs:1.6, 0.95);
-%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+\legend{\small Imágenes aleatorias, \small Imagen única} 
  
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
-%\label{fig:funcion-acumulada-palladio-500kb}
+\caption{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\label{fig:1000-ejecuciones-secuenciales-500kb}
 \end{figure}
+
+En la figura \ref{fig:1000-ejecuciones-secuenciales-500kb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 40Kb. Los resultados de los tiempos de respuesta muestran una tendencia marcada: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y no se observaron en las subsecuentes invocaciones tiempos de respuesta que llegaran a ser similares al primero. 
+
+
+\subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb}
+
+Para la realización de este experimento se contó con la siguiente configuración:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb alojadas en Amazon S3.
+    \item \emph{Carga de trabajo:} 
+    \begin{enumerate}
+        \item 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+        \item 1000 invocaciones secuenciales de redimensionamient de una sola imagen a IM-Simple.
+    \end{enumerate}
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
+\end{itemize}
+
+En la carga de trabajo \#1, utilizando imágenes aleatorias, la ejecución de las 1000 solicitudes de redimensionamiento fueron las mismas utilizadas para el experimento de la Sección \ref{sec:experimento-1}. 
+
+La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 minutos. Para la carga de trabajo \#2, utilizando una sola imagen, las 1000 solicitudes de redimensionamiento tomaron 2 horas y 30 minutos. Se modificó el \emph{script} en \texttt{Bash} del experimento de la Sección \ref{sec:experimento-1} para elegir aleatoriamente una imagen del \emph{cluster} de 1000 y generar 1000 solicitudes secuenciales a partir de esta con dimensiones de ancho y alto estáticas.
 
 \begin{figure}[h]
 \hspace{-1.5cm}
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
-    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
     xmin=0, 
     xmax=1005,
     ymin=0, 
-%    ymax=4100,
-    %extra y ticks = {0.9,0.95},
-    extra x tick style={tick label style={font=\footnotesize}},    
-	legend style={at={(0.5,-0.15)},
-		anchor=north,legend columns=-1},
+    extra x tick style={tick label style={font=\footnotesize}},
     grid=major,
     grid style=dashed,
 ]
@@ -1255,16 +1285,35 @@ pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-1mb-simple-2.csv};
 
 \addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-hasta-1mb-simple-una-imagen.csv};
-
-%\coordinate (a) at (axis cs:1.6, 0.95);
-%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
  
+\legend{\small Imágenes aleatorias, \small Imagen única} 
+
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
-%\label{fig:funcion-acumulada-palladio-500kb}
+\caption{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\label{fig:1000-ejecuciones-secuenciales-1mb}
 \end{figure}
 
+En la figura \ref{fig:1000-ejecuciones-secuenciales-1mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 750Kb. Los resultados de los tiempos de respuesta muestran una tendencia marcada: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
+
+
+\subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb}
+
+Para la realización de este experimento se contó con la siguiente configuración:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb alojadas en Amazon S3.
+    \item \emph{Carga de trabajo:} 
+    \begin{enumerate}
+        \item 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
+        \item 1000 invocaciones secuenciales de redimensionamiento de una sola imagen a IM-Simple.
+    \end{enumerate}
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch.
+\end{itemize}
+
+En la carga de trabajo \#1, utilizando imágenes aleatorias, la ejecución de las 1000 solicitudes de redimensionamiento fueron las mismas utilizadas para el experimento de la Sección \ref{sec:experimento-1}. 
+
+La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 minutos. Para la carga de trabajo \#2, utilizando una sola imagen, las 1000 solicitudes de redimensionamiento tomaron 2 horas y 16 minutos. Se modificó el \emph{script} en \texttt{Bash} del experimento de la Sección \ref{sec:experimento-1} para elegir aleatoriamente una imagen del \emph{cluster} de 1000 y generar 1000 solicitudes secuenciales a partir de esta con dimensiones de ancho y alto estáticas.
 
 
 \begin{figure}[h]
@@ -1272,7 +1321,7 @@ pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
-    title={\small \textbf{Probabilidad acumulada: solicitudes de redimensionamiento en imágenes $\leq 500Kb$ en PCM}},
+    title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
     xmin=0, 
@@ -1280,23 +1329,43 @@ pic-27.jpeg (500Kb - 1Mb) 10:45 -> 1am
     ymin=0, 
 %    ymax=4100,
     %extra y ticks = {0.9,0.95},
-    extra x tick style={tick label style={font=\footnotesize}},    
-	legend style={at={(0.5,-0.15)},
-		anchor=north,legend columns=-1},
+    extra x tick style={tick label style={font=\footnotesize}},
     grid=major,
     grid style=dashed,
 ]
 
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-2.csv};
 
-%\coordinate (a) at (axis cs:1.6, 0.95);
-%\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+\addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-una-imagen.csv};
+
+\legend{\small Imágenes aleatorias, \small Imagen única} 
  
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
-%\label{fig:funcion-acumulada-palladio-500kb}
+\caption{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\label{fig:1000-ejecuciones-secuenciales-2mb}
 \end{figure}
+
+En la figura \ref{fig:1000-ejecuciones-secuenciales-2mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 1,4Mb. Los resultados de los tiempos de respuesta muestran una tendencia similar a los casos anteriores: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
+
+\subsubsection{Análisis de resultados}
+Luego de las invocaciones de redimensionamiento tanto en imágenes aleatorias como en una sola imagen, se pudo observar que, si bien en las primeras invocaciones se experimenta mayores tiempos de respuesta, los tiempos de respuesta entregados por la función Lambda lograron bajar significativamente y en los casos de las invocaciones de redimiensionamiento en una sola imagen, estos tiempos lograron mantenerse sumamente estables.
+
+Este comportamiento sugiere que en la invocación de una función Lambda en AWS, la plataforma subyacente primero necesita aplicar tareas de aprovisionamiento para poner a disposición la función, y, una vez que esto se realiza, la función paulatinamente pasando a un estado ``caliente'' conforme van arribando las invocaciones de redimensionamiento. Aunque la arquitectura del servicio AWS Lambda no se encuentra disponible públicamente, en árticulos en Internet y en proyectos paralelos como SAM Cli y \emph{AWS Lambda container image converter tool}\footnote{\url{https://github.com/awslabs/aws-lambda-container-image-converter}} se sugiere el uso de contenedores Docker que son provisionados con el código de la función y que se encargan de procesar las invocaciones entrantes. 
+
+\paragraph{Relación con el modelo de rendimiento obtenido} El modelo de rendimiento obtenido y las simulaciones hechas son agnósticos a los estados ``frío'' o ``caliente'' que se muestran en las observaciones. El principal objetivo de los simuladores de PCM es el de obtener múltiples combinaciones de ejecuciones de una arquitectura de software dada, y, a menos que una comportamiento o característica de esta logre ser introducido en el modelo es que su impacto debería de verse reflejado en las simulaciones.
+
+Si bien, en el modelo obtenido no se introdujo esto explícitamente, las mediciones muestran que los tiempos de respuesta más prolongados se corresponden con el momento en que la función estaba en estado ``frío'', por ejemplo, durantes las primeras invocaciones. Si se toma como referencia el primer experimento ejecutado en la Sección \ref{sec:experimento-1}, invocaciones de redimensionamiento en imágenes menores o iguales a 500Kb, en la figura \ref{fig:comparacion-imsimple-palladio-500kb}, la primera medición a IM-Simple dió como resultado 4.1s y las subsecuentes 999 invocaciones bajaron a 1,6 segundos o menos; muchas de ellas incluso fueron menores a medio segundo. En los resultados de este experimento, existe un 95\% de probablidades que los tiempos de respuesta de las invocaciones sean de 1,6 segundos o menos, lo que, visto desde otro ángulo, quiere decir que existe un 5\% de probabilidad que los tiempos de respuesta de las  invocaciones tomen entre 1,6 y 4 segundos en ser procesadas. Ahora bien, aunque 5\% parece ser una probabilidad muy alta y que no refleja lo visto en las mediciones, cuando se vuelve a los resultados de las simulaciones se observa que hay probabilidad mayor al 99\% de que una invocación de redimensionamiento tenga un tiempo de respuesta igual o menor a 2 segundos. Esto quiere decir que hay una probabilidad de menos del 1\% de que una invocación a la función Lambda tome entre 2 y 4 segundos en ser procesada. En el caso de las simulaciones de la Figura \ref{fig:comparacion-imsimple-palladio-500kb} solamente 6 casos muestran tiempos de respuesta de entre 2 y 4 segundos lo que representa un 0.006\% del total de las simulaciones realizadas.
+
+Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones con los tiempos de respuesta más prolongados representan una cantidad muy pequeña la totalidad de los casos y que, estos casos, se pueden convertir en potenciales escenarios de la función Lambda en estado frío. Las simulaciones muestran que a pesar del impacto que tienen estos escenarios en las invocaciones, estos realmente no llegan afectar el comportamiento general de la función Lambda. 
+
+Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados pueden tienen el potencial de caracterizar a ejecuciones de la función en estado ``frío''.
+ 
+
+
+
+
+
 
 
 %\hspace{-3cm}
