@@ -2,7 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{inconsolata}
-\usepackage[spanish]{babel}
+\usepackage[spanish, es-tabla]{babel}
 \usepackage[letterpaper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
 \usepackage{utopia}
 \usepackage{pdfpages}
@@ -105,6 +105,8 @@
 \pagenumbering{roman} 
 \renewcommand*\contentsname{Índice}
 
+\renewcommand{\listtablename}{Lista de Tablas}
+
 
 \newpage
 {\footnotesize
@@ -129,7 +131,7 @@ Committer email: \gitCommitterEmail
 
 \tableofcontents
 \listoffigures
-%\listoftables
+\listoftables
 
 \chapter{Introducción}
 \pagenumbering{arabic}

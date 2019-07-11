@@ -1241,7 +1241,8 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
  
 \end{axis}
 \end{tikzpicture}
-\caption{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+% Formato del caption para el índice de figuras %
+\caption[hola]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-500kb}
 \end{figure}
 
@@ -1297,7 +1298,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 En la figura \ref{fig:1000-ejecuciones-secuenciales-1mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 750Kb. Los resultados de los tiempos de respuesta muestran una tendencia marcada: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
 
 
-\subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb}
+\subsubsection{Ejecución de invocaciones de redimensionamiento simultáneas para imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb}
 
 Para la realización de este experimento se contó con la siguiente configuración:
 \begin{itemize}
@@ -1336,7 +1337,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-2.csv};
 
-\addplot[mark=none,red,smooth] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-una-imagen.csv};
+\addplot[mark=none,red,smooth, style={ultra thick}] table [col sep=comma] {datos/tiempos-de-respuesta-mas-de-1mb-simple-una-imagen.csv};
 
 \legend{\small Imágenes aleatorias, \small Imagen única} 
  
@@ -1357,14 +1358,196 @@ Este comportamiento sugiere que en la invocación de una función Lambda en AWS,
 
 Si bien, en el modelo obtenido no se introdujo esto explícitamente, las mediciones muestran que los tiempos de respuesta más prolongados se corresponden con el momento en que la función estaba en estado ``frío'', por ejemplo, durantes las primeras invocaciones. Si se toma como referencia el primer experimento ejecutado en la Sección \ref{sec:experimento-1}, invocaciones de redimensionamiento en imágenes menores o iguales a 500Kb, en la figura \ref{fig:comparacion-imsimple-palladio-500kb}, la primera medición a IM-Simple dió como resultado 4.1s y las subsecuentes 999 invocaciones bajaron a 1,6 segundos o menos; muchas de ellas incluso fueron menores a medio segundo. En los resultados de este experimento, existe un 95\% de probablidades que los tiempos de respuesta de las invocaciones sean de 1,6 segundos o menos, lo que, visto desde otro ángulo, quiere decir que existe un 5\% de probabilidad que los tiempos de respuesta de las  invocaciones tomen entre 1,6 y 4 segundos en ser procesadas. Ahora bien, aunque 5\% parece ser una probabilidad muy alta y que no refleja lo visto en las mediciones, cuando se vuelve a los resultados de las simulaciones se observa que hay probabilidad mayor al 99\% de que una invocación de redimensionamiento tenga un tiempo de respuesta igual o menor a 2 segundos. Esto quiere decir que hay una probabilidad de menos del 1\% de que una invocación a la función Lambda tome entre 2 y 4 segundos en ser procesada. En el caso de las simulaciones de la Figura \ref{fig:comparacion-imsimple-palladio-500kb} solamente 6 casos muestran tiempos de respuesta de entre 2 y 4 segundos lo que representa un 0.006\% del total de las simulaciones realizadas.
 
-Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones con los tiempos de respuesta más prolongados representan una cantidad muy pequeña la totalidad de los casos y que, estos casos, se pueden convertir en potenciales escenarios de la función Lambda en estado frío. Las simulaciones muestran que a pesar del impacto que tienen estos escenarios en las invocaciones, estos realmente no llegan afectar el comportamiento general de la función Lambda. 
+Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones con los tiempos de respuesta más prolongados representan una cantidad muy pequeña de la totalidad de los casos y que, estos casos se pueden convertir en potenciales escenarios de la función Lambda en estado frío. Las simulaciones muestran que a pesar del impacto que tienen estos escenarios en las invocaciones, estos realmente no llegan afectar el comportamiento general de la función Lambda. 
 
-Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados pueden tienen el potencial de caracterizar a ejecuciones de la función en estado ``frío''.
+Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados tienen el potencial de caracterizar las ejecuciones de la función en estado ``frío''.
+
+%%%%%%%%%%%%%% Experimento 2
+\subsection{Variando el intervalo de las invocaciones de redimensionamiento}
+
+Este experimento se plantea como una variación del expuesto en la Sección \ref{sec:experimento-2}, donde se evaluaba el efecto de las invocaciones simultáneas a la función Lambda. Acá se plantea variar el intervalo entre invocaciones a la función Lambda con el fin de valorar los efectos en el comportamiento de la función y si el modelo obtenido en la Sección \ref{sec:experimento-1} contribuye a explicar algo de lo observado; en particular si los intervalos entre las invocaciones hacen que el rendimiento de la función se considere ``fría'' o ``caliente'' en algún punto.
+
+\subsubsection{Estrategia de intervalo de invocaciones a \emph{Image Handler}}
+Para evaluar los efectos de los intervalos de lanzamiento en las invocaciones a \emph{Image Handler}, se propone la ejecución de un número de invocaciones simultáneas (una ráfaga), luego entrar en un tiempo de espera y luego, aplicar otra ráfaga de invocaciones. 
+
+El tiempo de espera entre ráfagas se irá incrementando al doble del tiempo de espera anterior. Por ejemplo, si el primer tiempo de espera es de 2 minutos, el siguiente será de 4 minutos, luego 8, 16, 32 minutos y así sucesivamente. Para este experimento se propone utilizar tiempos de espera inicial de 10 minutos para luego aumentarlo en subsecuentes ráfagas de invocaciones.
+
+\subsubsection{Ejecución de ráfagas de invocaciones de redimensionamiento para imágenes de tamaño menor a 500Kb}
+
+Para la realización de este experimento se utilizó la siguiente configuración base:
+\begin{itemize}
+    \item \emph{Sujeto de prueba:} La función Lambda IM-XRay.
+    \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor o a 500Kb alojadas en Amazon S3.
+    \item \emph{Carga de trabajo:}
+    \begin{itemize}
+        \item 50 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-XRay seguida de un tiempo de espera inicial de 10 minutos.
+        \item Luego se ejecutará otra ráfaga de 100 invocaciones y se tendrá un tiempo de espera de 20 minutos.
+        \item Se continuará aplicando la carga de trabajo anterior hasta que se logre observar algún cambio en la función.
+    \end{itemize}
+    \item \emph{Herramientas de medición:} Amazon Cloudwatch y Amazon X-Ray.
+\end{itemize}
  
+De acuerdo con lo observado en los experimentos anteriores, luego de la primera invocación, las subsiguientes hacen que la función entre en un estado ``caliente''. Por esta razón, ejercitar la función con una ráfaga de 100 invocaciones haría que se logre llegar a este estado fácilmente.
 
+A diferencia de los experimentos anteriores, se utiliza la versión de IM-XRay en lugar de IM-Simple. La razón es que se quiere sacar provecho a las herramientas de monitoreo de AWS X-Ray para determinar si la función pasa de un estado \emph{frío $\rightarrow$ caliente $\rightarrow$ frío} y determinar el impacto de este cambio en el tiempo de respuesta.
 
+\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $\leq 500Kb$}\label{sec:rafagas-hasta-500kb}
 
+La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensionamiento en imágenes menores a 500Kb divididas en 100 ráfagas cada una. En la primer ráfaga la función se encuentra en estado ``frío'', sucede el aprovisionamiento inicial. Luego de esta primer invocación la función va entrando paulatinamente en estado ``caliente'' y se logra observar que para la mayoría de los casos las invocaciones de redimensionamiento no llegan a tomar más de 1,5 segundos. El tiempo promedio de ejecución de una ráfaga fue de 2 minutos y 45 segundos.
 
+\begin{figure}
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$}},
+    xlabel={\small Invocaciones a IM-XRay},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=-10, 
+    xmax=535,
+    ymin=0, 
+%    ymax=6000,
+%    extra x ticks = {90,165},
+    extra x tick style={tick label style={font=\footnotesize}},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-1.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-2.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-3.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-4.csv};
+
+%\legend{\small Imágenes aleatorias, \small Imagen única} 
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\label{fig:rafagas-hasta-500kb}
+\end{figure}
+
+En la segunda ráfaga, luego de 10 minutos, la función no experimenta un tiempo de respuesta inicial similar al de la primer ráfaga. Esto quiere decir que pasados 10 minutos de inactividad entre la primer y segunda ráfaga, la función continua en estado caliente.
+
+En la tercer ráfaga, luego de 20 minutos de haberse ejecutado la última invocación de redimensionamiento de la ráfaga anterior, sí se llega observar un tiempo de respuesta inicial alto. AWS X-Ray reporta que en esta invocación inicial se tuvo que re-aprovisionar la función, lo que sugiere que, durante los 20 minutos de inactividad entre una ráfaga y otra, la función fue pasando progresivamente a un estado ``frío'' debido a que la plataforma pudo determinar que el nivel de actividad de la función (cantidad de invocaciones) fue decreciendo hasta un punto en donde no detectó actividad alguna.
+
+La última ráfaga también experimentó un tiempo de respuesta inicial alto. Esta vez un poco mayor al de la ráfaga anterior pero menor a la de la primer ráfaga. Hubo 40 minutos de inactividad entre la tercera ráfaga y la cuarta. 
+
+\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}
+
+Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La Figura \ref{fig:rafagas-hasta-1mb} muestra los resultados de la ejecución de 5 ráfagas de 100 invocaciones cada una. El tiempo promedio de ejecución de una ráfaga fue de 9 minutos y 15 segundos. En la primera invocación de la primer ráfaga se obtuvo un tiempo de respuesta alto (función en estado frío). En la segunda ráfaga no se observó tiempos de respuesta elevados debido a que la función se encontraba en estado ``caliente''. 
+
+\begin{figure}
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}},
+    xlabel={\small Invocaciones a IM-XRay},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=-10, 
+    xmax=775,
+    ymin=0, 
+    ymax=14000,
+%    extra x ticks = {90,165},
+    extra x tick style={tick label style={font=\footnotesize}},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-1.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-2.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-3.csv};
+\addplot[color=black, mark=none, dashed, style={ultra thick}] coordinates {(260,8082)(260,14000)};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-4.csv};
+\addplot[color=black, mark=none, dashed, style={ultra thick}] coordinates {(434,9356)(434,14000)};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(535,0)(535,10000)(671,10000)(671,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-5.csv};
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\label{fig:rafagas-hasta-1mb}
+\end{figure}
+
+En la primera invocación de la tercera y cuarta ráfaga, AWS X-Ray reportó que en ambas hubo que re-aprovisionar la función. Es decir, el tiempo de inactividad entre la segunda ráfaga (20 minutos) y entre la tercera y la cuarta (40 minutos) fue suficiente para que la plataforma volviera a marcar la función como fría de nuevo. Lo interesante de estas dos primeras invocaciones, es que, a pesar que la plataforma tuvo que volver a re-aprovisionar la función, los tiempos de respuesta reportados fueron mucho más bajos que el de la invocación inicial de la primer ráfaga. En la Tabla \ref{table:rafagas-hasta-1mb-tiempos-primera-invocacion} se pueden ver los tiempos de respuesta de las primeras invocaciones de cada ráfaga.
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|r}
+        \toprule[1.5pt]
+        \multicolumn{2}{c}{\textbf{Entre 500Kb a 1Mb}} \\
+        \midrule
+        Ráfaga  & Tiempo de 1º invocación \\
+        \midrule
+        \#1  & 13s \\
+        \#2  & N.A. \\        
+        \#3  & 8s \\        
+        \#4  & 9s \\        
+        \#5  & 11s \\                                
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Tiempo de respuesta de la primer invocación de redimensionamiento en cada ráfaga.}
+    \label{table:rafagas-hasta-1mb-tiempos-primera-invocacion}
+\end{table}
+
+En la quinta ráfaga, el tiempo de respuesta de la primera invocación se elevó de nuevo. El tiempo de inactividad entre la cuarta ráfaga y la quinta fue de 80 minutos. 
+
+Debido a que los tiempos iniciales de la tercera y cuarta ráfaga fueron bajos (aunque AWS X-Ray reporta que para cada uno de ellos fue necesaria re-aprovisionar la función), fue que se la ejecución de una quita ráfaga se hizo necesaria con el fin de validar que, conforme los tiempos de inactividad entre ráfagas aumenta, el tiempo de respuesta de la primera invocación también aumenta. 
+
+\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}
+
+Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minutos y 15 segundos. En la ejecución de cada ráfaga, AWS X-Ray reportó que fue necesario re-aprovisionar la función cuando se ejecutó la primera invocación de cada ráfaga. En la Figura \ref{fig:rafagas-hasta-2mb} se muestran los resultados de la ejecución de las cuatro ráfagas.
+
+\begin{figure}
+\hspace{-1.5cm}
+\begin{tikzpicture}
+\begin{axis}[
+    width=16cm, height=12cm,
+    title={\small \textbf{4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}},
+    xlabel={\small Invocaciones a IM-XRay},
+    ylabel={\small Tiempo (en $ms$)},
+    xmin=-10, 
+    xmax=535,
+    ymin=0, 
+    ymax=16000,
+%    extra x ticks = {90,165},
+    extra x tick style={tick label style={font=\footnotesize}},
+    grid=major,
+    grid style=dashed,
+]
+
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-1.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-2.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-3.csv};
+\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-4.csv};
+ 
+\end{axis}
+\end{tikzpicture}
+\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\label{fig:rafagas-hasta-2mb}
+\end{figure}
+
+Los tiempos de respuesta de las primeras invocaciones de cada ráfaga resultaron ser más similares entre sí y, también se pudo observar que cuando existen tiempos de inactivad más prolongados, como el que entre la ráfaga tres y la cuando que es de 40 minutos, a la siguiente invocación le toma un mayor tiempo de respuesta que la primer invocación de la ráfaga anterior.
+
+\subsubsection{Análisis de resultados}
+La principal observación que arrojó este experimento es que conforme van aumentando los tiempos de inactividad en la función Lambda, también van aumentando los tiempos de respuesta entregados por la primera invocación luego de este tiempo de inactividad. 
+
+De acuerdo con \cite{cold-starts-aws-lambda-1}, una vez que una función ha sido instalada en la plataforma, la primer invocación debe de pasar por el proceso de aprovisionamiento. Luego de que esta primer invocación es procesada, la función pasa a un estado activo o ``caliente'' y el contenedor que la soporta se puede reutilizar para subsecuentes invocaciones. Cuando se detecta que la función se vuelve inactiva o ``fría'', el contenedor que la soporta se vuelve candidato a ser ``reciclado'' para ser utilizado por otra función que lo necesite.
+
+Si bien, no hay un tiempo límite definido para decidir cuándo el contenedor va a ser reciclado o no, los resultados de este experimento y los expuestos en \cite{cold-starts-aws-lambda-1} y \cite{cold-starts-aws-lambda-2} demuestran que entre mayor sean los tiempos de inactividad de una función, mayor será la probabilidad de que el contenedor que la soporta sea reciclado y que, cuando se vuelva a invocar a la función, se experimente un tiempo de respuesta mayor al promedio debido al proceso de aprovisionamiento. Según \cite{cold-starts-aws-lambda-1}, una vez que la función deja de recibir invocaciones y entra en un estado inactivo, el contenedor que la soporta se mantiene disponible por al menos 25 minutos. 
+
+% Rafaga 500Kb en promedio 2min, 45seg
+% Rafaga 1Mb en promedio 9 min, 15 seg
+% Rafaga 2Mb en promedio 13 min, 15 seg
 
 
 
