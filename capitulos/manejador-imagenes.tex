@@ -1223,7 +1223,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
     title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
-    xmin=0, 
+    xmin=-10, 
     xmax=1005,
     ymin=0, 
 %    ymax=4100,
@@ -1275,7 +1275,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
     title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
-    xmin=0, 
+    xmin=-10, 
     xmax=1005,
     ymin=0, 
     extra x tick style={tick label style={font=\footnotesize}},
@@ -1325,7 +1325,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
     title={\small \textbf{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}},
     xlabel={\small Invocaciones a IM-Simple},
     ylabel={\small Tiempo (en $ms$)},
-    xmin=0, 
+    xmin=-10, 
     xmax=1005,
     ymin=0, 
 %    ymax=4100,
@@ -1363,7 +1363,7 @@ Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones 
 Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados tienen el potencial de caracterizar las ejecuciones de la función en estado ``frío''.
 
 %%%%%%%%%%%%%% Experimento 2
-\subsection{Variando el intervalo de las invocaciones de redimensionamiento}
+\subsection{Variación del intervalo de las invocaciones de redimensionamiento}
 
 Este experimento se plantea como una variación del expuesto en la Sección \ref{sec:experimento-2}, donde se evaluaba el efecto de las invocaciones simultáneas a la función Lambda. Acá se plantea variar el intervalo entre invocaciones a la función Lambda con el fin de valorar los efectos en el comportamiento de la función y si el modelo obtenido en la Sección \ref{sec:experimento-1} contribuye a explicar algo de lo observado; en particular si los intervalos entre las invocaciones hacen que el rendimiento de la función se considere ``fría'' o ``caliente'' en algún punto.
 
@@ -1378,12 +1378,7 @@ Para la realización de este experimento se utilizó la siguiente configuración
 \begin{itemize}
     \item \emph{Sujeto de prueba:} La función Lambda IM-XRay.
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor o a 500Kb alojadas en Amazon S3.
-    \item \emph{Carga de trabajo:}
-    \begin{itemize}
-        \item 50 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-XRay seguida de un tiempo de espera inicial de 10 minutos.
-        \item Luego se ejecutará otra ráfaga de 100 invocaciones y se tendrá un tiempo de espera de 20 minutos.
-        \item Se continuará aplicando la carga de trabajo anterior hasta que se logre observar algún cambio en la función.
-    \end{itemize}
+    \item \emph{Carga de trabajo:} 100 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-XRay seguido de un tiempo de espera de 10, 20 y 40 minutos.      
     \item \emph{Herramientas de medición:} Amazon Cloudwatch y Amazon X-Ray.
 \end{itemize}
  
@@ -1396,7 +1391,7 @@ A diferencia de los experimentos anteriores, se utiliza la versión de IM-XRay e
 La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensionamiento en imágenes menores a 500Kb divididas en 100 ráfagas cada una. En la primer ráfaga la función se encuentra en estado ``frío'', sucede el aprovisionamiento inicial. Luego de esta primer invocación la función va entrando paulatinamente en estado ``caliente'' y se logra observar que para la mayoría de los casos las invocaciones de redimensionamiento no llegan a tomar más de 1,5 segundos. El tiempo promedio de ejecución de una ráfaga fue de 2 minutos y 45 segundos.
 
 \begin{figure}
-\hspace{-1.5cm}
+\hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
@@ -1440,7 +1435,7 @@ La última ráfaga también experimentó un tiempo de respuesta inicial alto. Es
 Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La Figura \ref{fig:rafagas-hasta-1mb} muestra los resultados de la ejecución de 5 ráfagas de 100 invocaciones cada una. El tiempo promedio de ejecución de una ráfaga fue de 9 minutos y 15 segundos. En la primera invocación de la primer ráfaga se obtuvo un tiempo de respuesta alto (función en estado frío). En la segunda ráfaga no se observó tiempos de respuesta elevados debido a que la función se encontraba en estado ``caliente''. 
 
 \begin{figure}
-\hspace{-1.5cm}
+\hspace{-1cm}
 \begin{tikzpicture}
 \begin{axis}[
     width=16cm, height=12cm,
@@ -1543,7 +1538,102 @@ La principal observación que arrojó este experimento es que conforme van aumen
 
 De acuerdo con \cite{cold-starts-aws-lambda-1}, una vez que una función ha sido instalada en la plataforma, la primer invocación debe de pasar por el proceso de aprovisionamiento. Luego de que esta primer invocación es procesada, la función pasa a un estado activo o ``caliente'' y el contenedor que la soporta se puede reutilizar para subsecuentes invocaciones. Cuando se detecta que la función se vuelve inactiva o ``fría'', el contenedor que la soporta se vuelve candidato a ser ``reciclado'' para ser utilizado por otra función que lo necesite.
 
-Si bien, no hay un tiempo límite definido para decidir cuándo el contenedor va a ser reciclado o no, los resultados de este experimento y los expuestos en \cite{cold-starts-aws-lambda-1} y \cite{cold-starts-aws-lambda-2} demuestran que entre mayor sean los tiempos de inactividad de una función, mayor será la probabilidad de que el contenedor que la soporta sea reciclado y que, cuando se vuelva a invocar a la función, se experimente un tiempo de respuesta mayor al promedio debido al proceso de aprovisionamiento. Según \cite{cold-starts-aws-lambda-1}, una vez que la función deja de recibir invocaciones y entra en un estado inactivo, el contenedor que la soporta se mantiene disponible por al menos 25 minutos. 
+Si bien no hay un tiempo límite definido para decidir cuándo el contenedor va a ser reciclado o no, los resultados de este experimento y los expuestos en \cite{cold-starts-aws-lambda-1} y \cite{cold-starts-aws-lambda-2} demuestran que entre mayor sean los tiempos de inactividad de una función, mayor será la probabilidad de que el contenedor que la soporta sea reciclado y que, cuando se vuelva a invocar a la función, se experimente un tiempo de respuesta mayor al promedio debido al proceso de aprovisionamiento. 
+
+Según las mediciones en \cite{cold-starts-aws-lambda-1}, el tiempo de vida de un contenedor no parece darse en forma determinística pero se estima que está entre los 25 a 65 minutos. Una contenedor inactivo casi siempre se mantiene vivo por 25 minutos, luego de eso la probabilidad de que sea desechado crece lentamente y llega a alcanzar el 100\% luego de alrededor de 1 hora luego de la última invocación.
+
+\paragraph{Relación con el modelo de rendimiento obtenido} En el experimento de la Sección \ref{sec:experimento-1} se obtuvo un modelo de rendimiento a partir una sola ráfaga invocaciones secuenciales de redimensionamiento. No se introdujo tiempos de inactividad. 
+
+Aquí, aunque se introducen tiempos de inactividad entre ráfagas, se presenta una tendencia que se ha repetido a lo largo de los tres experimentos ejecutados hasta este momento: las primeras invocaciones reportan mayores tiempos de respuesta, especialmente la primera invocación, y conforme la función va recibiendo más y más invocaciones, su tiempo de respuesta tiende a bajar considerablemente. Esta es una característica que el modelo obtenido logró reconocer y, de igual manera como en los experimentos anteriores, las invocaciones en donde los tiempos de respuesta fueron mayores representan un porcentaje muy bajo ($\approx$ 1\%) del total de invocaciones en una ráfaga, por lo que cuando el modelo reporte invocaciones con tiempos de respuesta alto se puede afirmar para el caso de \emph{Image Handler} que estas invocaciones serán muy pocas y que probablemente representen momentos en donde la función tuvo que pasar forzozamente de un estado ``frío'' a uno ``caliente''.
+
+
+En PCM, el comportamiento asociado a las invocaciones basadas en ráfagas y tiempos de inactividad podría llegar a ser introducido con un modelo de uso personalizado el cual pueda tomar en cuenta las particularidades del cómo es que una arquitectura de software puede ser potencialmente utilizada pero, la forma en la que PCM reporta los resultados de las simulaciones es la misma independientemente del modelo de uso (o de cualquier otro modelo) utilizado. Es por esto que, en términos de resultados, PCM siempre va a entregar resultados basados en la probabilidad de que una determinada simulación se ejecute en una arquitectura dada. Lo anterior se usa para aclarar que mientras se utilice PCM para ejecutar simulaciones utilizando el esquema de ráfaga/tiempo de espera, los resultados obtenidos no vendrán dados de forma específica para cada ráfaga ejecutada, sino más bien serán presentados de forma general.
+
+\subsection{Comparación de \texttt{SAM CLI} con observaciones reales}
+
+\begin{figure}
+\hspace{-1cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=16cm, height=12cm, xmin=0, ymin=0,
+	xmax=1010, 
+%	ymax=14500,
+	title={\textbf{\emph{Image Handler vs} \texttt{SAM CLI}: redimensionamiento en imágenes de tamaño $\leq 500Kb$}},
+	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
+	ylabel={\small Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-sam-data-500kb.csv};
+	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
+	\end{axis}
+\end{tikzpicture}
+\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\label{fig:comparacion-sam-500kb}
+\end{figure}
+
+
+\begin{figure}
+\hspace{-1cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=16cm, height=12cm, xmin=0, ymin=0,
+	xmax=1010, 
+%	ymax=14500,
+	title={\textbf{\emph{Image Handler vs} \texttt{SAM CLI}: redimensionamiento en imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
+	ylabel={\small Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-sam-data-1mb.csv};
+	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
+	\end{axis}
+\end{tikzpicture}
+\caption{Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$}
+\label{fig:comparacion-sam-1mb}
+\end{figure}
+
+
+\begin{figure}
+\hspace{-1cm}
+\begin{tikzpicture}
+	\begin{axis}[
+	width=16cm, height=12cm, xmin=0, ymin=0,
+	xmax=1010, 
+%	ymax=14500,
+	title={\textbf{\emph{Image Handler vs} \texttt{SAM CLI}: redimensionamiento en imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
+	ylabel={\small Milisegundos},
+	grid=major, grid style=dashed, label style={font=\small},
+	tick label style={font=\footnotesize},
+	scatter/classes={%
+		a={mark=square*,blue},%
+		b={mark=square*,red},%
+		c={mark=o,draw=black}}]			
+	\addplot[scatter,only marks,%
+		scatter src=explicit symbolic]%
+	table[meta=label, col sep=comma] {datos/xy-sam-data-2mb.csv};
+	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
+	\end{axis}
+\end{tikzpicture}
+\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\label{fig:comparacion-sam-2mb}
+\end{figure}
+
+
+
+
 
 % Rafaga 500Kb en promedio 2min, 45seg
 % Rafaga 1Mb en promedio 9 min, 15 seg
