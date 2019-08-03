@@ -15,6 +15,7 @@
 \usepackage{pgfplots}
 \usepackage{pdflscape}
 \usepackage{booktabs}
+\usepackage[acronym]{glossaries}
 
 %\hypersetup{
 %    colorlinks=true,
@@ -71,6 +72,21 @@
  
 \lstset{style=mystyle}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Glosario y acronimos
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\makeglossaries
+
+\newglossaryentry{unadeca}
+{
+    name=UNADECA,
+    description={Universidad Adventista de Centro América}
+}
+
+\newacronym{gcd}{GCD}{Greatest Common Divisor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
@@ -132,6 +148,10 @@ Committer email: \gitCommitterEmail
 \tableofcontents
 \listoffigures
 \listoftables
+
+\printglossary[type=\acronymtype, title=Acrónimos]
+
+\printglossaries
 
 \chapter{Introducción}
 \pagenumbering{arabic}

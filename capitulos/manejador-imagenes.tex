@@ -1362,8 +1362,8 @@ Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones 
 
 Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados tienen el potencial de caracterizar las ejecuciones de la función en estado ``frío''.
 
-%%%%%%%%%%%%%% Experimento 2
-\subsection{Variación del intervalo de las invocaciones de redimensionamiento}
+%%%%%%%%%%%%%% Experimento 3
+\subsection{Variación del intervalo de las invocaciones de redimensionamiento}\label{sec:experimento-3}
 
 Este experimento se plantea como una variante del expuesto en la Sección \ref{sec:experimento-2}, donde se evaluaba el efecto de las invocaciones simultáneas a la función Lambda. Acá se plantea variar el intervalo entre invocaciones a la función Lambda con el fin de valorar los efectos en el comportamiento de la función y si el modelo obtenido en la Sección \ref{sec:experimento-1} contribuye a explicar algo de lo observado; en particular si los intervalos entre las invocaciones hacen que el rendimiento de la función se considere ``fría'' o ``caliente'' en algún punto.
 
@@ -1549,7 +1549,8 @@ Aquí, aunque se introducen tiempos de inactividad entre ráfagas, se presenta u
 
 En PCM, el comportamiento asociado a las invocaciones basadas en ráfagas y tiempos de inactividad podría llegar a ser introducido con un modelo de uso personalizado el cual pueda tomar en cuenta las particularidades del cómo es que una arquitectura de software puede ser potencialmente utilizada pero, la forma en la que PCM reporta los resultados de las simulaciones es la misma independientemente del modelo de uso (o de cualquier otro modelo) utilizado. Es por esto que, en términos de resultados, PCM siempre va a entregar resultados basados en la probabilidad de que una determinada simulación se ejecute en una arquitectura dada. Lo anterior se usa para aclarar que mientras se utilice PCM para ejecutar simulaciones mediante el esquema de ráfaga/tiempo de espera, los resultados obtenidos no vendrán dados de forma específica para cada ráfaga ejecutada, sino más bien serán presentados de forma general.
 
-\subsection{Comparación de \texttt{SAM CLI} con observaciones reales de AWS Lambda}
+%%%%%%%%%%%%%% Experimento 4
+\subsection{Comparación de \texttt{SAM CLI} con observaciones reales de AWS Lambda}\label{sec:experimento-4} 
 \emph{Serverless Application Model} o \texttt{SAM CLI} es la primera herramienta desarrollada por Amazon para probar funciones Lambda localmente. \texttt{SAM CLI} permite desarrollar funciones Lambda en cualquiera de los lenguajes de programación soportados por el servicio AWS Lambda y probarlos sin necesidad de instalarlos directamente en el servicio. Para emular el servicio, \texttt{SAM CLI}, hace uso de Docker para instalar y ejecutar el código de una función en un contenedor especializado para tal fin. 
 
 \texttt{SAM CLI} no es la primera herramienta desarrollada para probar, instalar y emular funciones Lambda en un entorno local, pero si es la primera desarrollada por Amazon por lo que se espera que mediante su uso se pueda tener una aproximación muy cercana del comportamiento que va a tener una función Lambda cuando esté en producción.
@@ -1684,7 +1685,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
          & AWS Lambda & \texttt{SAM CLI} & Diferencia \\ 
          \midrule
         Duración & 72min & 218min & -- \\
-        Tiempo promedio  & 4345.80 & 1969.49ms & 2376.31ms\\
+        Tiempo promedio  & 4345.80ms & 1969.49ms & 2376.31ms\\
         Desviación estándar & 1867.64ms & 524.95ms & 1342.69ms \\
         Varianza & 3488063 & 275569.63 & -- \\
         Mediana & 3898.82ms & 1851.99ms & -- \\
@@ -1728,7 +1729,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	width=16cm, height=12cm, xmin=0, ymin=0,
 	xmax=1010, 
 %	ymax=14500,
-	title={\textbf{\emph{Image Handler vs} \texttt{SAM CLI}: redimensionamiento en imágenes de tamaño $500Kb \leq x \leq 1Mb$}},
+	title={\textbf{\emph{Image Handler vs} \texttt{SAM CLI}: redimensionamiento en imágenes de tamaño $1Mb \leq x \leq 2Mb$}},
 	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
 	ylabel={\small Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
@@ -1746,6 +1747,62 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 \caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
 \label{fig:comparacion-sam-2mb}
 \end{figure}
+
+\begin{table}
+    \centering
+    \begin{tabular}{l|r|r|r}
+        \toprule[1.5pt]
+         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: Hasta 2Mb}} \\
+         \midrule
+         & AWS Lambda & \texttt{SAM CLI} & Diferencia \\ 
+         \midrule
+        Duración & 120min & 225min & -- \\
+        Tiempo promedio  & 7113.377ms & 2840.91ms & 4272.464ms\\
+        Desviación estándar & 1768.520ms & 494ms & 1268.523ms \\
+        Varianza & 3106479.237 & 244032.83 & -- \\
+        Mediana & 7785.15ms & 3053.72ms & -- \\
+        Coeficiente de variación & 0.226 & 0.16 & -- \\                        
+        \bottomrule[1.5pt]
+    \end{tabular}
+    \caption{Resumen de datos estadísticos}
+    \label{table:sam-datos-estadisticos-hasta-2mb}
+\end{table}
+
+\paragraph{Resultados} En este experimento, los dos conjuntos obtenidos resultaron a ser los más disímiles entre sí. Solamente el 0,2\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se encontraron en el dentro del rango de tiempo de las invocaciones directas en AWS Lambda. Los datos de la tabla \ref{table:sam-datos-estadisticos-hasta-2mb} confirman que estos dos conjuntos de datos se comportan de manera muy diferente. 
+
+La duración total de todas las invocaciones de redimensionamiento fue de 120 minutos cuando se utilizó la función Lambda de forma directa y de 225 minutos con \texttt{SAM CLI}, similar a los tiempos del experimento anterior. Los tiempos de respuesta obtenidos cuando se usó \texttt{SAM CLI} fueron mejores que las invocaciones directas pero estas no pueden ser utilizadas como una referencia para predecir el comportamiento de la función Lambda cuando se redimensionen imágenes de tamaño mayor a 2Mb.
+
+\subsubsection{\texttt{SAM CLI} como herramienta para la simulación para \emph{Image Handler}}
+Los resultados de los experimentos realizados no sugieren que el uso de \texttt{SAM CLI} sea adecuado como herramienta para tener algún grado de predicción del cómo se van a comportar las invocaciones de redimensionamiento a \emph{Image Handler} cuando esté ejecutándose en AWS Lambda.
+
+El escenario que presentó mayor similitud fue con las invocaciones de redimensionamiento en imágenes menores a los 500Kb. En este caso al menos el 100\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se ubicaron dentro del rango de los tiempos de respuesta cuando se usó AWS Lambda. Conforme se fue incrementando el tamaño de las imágenes a redimensionar, las diferencias en los tiempos de respuesta de un conjunto con respecto al otro se hicieron más notables. Esto hace que para el caso de \emph{Image Handler}, \texttt{SAM CLI} no se considere confiable para caracterizar el comportamiento de la función en un ambiente en producción. Pese a esto, no se pone en duda la utilidad de \texttt{SAM CLI} para la implementación, pruebas e instalación de funciones Lambda en AWS.
+
+%% Para glosario y acronimos
+Some \gls{unadeca}, \acrlong{gcd} \acrshort{gcd}
+
+
+\subsection{Resumen de resultados de los cuatros principales experimentos propuestos}
+\paragraph{Experimento \#1} El primero experimento de la Sección \ref{sec:experimento-1} estuvo dirigido a generar un modelo de rendimiento a partir de las bitácoras de la función \emph{Image Handler}. Para esto, se implementó una versión de la función que estuvo instrumentalizada con la biblioteca de Kieker para generar una bitácora en dónde registraron datos del rendimiento de los eventos asociados a la entrada, obtención de la imagen, redimensionamiento y salida de la función. Luego, se tomó una bitácora y se le pasó a PMX para extraer un modelo de rendimiento en formato PCM. 
+
+Una vez obtenido este modelo de rendimiento, se procedió a crear tres experimentos en donde se realizaron mil invocaciones de redimensionamiento sobre tres grupos de imágenes y, al mismo tiempo, se realizaron refinamientos en los componentes del modelo de rendimiento para reflejar los cambios en la demanda de la función para ejecutar mil simulaciones en \emph{Palladio Workbench}.
+
+Por último se compararon los resultados de las invocaciones reales de redimensionamiento con los de los de las simulaciones las cuáles pudieron caracterizar el comporamiento de la función Lambda con una probabilidad del 95\%. 
+
+\paragraph{Experimento \#2} El experimento de la Sección \ref{sec:experimento-2} se planteó para explorar el comportamiento de la función Lambda cuando esta era ejercitada durante un periódo continuo y, al mismo tiempo, evaluar si el modelo de rendimiento obtenido en el experimento \#1 podría explicar algo del comportamiento observado aquí.
+
+Se ejecutaron ráfagas de mil invocaciones de redimensionamiento secuenciales utilizando imágenes aleatorias y otras ráfagas de mil invocaciones utilizando la misma imagen. Las invocaciones se realizaron sobre los tres mismos grupos de imágenes definidos en el experimento \#1.
+
+Como resultado de la ejecución de las mil ráfagas se pudo notar con mayor detalle cómo la función Lambda arranca inicialmente en un estado ``frio'' y conforme va recibiendo invocaciones, va pasando paulatinamente a un estado ``caliente'', tal y como lo señalaba la literatura consultada. Con respecto a los resultados de este experimento y el modelo de rendimiento obtenido del experimento \#1, se observó que hay una relación tanto entre las simulaciones que reportaron los tiempos de respuesta más prolongados con los tiempos de respuesta de la función cuando se encontraba en estado ``frío'', así como los tiempos de respuesta promedio con los tiempos de respuesta de la función en estado ``caliente''.
+
+\paragraph{Experimento \#3} Descrito en la Sección \ref{sec:experimento-3} y que es una variante del experimento \#2. Se introdujeron tiempos de inactividad entre ráfagas de invocaciones de redimensionamiento y, como en el experimento \#2, evaluar el comportamiento de la función ante estas ráfagas y la posible relación de este comportamiento con el modelo de rendimiento.
+
+Se ejecutaron ráfagas de cien invocaciones de redimensionamiento y tiempos de inactividad de 10, 20, 40 y 80 minutos entre cada ráfaga. Se utilizaron los mismos tres grupos de imágenes del experimento \#1 en las invocaciones de redimensionamiento.
+
+Conforme se fue incrementando el tiempo de inactividad entre ráfagas, incrementó también la posibilidad de que la función cayera en un estado ``frío'' y aunque este fue un comportamiento que no fue introducido en el modelo de rendimiento explícitamente, si se pudo notar una correspondencia entre los tiempos de respuesta de la función Lambda en estado ``frío'' y ``caliente'' en ráfagas individuales con los resultados de las simulaciones.
+
+\paragraph{Experimento \#4} En este experimento se puso a prueba si el uso de la herramienta \texttt{SAM CLI} podía considerarse confiable para simular y tener algún grado de predicción del comportamiento de una función Lambda en producción. 
+
+Para probar esto, se realizaron mil invocaciones de redimensionamiento sobre dos conjuntos de invocaciones de redimensionamiento de imágenes iguales en \texttt{SAM CLI} y AWS Lambda. Los resultados de las invocaciones demostraron que el comportamiento en \texttt{SAM CLI} resultó ser muy diferente al de AWS Lambda y, al menos para el caso de \emph{Image Handler} no resultó ser de utilidad para obtener una estimación de la ejecución de la función en un ambiente de producción.
 
 
 
