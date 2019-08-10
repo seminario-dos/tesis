@@ -55,11 +55,36 @@ Implementadores con mayor experiencia en el modelado y simulación basado en com
 \end{itemize}
 
 \section{Instrumentalización con Kieker}
-Se tiene que descargar Kieker de \url{http://kieker-monitoring.net/}, instalarlo y ejecutarlo en una computadora en donde se pueda tener acceso y control para manipular las bitáboras obtenidas. Se recomienda la lectura del manual de usuario de Kieker, disponible en \cite{kieker-user-guide}, para obtener mayores detalles en su instalación y configuración.
+
+\begin{singlespace}
+\begin{algorithm}[H]
+\SetAlgoLined
+%\KwResult{Write here the result }
+% initialization\;
+\tcc{Se asume que la función Lambda está escrita en Java y será instalada en el servicio AWS Lambda}
+Aprovisionar una máquina virtual en el servicio \texttt{EC2}\;
+Instalar, configurar y ejecutar Kieker de acuerdo con \cite{kieker-user-guide}\;
+Instalar, configurar y ejecutar una cola \texttt{JMS}\;
+Configurar \texttt{Kieker} para que consuma los mensajes producidos en la cola\;
+
+Instrumentalizar la función Lambda con el \texttt{SDK} de \texttt{Kieker}\;
+Generar eventos de tipo \texttt{OperationExecutionRecord}\;
+Apuntar hacia la cola \texttt{JMS} de (4) como el destino de los eventos de rendimiento\;
+
+\While{que ingresen invocaciones de redimensionamiento}{
+      (Función $\lambda$) Publica eventos de rendimiento en la cola \texttt{JMS}\;
+      (\texttt{JMS}) Gestiona los mensajes entrantes\;
+      (\texttt{Kieker}) Consume mensajes de la cola y los registra en una bitácora local\;
+ }
+ \caption{How to write algorithms}
+\end{algorithm}
+\end{singlespace}
+
+A partir de aquí se asume que la función Lambda en la que se va a trabajar está escrita en Java y será instalada en el servicio AWS Lambda. Se tiene que descargar Kieker de \url{http://kieker-monitoring.net/}, instalarlo y ejecutarlo en una computadora en donde se pueda tener acceso y control para manipular las bitáboras obtenidas. Se recomienda la lectura del manual de usuario de Kieker, disponible en \cite{kieker-user-guide}, para obtener mayores detalles en su instalación y configuración.
 
 Kieker permite varias formas de configuración y ejecución. Debido a que las funciones Lambda se ejecutan en ambientes que son inaccesibles por los implementadores, se optó por configurar Kieker para que escuche los eventos de la función por medio de una cola JMS. La cola JMS y el servicio de Kieker fueron instalados y configurados en una máquina virtual independiente.
 
-En la Sección \ref{sec:image-handler-kieker-pmx} se introduce la programación requerida para generar entradas en una bitádora de Kieker. Se generaron eventos de tipo\\ \texttt{OperationExecutionRecord} que son los tipos de regitros más básicos que se pueden producir en Kieker y, además, se configuró la biblioteca de Kieker para que publicara los eventos de rendimiento a una cola JMS. El servicio de Kieker consumía los eventos de la cola y los registraba en una bitácora local.
+En la Sección \ref{sec:image-handler-kieker-pmx} se introduce la programación requerida para generar entradas en una bitádora de Kieker. Se generaron eventos de tipo \emph{OperationExecutionRecord} que son los tipos de registros más básicos que se pueden producir en Kieker y, además, se configuró la biblioteca de Kieker para que publicara los eventos de rendimiento a una cola JMS. El servicio de Kieker consumía los eventos de la cola y los registraba en una bitácora local.
 
 \begin{center}
 Función Lambda $\rightarrow$ JMS $\rightarrow$ Kieker $\rightarrow$ Bitácora
@@ -68,4 +93,113 @@ Función Lambda $\rightarrow$ JMS $\rightarrow$ Kieker $\rightarrow$ Bitácora
 Se recomienda la lectura del manual de usuario y del tutorial de Kieker disponibles en \cite{kieker-user-guide} y en \cite{kieker-icpe-tutorial-2014} respectivamente para tener mayores detalles sobre otros tipos de eventos que pueden ser generados por la biblioteca de Kieker.
 
 \section{Extracción del modelo con PMX}
+
+\begin{singlespace}
+\begin{algorithm}[H]
+\SetAlgoLined
+%\KwResult{Write here the result }
+% initialization\;
+
+Descargar e instalar \texttt{PMX}\;
+\eIf{se ejecuta con \texttt{Docker}}{
+    Ir al directorio \texttt{pcmserver}\;
+    Iniciar el contenedor \texttt{Docker}\;
+    Ir al navegador, acceder a \texttt{pmx-pcm-server}\;
+    Subir bitácora de \texttt{Kieker} y analizar\;
+}{
+    \If{se ejecuta \texttt{pcmConsole.jar}}{
+        Ir al directorio \texttt{pcmserver}\;
+        Ejecutar \texttt{pcmConsole.jar}\;
+        Revisar directorio destino con los archivos producidos\;            
+    }
+}
+\If{\texttt{PMX} no genera archivos de \texttt{PCM}}{
+    Revisar la instrumentalización de \texttt{Kieker}\;
+    Revisar el manual de usuario de \texttt{Kieker}\;
+}
+\caption{How to write algorithms}
+\end{algorithm}
+\end{singlespace}
+
+
+Se debe descargar PMX del sitio Web \url{https://se.informatik.uni-wuerzburg.de/software-engineering-group/tools/pmx/}. Una vez obtenido la distribución de PMX, hay que asegurarse de usar la versión de PMX que extrae modelos de rendimiento en PCM, \texttt{pcm-pmx}, esto debido a que PMX puede generar modelos de rendimiento en PCM y DML(Sección \ref{sec:dml}) y ambas versiones vienen incluidos en el archivo que se descarga.
+
+Una vez que se cuenta con la versión \texttt{pcm-pmx}, existen dos opciones para extraer un modelo de rendimiento PCM a partir de una bitácora en Kieker:
+\begin{enumerate}
+    \item Ejecutar \texttt{pcm-pmx-server}, la aplicación Web que proporciona el servicio de extracción a partir de una bitácora de Kieker, como un contenedor Docker.
+    \item Ejecutar \texttt{pcmConsole.jar}, la aplicación Java que lleva a cabo el trabajo de extracción del modelo PCM a partir de una bitácora en Kieker.
+\end{enumerate}
+
+Con ambas herramientas se puede extraer un modelo PCM a partir de una bitácora de Kieker. Con \texttt{pcm-pmx-server} se puede acceder a una página Web la cual provee un formulario para subir una bitácora, analizarla y luego obtener un archivo \texttt{.zip} con los resultados de la extracción. Si se utiliza \texttt{pcmConsole.jar} es un método más directo. Se invoca al programa con los siguientes parámetros la ruta en donde se encuentra la bitácora:
+\begin{itemize}
+    \item La ruta en donde se encuentra la bitácora de Kieker.
+    \item La ruta en donde se desea almacenar los archivos resultates de la extracción.
+\end{itemize}
+Ambas herramientas no son excluyentes entre sí.\texttt{pcm-pmx-server} usa \texttt{pcmConsole.jar} para el ejecutar el proceso de extracción.
+
+\subsection{\texttt{pcm-pmx-server} con Docker} 
+Al momento de escribir este documento \texttt{pcm-pmx-server} se encuentra bajo la siguiente ruta (asumiendo ``\texttt{pmx}'' como el directorio padre, el directorio principal de la distribución descargada de \texttt{pmx}):
+\begin{verbatim}
+pmx/pmx-pcm/tools.descartes.pmx.pcm.docker/pcmserver
+\end{verbatim}
+Una vez dentro del directorio \texttt{pcmserver}, ejecutar los siguientes comandos para iniciar el contenedor Docker:
+
+\begin{verbatim}
+> docker build -t descartesresearch/pmx-pcm-server .
+> docker run -d -p 8080:8080 descartesresearch/pmx-pcm-server
+# para detener el contendor
+> docker stop {id-de-contenedor}
+\end{verbatim}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=15cm]{pcmserver}
+  \caption{PMX-PCM Server. Tomado del Sitio Web de PMX}
+  \label{fig:pcmserver}
+\end{figure}
+
+La figura \ref{fig:pcmserver} muestra el formulario proporcionado por el PCX-PCM WebServer para extraer un modelo PCM a partir de una bitácora en Kieker.
+
+\subsection{Extracción con \texttt{pcmConsole.jar}} Al momento de escribir este documento \texttt{pcmConsole.jar} se encuentra bajo la siguiente ruta (asumiendo ``\texttt{pmx}'' como el directorio padre, el directorio principal de la distribución descargada de \texttt{pmx}):
+\begin{verbatim}
+pmx/pmx-pcm/tools.descartes.pmx.pcm.docker/pcmserver/pcmConsole.jar
+\end{verbatim}
+Una vez dentro del directorio \texttt{pcmserver}, se puede ejecutar el siguiente siguientes commando:
+
+\begin{verbatim}
+java -jar pcmConsole.jar -i <ruta-directorio-de-bitacora> \
+    -o <ruta-directorio-destino>
+\end{verbatim}
+
+\subsubsection{Consideraciones}
+Si PMX no entrega ningún resultado como parte del proceso de extracción, esto quiere decir que la bitácora proporcionada no tiene un formato apropiado para PMX. Si esto pasa, quiere decir que vale la pena revisar los puntos en donde se introdujo la instrumentación de Kieker. Se debe poner atención a si los eventos contienen toda la información necesaria de acuerdo con el manual de usuario. 
+
+\subsection{Importar archivos producidos por \texttt{PMX} a \emph{Palladio Workbench}}
+Si el proceso anterior se realizó con éxito, PMX va generar 5 archivos en formato XML que representan cada uno de los modelos con los que se puede trabajar en Palladio: modelo de componentes, asignación de recursos, ambiente, sistema y uso. También se generan archivos \texttt{*.csv} con estimaciones del uso de los componentes. El uso de las estimaciones contenidas en estos archivos es opcional.
+
+En \emph{Palladio Workbench} hay que crear un nuevo proyecto y ponerle un nombre.
+\begin{verbatim}
+File > New > Project > Other > New Palladio Project
+\end{verbatim}
+Luego de esto hay que importar cada uno de los archivos XML producidos por PMX al proyecto recién creado.
+\begin{verbatim}
+Seleccionar el proyecto > 
+File > Import > File System > Seleccionar el directorio con los archivos
+\end{verbatim}
+Con los archivos cargados en el proyecto, se pueden entonces iniciar la ejecución de simulaciones.
+\begin{verbatim}
+Seleccionar el proyecto > Click derecho > Run As > Run Configurations
+\end{verbatim}
+Luego se muestra la pantalla en donde se crean y administran configuraciones de ejecución. En este estudio se utilizó el motor de simulación \texttt{SimuBench} pero se proveen otros motores de simulación. Se puede utilizar los valores por defecto en un inicio y ejecutar las simulaciones.
+
+
+\subsubsection{Consideraciones}
+\begin{enumerate}
+    \item Los espacios de nombres, \emph{namespaces}, de los archivos XML producidos por PMX pueden llegar a ser diferentes a los de la versión de \emph{Palladio Workbench} que se esté utilizando. Dependiendo del modelo PCM con el que se esté trabajando esto podría llegar a ser un problema o no. 
+    \item Algunos tipos de datos producidos en los archivos XML de PMX pueden llegar a ser diferentes a los de la versión de \emph{Palladio Workbench}.
+\end{enumerate}
+
+Un truco que ayudó a resolver estos problemas de compatibilidad, fue generar un nuevo proyecto en \emph{Palladio Workbench} y utilizar, por ejemplo, en el modelo de repositorio, componentes similares a los producidos por PMX. Luego ver el código XML de el modelo de repositorio y comparar las definiciones de este archivo con el de PMX.
+ 
+
 
