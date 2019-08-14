@@ -1,5 +1,78 @@
+En esta tesis se exploró el modelado y simulación basado en componentes en funciones en la nube en plataformas \emph{FaaS}, con el fin de evaluar si la aplicación de este método logra entregar información relevante sobre el comportamiento de la función, la cual pueda servir tanto para razonar sobre el diseño e implementación de la arquitectura del software, como también para tener criterios más informados para predecir el comportamiento en ambientes de producción.
+
+Para la realización de este trabajo, se desarrolló e instaló una función Lambda en el servicio AWS Lambda.  Se utilizó el enfoque de ingeniería de rendimiento declarativo descrito en \cite{Walter:2018:TDP:3185768.3185777} ya que, al estar haciendo los primeros pasos en el campo de la ingeniería de rendimiento de software basado en componentes, mediante el uso de este enfoque se pudo automatizar gran parte del proceso.
+
+El principal hallazgo hecho durante la realización de esta tesis es que el modelado y simulación basado en componentes sí logra caracterizar en gran medida el comportamiento de una función Lambda. Luego de la ejecución tanto de miles de invocaciones a la función Lambda y miles de simulaciones sobre el modelo de rendimiento, se pudo corroborar que los conjuntos de resultados obtenidos en ambos escenarios presentaron tendencias muy similares. 
+
+\textbf{Revisar con ITZ}
+
+
+La instrumentalización hecha en el código fuente para soportar el monitoreo de los eventos a lo interno de la función causó que las simulaciones reportaran una diferencia de en promedio de 247ms con respecto al tiempo promedio de los tiempos de respuesta de las invocaciones hechas a la función Lambda.
+
 \subsection{Análisis de resultados}
-\subsubsection{Cumplimiento de objetivos}
+\paragraph{Experimento \#1} El primer experimento de la Sección \ref{sec:experimento-1} estuvo dirigido a generar un modelo de rendimiento a partir de las bitácoras de la función \emph{Image Handler}. Para esto, se implementó una versión de la función que estuvo instrumentalizada con la biblioteca de Kieker para generar una bitácora en dónde registrar los datos del rendimiento de los eventos asociados a la entrada, obtención de la imagen, redimensionamiento y salida de la función. Luego, se tomó una bitácora y se le pasó a PMX para extraer un modelo de rendimiento en formato PCM. 
+
+Una vez obtenido este modelo de rendimiento, se procedió a crear tres experimentos en donde se realizaron mil invocaciones de redimensionamiento sobre tres grupos de imágenes y, al mismo tiempo, se realizaron refinamientos en los componentes del modelo de rendimiento para reflejar los cambios en la demanda de la función para ejecutar mil simulaciones en \emph{Palladio Workbench}.
+
+\textbf{Revisar esta redaccion con ITZ}
+Por último se compararon los resultados de las invocaciones reales de redimensionamiento con los de los de las simulaciones las cuales pudieron caracterizar el comportamiento de la función Lambda con una probabilidad del 95\%. 
+
+\paragraph{Experimento \#2} El experimento de la Sección \ref{sec:experimento-2} se planteó para explorar el comportamiento de la función Lambda cuando esta era ejercitada durante un periodo continuo y, al mismo tiempo, evaluar si el modelo de rendimiento obtenido en el experimento \#1 podría explicar algo del comportamiento observado aquí.
+
+Se ejecutaron ráfagas de mil invocaciones de redimensionamiento secuenciales utilizando imágenes aleatorias y otras ráfagas de mil invocaciones utilizando la misma imagen. Las invocaciones se realizaron sobre los tres mismos grupos de imágenes definidos en el experimento \#1.
+
+Como resultado de la ejecución de las mil ráfagas se pudo notar con mayor detalle cómo la función Lambda arranca inicialmente en un estado ``frio'' y conforme va recibiendo invocaciones, va pasando paulatinamente a un estado ``caliente'', tal y como lo señalaba la literatura consultada. Con respecto a los resultados de este experimento y el modelo de rendimiento obtenido del experimento \#1, se observó que hay una relación tanto entre las simulaciones que reportaron los tiempos de respuesta más prolongados con los tiempos de respuesta de la función cuando se encontraba en estado ``frío'', así como los tiempos de respuesta promedio con los tiempos de respuesta de la función en estado ``caliente''.
+
+\paragraph{Experimento \#3} Descrito en la Sección \ref{sec:experimento-3} y que es una variante del experimento \#2. Se introdujeron tiempos de inactividad entre ráfagas de invocaciones de redimensionamiento y, como en el experimento \#2, se buscó evaluar el comportamiento de la función ante estas ráfagas y la posible relación de este comportamiento con el modelo de rendimiento.
+
+Se ejecutaron ráfagas de cien invocaciones de redimensionamiento y se introdujo tiempos de inactividad de 10, 20, 40 y 80 minutos entre cada ráfaga. Se utilizaron los mismos tres grupos de imágenes del experimento \#1 en las invocaciones de redimensionamiento.
+
+Conforme se fue incrementando el tiempo de inactividad entre ráfagas, observamos un incremento también en la posibilidad de que la función cayera en un estado ``frío'' y aunque este fue un comportamiento que no fue introducido en el modelo de rendimiento explícitamente, sí se pudo notar una correspondencia entre los tiempos de respuesta de la función Lambda en estado ``frío'' y ``caliente'' en ráfagas individuales con los resultados de las simulaciones.
+
+\paragraph{Experimento \#4} En este experimento se puso a prueba si el uso de la herramienta \texttt{SAM CLI} podía considerarse confiable para simular y tener algún grado de predicción del comportamiento de una función Lambda en producción. 
+
+Para probar esto, se realizaron mil invocaciones de redimensionamiento en cada una de las dos plataformas, de manera que las secuencia de imágenes fuera idéntica en ambos casos. Los resultados de las invocaciones demostraron que el comportamiento en \texttt{SAM CLI} resultó ser muy diferente al de AWS Lambda y, al menos para el caso de \emph{Image Handler} no resultó ser de utilidad para obtener una estimación de la ejecución de la función en un ambiente de producción.
+
+\subsection{Cumplimiento de objetivos}
+A continuación se dan a conocer las actividades que se llevaron a cabo para cumplir con los objetivos específicos planteados para esta tesis:
+
+%    \item Revisar el estado del arte de trabajos relacionados con enfoques de predicción y medición del rendimiento en sistemas de software como servicio.\label{sec:obj1}
+%    \item Sintetizar un caso de uso de una función en la nube considerada como de referencia, con el propósito de analizar su comportamiento.\label{sec:obj2}
+%    \item Elaborar, conforme a un diseño experimental, pruebas de rendimiento sobre el caso de uso seleccionado a fin de obtener datos base.
+%    \item Analizar los datos experimentales mediante herramientas de extracción de modelos de rendimiento de software.
+%    \item Proponer y validar modelos de rendimiento a partir de los experimentos realizados.        
+%    \item Formular una guía metodológica para dar a conocer aspectos de rendimiento en funciones en la nube a partir de la experiencia obtenida.
+
+\paragraph{Objetivo \#\ref{sec:obj1}:} \emph{Revisar el estado del arte de trabajos relacionados con enfoques de predicción y medición del rendimiento en sistemas de software como servicio.}\\
+En el Capítulo \ref{cap:antecedentes} se presenta una revisión de literatura de estudios relacionados con el modelado de rendimiento de software, retos y oportunidades de investigación que existen en esta área.
+
+\paragraph{Objetivo \#\ref{sec:obj2}} \emph{Sintetizar un caso de uso de una función en la nube considerada como de referencia, con el propósito de analizar su comportamiento}\\
+Se desarrolló la función Lambda \emph{Image Handler}, que permite el redimensionamiento de imágenes ``al vuelo'' y que es considerada como un caso de uso de referencia en AWS. Los detalles de la implementación de esta función Lambda se abarcan en el Capítulo \ref{cap:manejador-imagenes}.
+ 
+\paragraph{Objetivo \#\ref{sec:obj3}} \emph{Elaborar, conforme a un diseño experimental, pruebas de rendimiento sobre el caso de uso seleccionado a fin de obtener datos base.}\\
+En los cuatro experimentos planteados en el Capítulo \ref{cap:diseno-experimental}, se realizaron pruebas de rendimiento utilizando tres grupos de imágenes sobre la función Lambda. Los resultados obtenidos a partir de estas pruebas permitieron tener datos base sobre el rendimiento de la función sobre los cuáles fueron comparadas los resultados de las simulaciones posteriores.
+
+\paragraph{Objetivo \#\ref{sec:obj4}} \emph{Analizar los datos experimentales mediante herramientas de extracción de modelos de rendimiento de software.}\\
+En las Secciones \ref{sec:estrategia-de-extraccion-de-modelo} y \ref{sec:experimento-1} se expone la estrategia y la aplicación de extracción y obtención de un modelo de rendimiento a partir de datos experimentales. En la Sección \ref{sec:estrategia-de-extraccion-de-modelo} se da a conocer la estrategia general para la extracción y obtención de un modelo de rendimiento, la cual, como ahí mismo se indica es una variante del enfoque de ingeniería de rendimiento declarativo propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
+
+Como parte de las tareas realizadas en el experimento llevado a cabo en la Sección \ref{sec:experimento-1} se:
+\begin{itemize}
+    \item implementaron variantes de la función Lambda a las cuales se les ejecutaron pruebas de rendimiento y que fueron de mucha utilidad para calibrar el modelo de rendimiento obtenido.
+    \item se obtuvieron bitácoras con datos del rendimiento de estas funciones Lambda alternativas y
+    \item se analizaron las bitácoras y se extrajo un modelo de rendimiento por medio de la herramienta PMX.
+\end{itemize}
+
+
+\paragraph{Objetivo \#\ref{sec:obj5}} \emph{Proponer y validar modelos de rendimiento a partir de los experimentos realizados.}\\
+A partir del modelo de rendimiento obtenido, se inició un ciclo de prueba $\rightarrow$ validación $\rightarrow$ afinamiento. Estas actividades se exponen con mayor detalle el experimento de la Sección \ref{sec:experimento-1}.
+
+Se ejecutaron simulaciones sobre modelo y se validaron los resultados con los obtenidos sobre la función Lambda base IM-Simple. Se llevaron a cabo cálculos estadísticos para evaluar qué tan similares eran ambos conjuntos de resultados.
+
+En los experimentos de las Secciones \ref{sec:experimento-2}, \ref{sec:experimento-3} y \ref{sec:experimento-4}, se tomó el modelo de rendimiento como referencia para comparar los resultados obtenidos de cada experimento con los resultados de las simulaciones sobre el model con el fin de explorar las relaciones entre uno y otro.
+
+\paragraph{Objetivo \#\ref{sec:obj6}} \emph{Formular una guía metodológica para dar a conocer aspectos de rendimiento en funciones en la nube a partir de la experiencia obtenida.}\\
+La guía metodológica que del Capítulo \ref{cap:guia-metodologica} expone las actividades que se llevaron a cabo para la obtención de un modelo de rendimiento a partir de una función Lambda. Se espera que lo expuesto en esta guía sirva como un punto de partida para explorar las herramientas y los enfoques utilizados en este trabajo y de esta manera replicarlos o extenderlos en otros casos de uso.
+
 
 \subsection{Trabajo futuro}
 

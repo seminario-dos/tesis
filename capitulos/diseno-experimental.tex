@@ -1315,26 +1315,26 @@ El escenario que presentó mayor similitud fue con las invocaciones de redimensi
 Some \gls{unadeca}, \acrlong{gcd} \acrshort{gcd}
 
 
-\subsection{Resumen de resultados de los cuatros principales experimentos propuestos}
-\paragraph{Experimento \#1} El primer experimento de la Sección \ref{sec:experimento-1} estuvo dirigido a generar un modelo de rendimiento a partir de las bitácoras de la función \emph{Image Handler}. Para esto, se implementó una versión de la función que estuvo instrumentalizada con la biblioteca de Kieker para generar una bitácora en dónde registrar los datos del rendimiento de los eventos asociados a la entrada, obtención de la imagen, redimensionamiento y salida de la función. Luego, se tomó una bitácora y se le pasó a PMX para extraer un modelo de rendimiento en formato PCM. 
-
-Una vez obtenido este modelo de rendimiento, se procedió a crear tres experimentos en donde se realizaron mil invocaciones de redimensionamiento sobre tres grupos de imágenes y, al mismo tiempo, se realizaron refinamientos en los componentes del modelo de rendimiento para reflejar los cambios en la demanda de la función para ejecutar mil simulaciones en \emph{Palladio Workbench}.
-
-\textbf{Revisar esta redaccion con ITZ}
-Por último se compararon los resultados de las invocaciones reales de redimensionamiento con los de los de las simulaciones las cuales pudieron caracterizar el comporamiento de la función Lambda con una probabilidad del 95\%. 
-
-\paragraph{Experimento \#2} El experimento de la Sección \ref{sec:experimento-2} se planteó para explorar el comportamiento de la función Lambda cuando esta era ejercitada durante un periodo continuo y, al mismo tiempo, evaluar si el modelo de rendimiento obtenido en el experimento \#1 podría explicar algo del comportamiento observado aquí.
-
-Se ejecutaron ráfagas de mil invocaciones de redimensionamiento secuenciales utilizando imágenes aleatorias y otras ráfagas de mil invocaciones utilizando la misma imagen. Las invocaciones se realizaron sobre los tres mismos grupos de imágenes definidos en el experimento \#1.
-
-Como resultado de la ejecución de las mil ráfagas se pudo notar con mayor detalle cómo la función Lambda arranca inicialmente en un estado ``frio'' y conforme va recibiendo invocaciones, va pasando paulatinamente a un estado ``caliente'', tal y como lo señalaba la literatura consultada. Con respecto a los resultados de este experimento y el modelo de rendimiento obtenido del experimento \#1, se observó que hay una relación tanto entre las simulaciones que reportaron los tiempos de respuesta más prolongados con los tiempos de respuesta de la función cuando se encontraba en estado ``frío'', así como los tiempos de respuesta promedio con los tiempos de respuesta de la función en estado ``caliente''.
-
-\paragraph{Experimento \#3} Descrito en la Sección \ref{sec:experimento-3} y que es una variante del experimento \#2. Se introdujeron tiempos de inactividad entre ráfagas de invocaciones de redimensionamiento y, como en el experimento \#2, se buscó evaluar el comportamiento de la función ante estas ráfagas y la posible relación de este comportamiento con el modelo de rendimiento.
-
-Se ejecutaron ráfagas de cien invocaciones de redimensionamiento y se introdujo tiempos de inactividad de 10, 20, 40 y 80 minutos entre cada ráfaga. Se utilizaron los mismos tres grupos de imágenes del experimento \#1 en las invocaciones de redimensionamiento.
-
-Conforme se fue incrementando el tiempo de inactividad entre ráfagas, observamos un incremento también en la posibilidad de que la función cayera en un estado ``frío'' y aunque este fue un comportamiento que no fue introducido en el modelo de rendimiento explícitamente, sí se pudo notar una correspondencia entre los tiempos de respuesta de la función Lambda en estado ``frío'' y ``caliente'' en ráfagas individuales con los resultados de las simulaciones.
-
-\paragraph{Experimento \#4} En este experimento se puso a prueba si el uso de la herramienta \texttt{SAM CLI} podía considerarse confiable para simular y tener algún grado de predicción del comportamiento de una función Lambda en producción. 
-
-Para probar esto, se realizaron mil invocaciones de redimensionamiento en cada una de las dos plataformas, de manera que las secuencia de imágenes fuera idéntica en ambos casos. Los resultados de las invocaciones demostraron que el comportamiento en \texttt{SAM CLI} resultó ser muy diferente al de AWS Lambda y, al menos para el caso de \emph{Image Handler} no resultó ser de utilidad para obtener una estimación de la ejecución de la función en un ambiente de producción.
+%\subsection{Resumen de resultados de los cuatros principales experimentos propuestos}
+%\paragraph{Experimento \#1} El primer experimento de la Sección \ref{sec:experimento-1} estuvo dirigido a generar un modelo de rendimiento a partir de las bitácoras de la función \emph{Image Handler}. Para esto, se implementó una versión de la función que estuvo instrumentalizada con la biblioteca de Kieker para generar una bitácora en dónde registrar los datos del rendimiento de los eventos asociados a la entrada, obtención de la imagen, redimensionamiento y salida de la función. Luego, se tomó una bitácora y se le pasó a PMX para extraer un modelo de rendimiento en formato PCM. 
+%
+%Una vez obtenido este modelo de rendimiento, se procedió a crear tres experimentos en donde se realizaron mil invocaciones de redimensionamiento sobre tres grupos de imágenes y, al mismo tiempo, se realizaron refinamientos en los componentes del modelo de rendimiento para reflejar los cambios en la demanda de la función para ejecutar mil simulaciones en \emph{Palladio Workbench}.
+%
+%\textbf{Revisar esta redaccion con ITZ}
+%Por último se compararon los resultados de las invocaciones reales de redimensionamiento con los de los de las simulaciones las cuales pudieron caracterizar el comportamiento de la función Lambda con una probabilidad del 95\%. 
+%
+%\paragraph{Experimento \#2} El experimento de la Sección \ref{sec:experimento-2} se planteó para explorar el comportamiento de la función Lambda cuando esta era ejercitada durante un periodo continuo y, al mismo tiempo, evaluar si el modelo de rendimiento obtenido en el experimento \#1 podría explicar algo del comportamiento observado aquí.
+%
+%Se ejecutaron ráfagas de mil invocaciones de redimensionamiento secuenciales utilizando imágenes aleatorias y otras ráfagas de mil invocaciones utilizando la misma imagen. Las invocaciones se realizaron sobre los tres mismos grupos de imágenes definidos en el experimento \#1.
+%
+%Como resultado de la ejecución de las mil ráfagas se pudo notar con mayor detalle cómo la función Lambda arranca inicialmente en un estado ``frio'' y conforme va recibiendo invocaciones, va pasando paulatinamente a un estado ``caliente'', tal y como lo señalaba la literatura consultada. Con respecto a los resultados de este experimento y el modelo de rendimiento obtenido del experimento \#1, se observó que hay una relación tanto entre las simulaciones que reportaron los tiempos de respuesta más prolongados con los tiempos de respuesta de la función cuando se encontraba en estado ``frío'', así como los tiempos de respuesta promedio con los tiempos de respuesta de la función en estado ``caliente''.
+%
+%\paragraph{Experimento \#3} Descrito en la Sección \ref{sec:experimento-3} y que es una variante del experimento \#2. Se introdujeron tiempos de inactividad entre ráfagas de invocaciones de redimensionamiento y, como en el experimento \#2, se buscó evaluar el comportamiento de la función ante estas ráfagas y la posible relación de este comportamiento con el modelo de rendimiento.
+%
+%Se ejecutaron ráfagas de cien invocaciones de redimensionamiento y se introdujo tiempos de inactividad de 10, 20, 40 y 80 minutos entre cada ráfaga. Se utilizaron los mismos tres grupos de imágenes del experimento \#1 en las invocaciones de redimensionamiento.
+%
+%Conforme se fue incrementando el tiempo de inactividad entre ráfagas, observamos un incremento también en la posibilidad de que la función cayera en un estado ``frío'' y aunque este fue un comportamiento que no fue introducido en el modelo de rendimiento explícitamente, sí se pudo notar una correspondencia entre los tiempos de respuesta de la función Lambda en estado ``frío'' y ``caliente'' en ráfagas individuales con los resultados de las simulaciones.
+%
+%\paragraph{Experimento \#4} En este experimento se puso a prueba si el uso de la herramienta \texttt{SAM CLI} podía considerarse confiable para simular y tener algún grado de predicción del comportamiento de una función Lambda en producción. 
+%
+%Para probar esto, se realizaron mil invocaciones de redimensionamiento en cada una de las dos plataformas, de manera que las secuencia de imágenes fuera idéntica en ambos casos. Los resultados de las invocaciones demostraron que el comportamiento en \texttt{SAM CLI} resultó ser muy diferente al de AWS Lambda y, al menos para el caso de \emph{Image Handler} no resultó ser de utilidad para obtener una estimación de la ejecución de la función en un ambiente de producción.
