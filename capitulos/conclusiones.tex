@@ -73,7 +73,17 @@ En los experimentos de las Secciones \ref{sec:experimento-2}, \ref{sec:experimen
 \paragraph{Objetivo \#\ref{sec:obj6}} \emph{Formular una guía metodológica para dar a conocer aspectos de rendimiento en funciones en la nube a partir de la experiencia obtenida.}\\
 La guía metodológica que del Capítulo \ref{cap:guia-metodologica} expone las actividades que se llevaron a cabo para la obtención de un modelo de rendimiento a partir de una función Lambda. Se espera que lo expuesto en esta guía sirva como un punto de partida para explorar las herramientas y los enfoques utilizados en este trabajo y de esta manera replicarlos o extenderlos en otros casos de uso.
 
-
 \subsection{Trabajo futuro}
+Conforme se fue desarrollando esta tesis se fueron reconociendo aspectos que tienen valor en ser profundizados en aras de crear mayor conocimiento el área del modelado y simulación basado en componentes y arquitecturas o aplicaciones en ambientes en la nube.
+
+La lista que se presenta a continuación, sintetiza los temas identificados como relevantes a ser profundizados:
+\begin{itemize}
+    \item \emph{Estudios sobre el rendimiento de funciones en la nube instaladas en plataformas FaaS \emph{Open Source}}: el trabajo de esta tesis se llevó a cabo en la plataforma AWS Lambda, una plataforma propietaria. Si se replicara este estudio en plataformas FaaS \emph{Open Source}, se podría evaluar si el método aquí presentando puede llevarse a cabo.
+    \item \emph{Evaluación del rendimiento de las plataformas FaaS por medio de modelado y simulación}: alternativamente, se reconoce valor en examinar el comportamiento de toda una plataforma FaaS por medo de modelado y simulación. Para llevar a cabo este estudio se podría utilizar plataformas FaaS \emph{Open Source} como Apache OpenWhisk. Este estudio puede brindar mayores detalles de las particulares del comportamiento de la plataforma FaaS y cómo esta interactúa e impacta con el rendimiento de funciones en la nube.
+    \item \emph{Extensión del Palladio Workbench para incluir componentes propios para modelado y simulación de aplicaciones en ambientes en la nube}: \emph{Palladio Workbench} está destinado para el modelado y simulación de software de uso general, por lo que las particulares de las arquitecturas de software en ambientes en la nube no se incluyen. Estas deben ser incluidas de formas explícita e interpretadas con los motores de simulación y visualización con lo que pone a disposición la herramienta. Nuevos componentes para análisis de arquitecturas en la nube en \emph{Palladio Workbench} contribuirían a promover el estudio de carácterísticas de rendimiento, escalabilidad e integración, áreas en las que se ha reportado que existe una necesidad.
+    \item \emph{Desarrollo de herramientas para desarrollo y prototipado de funciones en la nube que tomen en cuenta las particularidades de la instalación y ejecución en ambientes de producción}: actualmente las herramientas existentes son competentes pero, no brindan mayor información sobre la ejecución de las funciones en un eventual ambiente de producción. Esto es importante porque ayudaría a calibrar aún más los aspectos relacionados con la arquitectura y el rendimiento antes que se llegue a dar la instalación.
+\end{itemize}
+
+
 
 \subsection{Reflexiones personales}
