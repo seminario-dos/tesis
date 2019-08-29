@@ -149,6 +149,27 @@ El \emph{Descartes Modeling Language} (DML) es un lenguaje de modelado de nivel 
 \end{figure}
 
 La figura \ref{fig:dml-instance} muestra la relación de los diferentes modelos que son parte de una instancia DML, el sistema gestionado (\emph{managed system}) y el proceso de adaptación del sistema (\emph{adaptation process}). En la esquina inferior derecha de la figura \ref{fig:dml-instance}, se ve el sistema, el cual es gestionado por un proceso de adaptación, mostrado en la esquina superior derecha de la figura \ref{fig:dml-instance}. En la esquina inferior izquierda se muestran modelos que reflejan los aspectos técnicos del sistema. Esos aspectos son los recursos de hardware y su distribución (\emph{resource landscape model}), los componentes de software y el comportamiento relevante al rendimiento (\emph{application architecture model}), la instalación de componentes de software en el hardware (\emph{deployment model}), el comportamiendo del uso y las cargas de trabajo de los usuarios del sistema (\emph{usage profile model}) y los grados de libertad del sistema que pueden ser empleados para la adaptación del sistema en ejecución (\emph{adaptation points model}). Por encima de estos modelos (esquina superior izquierda de la figura \ref{fig:dml-instance}) se muestra el modelo de proceso de adaptación, que especifica un proceso de adaptación que describe cómo el sistema se adapta a cambios en su ambiente. El proceso de adaptación aprovecha las técnicas de predicción de rendimiento en línea para razonar sobre posibles estrategias, tácticas y acciones de adaptación.
+
+\subsubsection{Enfoque de ingeniería de rendimiento declarativo}
+%Las cargas de trabajo descritas en la sección \ref{sec:manejador-imagenes-spe} van a alimentar la bitácora de eventos de la función. En AWS el servicio encargado de llevar registro de los eventos que suceden en una función Lambda se llama Amazon CloudWatch\footnote{\url{https://aws.amazon.com/cloudwatch}}. 
+
+Para obtener un modelo a partir del comportamiento de un software en existente, en Walter et al.\cite{Walter:2018:TDP:3185768.3185777} se introduce el enfoque de ingeniería de rendimiento declarativo, el cual busca la automatización de gran parte del proceso de ingeniería de rendimiento  con el fin de explorar, responder y visualizar aspectos concernientes al rendimiento de un sistema. Esto se logra gracias a una serie de herramientas desarrolladas por el grupo de ingeniería de software de la Universidad Würzburg de Alemania y que están disponibles en \url{http://descartes.tools}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=17cm]{declarative-performance-engineering}
+  \caption[Herramientas utilizadas para ingeniería de rendimiento declarativo]{Herramientas utilizadas para ingeniería de rendimiento declarativo. Tomado de \cite{Walter:2018:TDP:3185768.3185777}}
+  \label{fig:declarative-performance-engineering}
+\end{figure}
+
+
+La figura \ref{fig:declarative-performance-engineering} muestra las herramientas involucradas en el proceso de ingeniería de rendimiento declarativo. Pueden clasificarse en: herramientas para determinar niveles de servicio, para interpretar mediciones obtenidas por medio de la ejecución de un sistema, para extraer modelos de rendimiento y para visualizar resultados. En las figura \ref{fig:declarative-performance-engineering} estas herramientas son:
+\begin{itemize}
+    \item \textbf{DPE Framework (DPE)}: herramienta para determinar los niveles de servicio de un sistema. Esto lo logra mediante el \emph{Descartes Query Language}(DQL), un lenguaje de consultar indicadores de rendimiento. DPE también incluye \emph{Performance Analysis Visualization} (PAVO) para la visualización de indicadores de rendimiento.
+    \item \textbf{Kieker}: una herramienta para el monitoreo del rendimiento de la aplicación (APM por sus siglas en inglés). 
+    \item \textbf{Performance Model Extractor (PMX)}: una herramienta que puede derivar modelos de rendimiento a partir de los datos del monitoreo del rendimiento de la aplicación. Puede tomar los datos obtenidos por Kieker y generar modelos de rendimiento en PCM y DML (sección \ref{sec:dml})
+\end{itemize}
+
  
 \subsection{Computación en nube}
 

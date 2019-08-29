@@ -374,7 +374,7 @@ Para la extracción del modelo PCM a partir de las bitácoras de Kieker, se llev
 
 \subsection{Modelo obtenido}
 A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
-\begin{itemize}
+\begin{itemize} 
     \item \texttt{ImageHandlerKieker}: El punto de entrada de la función.
     \item \texttt{ImageRequestParser}: Encargado de tomar la solicitud de redimensionamiento, analizarla y convertirla en un objeto que pueda ser utilizado por el resto de componentes.
     \item \texttt{S3ImageService}: Contiene la lógica de:
@@ -387,6 +387,8 @@ A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 co
     \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
 \end{itemize}
 
+
+Adicionalmente, como parte de las tareas de afinamiento en el modelo, se agregó un nuevo componente al llamado \texttt{AWS Lambda} por medio del cual se representó el efecto que la plataforma AWS Lambda tiene en la invocación a la función. Los detalles acerca de este componente se discuten en mayor detalle en la Sección \ref{sec:experimento-1}. 
 
 Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simulación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
 

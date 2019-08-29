@@ -14,11 +14,15 @@ Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} 
     \item Imágenes de tamaño mayor a 500Kb y menor a 1Mb.
     \item Imágenes de tamaño mayor a 1Mb y menor a 2Mb.
 \end{enumerate}
+Los rangos de tamaños de imágenes se seleccionaron tomando como referencia recomendaciones actuales para el manejo de imágenes para la Web. Las imágenes dentro del primer rango ($x \leq 500Kb$), representan los tamaños de imágenes de uso general sugeridos para contar con sitios Web de buen rendimiento. En los otros dos rangos se agrupan imágenes que tienen el potencial de ser utilizadas forma más especializada dentro de un sitio Web, como por ejemplo imágenes que suben los usuarios como parte de una red social o imágenes de mayor calidad para enriquecer un diseño, mostrar imágenes de mapas, entre otros.
+
+
 En este experimento, el objetivo es comprobar por medio de mediciones directas y de simulaciones en un modelo, cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
 
 Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menos tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
 
 Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
+
 
 %%%%%%%%%%%%%%%%%%% 1
 
@@ -36,7 +40,7 @@ Configuración para la obtención de datos de rendimiento
 \begin{itemize}
     \item \emph{Sujeto de prueba:} Las funciones Lambda IM-KP y IM-XRay
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor a 500Kb alojadas en Amazon S3.     
-    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-PK y IM-XRay.
+    \item \emph{Carga de trabajo:} 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-KP y IM-XRay.
     \item \emph{Herramientas de medición:} Kieker, PMX y Amazon X-Ray.
 \end{itemize}
 
@@ -66,7 +70,9 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 \end{figure}
 
 \paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
-Se creó un \emph{script} en \texttt{Bash} para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño menor a 500Kb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura (\emph{thumbnails}) \textbf{AGREGAR APARTADO SOBRE LA ELECCION LOS THUMBNAILS}.
+Se creó un \emph{script} en \texttt{Bash} para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño menor a 500Kb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura (\emph{thumbnails}).
+
+El \emph{script} cuenta con once tamaños para redimensionar las imágenes originales. Estos once tamaños se seleccionaron luego de consultar las guías de referencia en \cite{thumbnail-ref-1, thumbnail-ref-2} sobre tamaños de \emph{thumbnails} en redes sociales tales como Facebook, Twitter, LinkedIn, Pinterest, Tumblr, Instagram y Youtube.
 
 \begin{figure}[h]
 \hspace{-1.0cm}
@@ -121,9 +127,14 @@ En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb} se muestra 
 
 \paragraph{Mediciones para obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-PK y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
 
-En primera instancia se ejecutaron 1000 invocaciones a IM-PK para generar una bitácora de Kieker y a partir de la misma extraer un modelo de rendimiento PCM usando PMX. Tal y como se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Fue por esta razón que, para contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las  métricas de rendimiento, se introdujo IM-XRay.
+En primera instancia se ejecutaron 1000 invocaciones a IM-KP para generar una bitácora de Kieker y a partir de la misma extraer un modelo de rendimiento PCM usando PMX. Tal y como se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Fue por esta razón que, para contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las  métricas de rendimiento, se introdujo IM-XRay. 
 
-Al igual que en caso anterior, se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
+Al igual que en caso anterior, se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. 
+
+Otro valor agregado que brindó IM-XRay a este estudio fue la capacidad de medir el efecto que la plataforma AWS Lambda tuvo sobre las invocaciones de redimensionamiento, especialmente durante las primeras invocaciones. Se pudo observar que en las primeras invocaciones de redimensionamiento X-Ray reportaba tiempos de ``inicialización'' y que, cuando esto se daba, la duración total de la invocación de redimensionamiento era mucho mayor al resto. Para incluir estos tiempos de inicialización, se creó un nuevo componente en el modelo con nombre \texttt{AWS Lambda} y, al igual que en los demás componentes, se tomaron los tiempos de inicialización reportados por AWS X-Ray, se exportaron en formato \texttt{.csv} a \texttt{R} para obtener una distribución de frecuencia de la probabilidad e incluirla en los \emph{SEEFs} del componente \texttt{AWS Lambda}. 
+
+
+Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
 \begin{itemize}
     \item Generación de 1000 mediciones.
     \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
@@ -242,7 +253,7 @@ Configuración para la obtención de datos de rendimiento
     \item \emph{Herramientas de medición:} Amazon X-Ray.
 \end{itemize}
 
-Para este experimento no se realizó ningún trabajo sobre la versión IM-KP porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay. 
+Para este experimento no se realizó ningún trabajo sobre la versión IM-KP porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay.
 
 Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
 
