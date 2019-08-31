@@ -33,7 +33,7 @@ En este capítulo se introducen los actividades que permiten a una persona inter
  }
 }
 
-\caption{How to write algorithms}
+\caption{Selección de caso de uso de función en la nube}
 \end{algorithm}
 \end{singlespace}
 
@@ -75,7 +75,7 @@ Apuntar hacia la cola \texttt{JMS} del paso 4 como el destino de los eventos de 
       (\texttt{JMS}) Gestiona los mensajes entrantes\;
       (\texttt{Kieker}) Consume mensajes de la cola y los registra en una bitácora local\;
  }
- \caption{How to write algorithms}
+ \caption{Pasos para instrumentalizar la función con Kieker}
 \end{algorithm}
 \end{singlespace}
 
@@ -85,9 +85,9 @@ Kieker permite varias formas de configuración y ejecución. Debido a que las fu
 
 En la Sección \ref{sec:image-handler-kieker-pmx} se introduce la programación requerida para generar entradas en una bitácora de Kieker. Se generaron eventos de tipo \emph{OperationExecutionRecord} que son los tipos de registros más básicos que se pueden producir en Kieker y, además, se configuró la biblioteca de Kieker para que publicara los eventos de rendimiento a una cola JMS. El servicio de Kieker consume los eventos de la cola y los registra en una bitácora local.
 
-\begin{center}
-Función Lambda $\rightarrow$ JMS $\rightarrow$ Kieker $\rightarrow$ Bitácora
-\end{center}
+%\begin{center}
+%Función Lambda $\rightarrow$ JMS $\rightarrow$ Kieker $\rightarrow$ Bitácora
+%\end{center}
 
 Se recomienda la lectura del manual de usuario y del tutorial de Kieker disponibles en \cite{kieker-user-guide} y en \cite{kieker-icpe-tutorial-2014} respectivamente, para tener mayores detalles sobre otros tipos de eventos que pueden ser generados por la biblioteca de Kieker.
 
@@ -116,7 +116,7 @@ Descargar e instalar \texttt{PMX}\;
     Revisar la instrumentalización de \texttt{Kieker}\;
     Revisar el manual de usuario de \texttt{Kieker}\;
 }
-\caption{How to write algorithms}
+\caption{Extracción de un modelo de rendimiento con PMX}
 \end{algorithm}
 \end{singlespace}
 
@@ -187,7 +187,7 @@ Importar archivos generados por \texttt{PMX}\;
 }{
     Evaluar incompatibilidades y corregir\;
 }
-\caption{How to write algorithms}
+\caption{Importacio4n de archivos de PMX an \emph{Palladio Workbench}}
 \end{algorithm}
 \end{singlespace}
 
@@ -230,7 +230,7 @@ Ejecutar simulaciones con \emph{SimuBench}\;
     Obtener estimaciones de herramientas alternas a \texttt{PMX}\;
     Evaluar resultados\;
 }
-\caption{How to write algorithms}
+\caption{Ejecución de simulaciones y refinamiento del modelo}
 \end{algorithm}
 \end{singlespace}
 

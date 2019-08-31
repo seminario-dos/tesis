@@ -125,7 +125,7 @@ El \emph{script} cuenta con once tamaños para redimensionar las imágenes origi
 
 En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb} se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las imágenes de tamaño menor a 500Kb. Con excepción de la primera invocación, la cual tuvo una duración de 4 segundos, más del 97,5\% de las invocaciones no superó los 1,6 segundos.
 
-\paragraph{Mediciones para obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-PK y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
+\paragraph{Mediciones para obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-KP y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
 
 En primera instancia se ejecutaron 1000 invocaciones a IM-KP para generar una bitácora de Kieker y a partir de la misma extraer un modelo de rendimiento PCM usando PMX. Tal y como se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Fue por esta razón que, para contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las  métricas de rendimiento, se introdujo IM-XRay. 
 
@@ -145,7 +145,7 @@ Por último se ejecutó una simulación en \emph{Palladio Workbench} con los sig
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-        \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
+        \multicolumn{4}{c}{\textbf{Resumen de datos estadísticos: imágenes $\leq 500Kb$}} \\
         \midrule
         Solicitud de redimensionamiento  & IM-Simple & PCM & Diferencia\\
         \midrule
@@ -156,7 +156,7 @@ Por último se ejecutó una simulación en \emph{Palladio Workbench} con los sig
         Coeficiente de variación & 0.987 & 0.683 & -- \\                       
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption{Resumen de datos estadísticos: imágenes $\leq 500Kb$}
     \label{table:datos-estadisticos-hasta-500kb}
 \end{table}
 
@@ -257,7 +257,7 @@ Para este experimento no se realizó ningún trabajo sobre la versión IM-KP por
 
 Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
@@ -283,7 +283,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 \paragraph{Medición Base: 1000 invocaciones de redimensionamiento de imágenes en IM-Simple.} 
 Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura.
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
@@ -376,7 +376,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-         \multicolumn{4}{c}{\textbf{Entre 500Kb a 1Mb}} \\
+         \multicolumn{4}{c}{\textbf{Resumen estadístico: imágenes $500Kb \leq x \leq 1Mb$}} \\
         \midrule
         Solicitud de redimensionamiento  & Image Handler & Palladio & Diferencia\\  
         \midrule        
@@ -387,7 +387,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
         Coeficiente de variación & 0.473 & 0.462 & -- \\                      
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption{Resumen estadístico: imágenes $500Kb \leq x \leq 1Mb$}
     \label{table:datos-estadisticos-hasta-1mb}
 \end{table}
 
@@ -477,7 +477,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejecutar 1000 invocaciones de redimensionamiento en la función IM-Simple en las imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb. El \emph{script} selecciona una imagen de forma aleatoria y luego ejecuta la solicitud de redimensionamiento utilizando dimensiones de ancho y alto de uso común para imágenes en miniatura.
 
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
@@ -570,7 +570,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-         \multicolumn{4}{c}{\textbf{Entre 1Mb y 2Mb}} \\
+         \multicolumn{4}{c}{\textbf{Resumen de datos estadísticos: imágenes $1Mb \leq x \leq 2Mb$}} \\
          \midrule 
         Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
         Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
@@ -579,7 +579,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption{Resumen de datos estadísticos: imágenes $1Mb \leq x \leq 2Mb$}
     \label{table:datos-estadisticos-hasta-2mb}
 \end{table}
 
@@ -687,6 +687,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
+        \multicolumn{4}{c}{\textbf{Resumen de datos estadísticos de los tres experimentos propuestos}} \\
         \multicolumn{4}{c}{\textbf{Hasta 500Kb}} \\
         \midrule
         Solicitud de redimensionamiento  & IM-Simple & Palladio & Diferencia\\
@@ -719,10 +720,11 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
 \end{table}
 
 \begin{landscape}
-\begin{figure}[h]
+\thispagestyle{empty}
+\begin{figure}[htb]
   \vspace*{-3cm}  
   \centering
-  \includegraphics[width=20cm]{image-handler-extracted-repository-diagram.png}
+  \includegraphics[width=\linewidth]{image-handler-extracted-repository-diagram.png}
   \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
   \label{fig:image-handler-pcm-model}
 \end{figure}
@@ -737,6 +739,7 @@ En el experimento de la Sección \ref{sec:experimento-1} se realizaron múltiple
 Una de las principales inquietudes durante la ejecución de funciones en la nube es determinar si la velocidad en la que se procesa una solicitud resulta ser baja y muestra una tendencia predecible. Los desarrolladores e implementadores necesitan evaluar esto para afinar el código fuente y la arquitectura para evitar cobros elevados por el uso de la plataforma.
 De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados: uno ``fría'' y una ``caliente''. En el estado frío, la plataforma que soporta la función en la nube debe aprovisionar los recursos necesarios para ejecutar la función. Durante esta fase se pueden experimentar los tiempos de respuesta más prolongados. La fase caliente se da luego de que la plataforma que soporta la función reconoce que la función está siendo invocada constantemente y que, debido a este uso, necesita proporcionarle mayores recursos computacionales para brindar mejores tiempos de respuesta. Se espera que, en una función que se esté invocando constantemente, solamente un porcentaje muy bajo del tiempo se encuentre en estado frío y la mayor parte (mientras continúe siendo invocada) estará en estado caliente.
 
+\newpage
 
 \subsubsection{Ejecución de solicitudes de redimensionamiento simultáneas para imágenes de tamaño menor a 500Kb}
 
@@ -787,7 +790,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 \end{axis}
 \end{tikzpicture}
 % Formato del caption para el índice de figuras %
-\caption[hola]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$.]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-500kb}
 \end{figure}
 
@@ -836,7 +839,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 
 \end{axis}
 \end{tikzpicture}
-\caption{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-1mb}
 \end{figure}
 
@@ -888,7 +891,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
  
 \end{axis}
 \end{tikzpicture}
-\caption{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-2mb}
 \end{figure}
 
@@ -935,7 +938,7 @@ A diferencia de los experimentos anteriores, se utiliza la versión de IM-XRay e
 
 La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensionamiento en imágenes menores a 500Kb divididas en 100 ráfagas cada una. En la primer ráfaga la función se encuentra en estado ``frío'', sucede el aprovisionamiento inicial. Luego de esta primer invocación la función va entrando paulatinamente en estado ``caliente'' y se logra observar que para la mayoría de los casos las invocaciones de redimensionamiento no llegan a tomar más de 1,5 segundos. El tiempo promedio de ejecución de una ráfaga fue de 2 minutos y 45 segundos.
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1.0cm}
 \begin{tikzpicture}
 \begin{axis}[
@@ -965,7 +968,7 @@ La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensiona
  
 \end{axis}
 \end{tikzpicture}
-\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-500kb}
 \end{figure}
 
@@ -1011,7 +1014,7 @@ Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La 
  
 \end{axis}
 \end{tikzpicture}
-\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-1mb}
 \end{figure}
 
@@ -1044,7 +1047,7 @@ Debido a que los tiempos iniciales de la tercera y cuarta ráfaga fueron bajos (
 
 Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minutos y 15 segundos. En la ejecución de cada ráfaga, AWS X-Ray reportó que fue necesario re-aprovisionar la función cuando se ejecutó la primera invocación de cada ráfaga. En la Figura \ref{fig:rafagas-hasta-2mb} se muestran los resultados de la ejecución de las cuatro ráfagas.
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1.5cm}
 \begin{tikzpicture}
 \begin{axis}[
@@ -1072,7 +1075,7 @@ Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minuto
  
 \end{axis}
 \end{tikzpicture}
-\caption{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-2mb}
 \end{figure}
 
@@ -1126,7 +1129,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 \end{itemize}
 
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1cm}
 \begin{tikzpicture}
 	\begin{axis}[
@@ -1156,7 +1159,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: Hasta 500Kb}} \\
+         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: imágenes $x \leq 500Kb$}} \\
          \midrule
          & AWS Lambda & \texttt{SAM CLI} & Diferencia \\ 
          \midrule
@@ -1168,7 +1171,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Coeficiente de variación & 0.64 & 0.21 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $x \leq 500Kb$]{Resumen de datos estadísticos}
     \label{table:sam-datos-estadisticos-hasta-500kb}
 \end{table}
 
@@ -1225,7 +1228,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: Hasta 1Mb}} \\
+         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: imágenes $500Kb \leq x \leq 1Mb$}} \\
          \midrule
          & AWS Lambda & \texttt{SAM CLI} & Diferencia \\ 
          \midrule
@@ -1237,7 +1240,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Coeficiente de variación & 0.48 & 0.28 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $500Kb \leq x \leq 1Mb$]{Resumen de datos estadísticos}
     \label{table:sam-datos-estadisticos-hasta-1mb}
 \end{table}
 
@@ -1297,7 +1300,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
-         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: Hasta 2Mb}} \\
+         \multicolumn{4}{c}{\textbf{AWS Lambda vs SAM CLI: imágenes $1Mb \leq x \leq 2Mb$}} \\
          \midrule
          & AWS Lambda & \texttt{SAM CLI} & Diferencia \\ 
          \midrule
@@ -1309,7 +1312,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Coeficiente de variación & 0.226 & 0.16 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $1Mb \leq x \leq 2Mb$]{Resumen de datos estadísticos}
     \label{table:sam-datos-estadisticos-hasta-2mb}
 \end{table}
 
