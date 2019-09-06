@@ -372,6 +372,7 @@ Para la extracción del modelo PCM a partir de las bitácoras de Kieker, se llev
     \item Una vez obtenida una bitácora en formato Kieker, esta se usó como entrada para PMX. PMX inspecciona la bitácora, la procesa y retorna un archivo \texttt{.zip} con los archivos correspondientes a una instancia de PCM. Lo anterior se aprecia en la figura \ref{fig:image-handler-pmx}.
 \end{enumerate}
 
+\newpage
 \subsection{Modelo obtenido}
 A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 componentes principales:
 \begin{itemize} 
@@ -387,15 +388,17 @@ A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 co
     \item \texttt{HandlerResponseWriter}: Convierte la imagen redimensionada a una representación en \texttt{Base 64} y prepara la respuesta de la función.
 \end{itemize}
 
-
 Adicionalmente, como parte de las tareas de afinamiento en el modelo, se agregó un nuevo componente al llamado \texttt{AWS Lambda} por medio del cual se representó el efecto que la plataforma AWS Lambda tiene en la invocación a la función. Los detalles acerca de este componente se discuten en mayor detalle en la Sección \ref{sec:experimento-1}. 
 
 Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simulación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
 
-
 Durante las pruebas realizadas al modelo generado por PMX, se percató que si bien el modelo representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de acciones, estimaciones de rendimiento e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
 
 En principio, las estimaciones incluidas en los SEFFs generados por PMX no lograron ser de utilidad para obtener predicciones representativas de lo observado en las ejecuciones de la función Lambda: mientras que en las invocaciones a \emph{Image-Handler} se entregaban tiempos de respuesta distintos, las simulaciones sobre el modelo entregan siempre un dato fijo. Las estimaciones de rendimiento de los SEFFs se basaban en tiempos de cómputo constantes lo que hacía que el motor de simulaciones generara una predicción del tiempo de respuesta que era el mismo para todos los casos.
+
+En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositorio en \emph{Palladio Component Model} obtenido a partir del proceso de extracción. En este modelo se muestran los tipos de datos, interfases y componentes de \emph{Image Handler}. Las interfases contienen la especificación del servicio que proporcionará el componente, mientras que el componente es el que contiene los detalles del cómo llevar a cabo dicha especificación.
+
+
 
 %Por esta razón fue se recurrió al trabajo del punto \#3, para obtener datos ``crudos'' del rendimiento de la función Lambda e incluir esto en los \emph{SEFFs} del modelo como distribuciones de frecuencia.
 
@@ -464,6 +467,25 @@ AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servici
 
 Las trazas recolectadas en AWS X-Ray fueron de gran utilidad para refinar las estimaciones de rendimiento que cada uno de los componentes identificados realizaba. En el experimento \#1, en la Sección \ref{sec:experimento-1}, se tomaron los datos de rendimiento de cada componente y se realizaron sobre los mismos análisis de frencuencias con el fin de conocer cómo se distribuían estos datos con respecto a sus probabilidades. Las probabilidades fueron introducidas en los \emph{SEFFs} de cada componente para la ejecución de simulaciones.   
 
+
+
+\eject \pdfpagewidth=28in \pdfpageheight=23in
+\begin{landscape}
+\thispagestyle{empty}
+\begin{figure}[htb]
+  \vspace*{3cm} 
+  \hspace{-33cm} 
+  \centering
+  \includegraphics[scale=1.0]{image-handler-extracted-repository-diagram.png}
+  \caption[\hspace{0.2cm} Modelo de repositorio en \emph{Palladio Component Model}]{Modelo de repositorio en \emph{Palladio Component Model}: tipos de datos, interfases y componentes producidos por PMX a partir de una bitácora Kieker.}
+  \label{fig:image-handler-pcm-model}
+\end{figure}
+\end{landscape}
+
+
+
+
+\eject \pdfpagewidth=\paperwidth \pdfpageheight=\paperheight
 
 
 

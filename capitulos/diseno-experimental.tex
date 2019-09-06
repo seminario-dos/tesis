@@ -382,7 +382,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
         \midrule        
         Tiempo promedio  & 4073.600ms & 4348.029ms & 274.428ms\\
         Desviación estándar & 1731.974ms & 1844.893ms & 112.919ms\\
-        Varianza & 2999736.844 & 3403633.84 & --\\
+        Varianza & 2999736.844 & 3403633.840 & --\\
         Mediana & 3658.825ms & 3989.406ms & -- \\
         Coeficiente de variación & 0.473 & 0.462 & -- \\                      
         \bottomrule[1.5pt]
@@ -422,7 +422,7 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
 \draw[blue, dashed, thick](b |- current plot begin) -- (b);
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM}
+\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM}
 \label{fig:funcion-acumulada-palladio-1mb}
 \end{figure}
 
@@ -469,7 +469,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
 \label{fig:distribucion-tamanno-imagenes-hasta-2mb}
 \end{figure}
 
@@ -497,7 +497,7 @@ Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejec
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-simple.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple}
+\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple}
 \label{fig:distribucion-solicitudes-imagenes-hasta-2mb}
 \end{figure}
 
@@ -532,7 +532,7 @@ Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \t
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio}
+\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio}
 \label{fig:distribucion-simulacion-imagenes-hasta-2mb}
 \end{figure}
 
@@ -562,7 +562,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
 	\end{axis}
 \end{tikzpicture}
-\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
 \label{fig:comparacion-imsimple-palladio-2mb}
 \end{figure}
 
@@ -574,7 +574,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
          \midrule 
         Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
         Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
-        Varianza & 3298410.017 & 3664385 & -- \\
+        Varianza & 3298410.017 & 3664385.000 & -- \\
         Mediana & 8200.875ms & 8310.293ms & -- \\
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
@@ -620,7 +620,7 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
 
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM}
+\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM}
 \label{fig:funcion-acumulada-palladio-2mb}
 \end{figure}
 
@@ -664,7 +664,7 @@ En los tres experimentos propuestos, los resultados provenientes de las simulaci
  
 \end{axis}
 \end{tikzpicture}
-\caption{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}
+\caption[\hspace{0.2cm} 3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas]{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}
 \label{fig-probabilidad-acumulada-3-casos}
 \end{figure}
 
@@ -694,7 +694,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
         \midrule
         Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
         Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
-        Varianza & 212206.961 & 216635 & -- \\
+        Varianza & 212206.961 & 216635.000 & -- \\
         Mediana & 466.715ms & 680.482ms &. -- \\
         Coeficiente de variación & 0.987 & 0.683 & -- \\
         \toprule[1.5pt]
@@ -702,7 +702,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
          \midrule 
         Tiempo promedio  & 4073.600ms & 4348.029ms & 274.428ms\\
         Desviación estándar & 1731.974ms & 1844.893ms & 112.919ms\\
-        Varianza & 2999736.844 & 3403633.84 & --\\
+        Varianza & 2999736.844 & 3403633.840 & --\\
         Mediana & 3658.825ms & 3989.406ms & -- \\
         Coeficiente de variación & 0.473 & 0.462 & -- \\
         \toprule[1.5pt]
@@ -710,7 +710,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
          \midrule 
         Tiempo promedio  & 7539.139ms & 7796.913ms & 257.773ms\\
         Desviación estándar & 1816.152ms & 1914.258ms & 98.106ms \\
-        Varianza & 3298410.017 & 3664385 & -- \\
+        Varianza & 3298410.017 & 3664385.000 & -- \\
         Mediana & 8200.875ms & 8310.293ms & -- \\
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
@@ -719,19 +719,11 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
     \label{table:resumen-estadistico-general}
 \end{table}
 
-\begin{landscape}
-\thispagestyle{empty}
-\begin{figure}[htb]
-  \vspace*{-3cm}  
-  \centering
-  \includegraphics[width=\linewidth]{image-handler-extracted-repository-diagram.png}
-  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
-  \label{fig:image-handler-pcm-model}
-\end{figure}
-\end{landscape}
+
+
 
 %%%%%%%%%%%%%% Experimento 2
-
+\newpage
 \subsection{Ejecución Secuencial Ininterrumpida de solicitudes de redimensionamiento}\label{sec:experimento-2}
 
 En el experimento de la Sección \ref{sec:experimento-1} se realizaron múltiples solicitudes de redimensionamiento con el fin de extraer y crear un modelo de rendimiento, ejecutar simulaciones sobre este modelo y comparar los resultados con lo observado en una versión de \emph{Image Handler} real.
@@ -790,7 +782,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 \end{axis}
 \end{tikzpicture}
 % Formato del caption para el índice de figuras %
-\caption[1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$.]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$.]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-500kb}
 \end{figure}
 
@@ -839,7 +831,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 
 \end{axis}
 \end{tikzpicture}
-\caption[1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-1mb}
 \end{figure}
 
@@ -891,7 +883,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
  
 \end{axis}
 \end{tikzpicture}
-\caption[1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
 \label{fig:1000-ejecuciones-secuenciales-2mb}
 \end{figure}
 
@@ -970,7 +962,7 @@ La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensiona
  
 \end{axis}
 \end{tikzpicture}
-\caption[4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-500kb}
 \end{figure}
 
@@ -1016,7 +1008,7 @@ Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La 
  
 \end{axis}
 \end{tikzpicture}
-\caption[5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-1mb}
 \end{figure}
 
@@ -1077,7 +1069,7 @@ Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minuto
  
 \end{axis}
 \end{tikzpicture}
-\caption[4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
 \label{fig:rafagas-hasta-2mb}
 \end{figure}
 
@@ -1153,7 +1145,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
 \label{fig:comparacion-sam-500kb}
 \end{figure}
 
@@ -1222,7 +1214,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption{Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$}
 \label{fig:comparacion-sam-1mb}
 \end{figure}
 
@@ -1294,7 +1286,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
 \label{fig:comparacion-sam-2mb}
 \end{figure}
 
