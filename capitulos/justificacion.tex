@@ -1,5 +1,5 @@
 \section{Innovación}
-Los aspectos más novedosos que se aportarán en esta tesis serán:
+Los aspectos más novedosos que se aportan en esta tesis son:
 \begin{enumerate}
     \item Proponer un método mediante el cual se pueden obtener estimaciones del rendimiento de una función en la nube
     \item Realizar modelado y simulación basados en componentes para caracterizar el rendimiento de funciones en la nube sobre plataformas FaaS
@@ -8,21 +8,21 @@ Los aspectos más novedosos que se aportarán en esta tesis serán:
 
 Con respecto de (1), en \cite{vanEyk:2018:SRC:3185768.3186308} se reporta que la predicción del rendimiento es uno de los principales retos de investigación en plataformas FaaS y que no se cuenta con modelos de rendimiento que consideren las características de FaaS. Esto abre la posibilidad de explorar la aplicabilidad de técnicas conocidas de modelaje de rendimiento en sistemas de software a nuestro dominio de problema. 
 
-(2) El modelado y simulación de arquitecturas de software basadas en componentes, representa una alternativa atractiva para abordar este problema, pues es un enfoque en donde hay una comunidad de investigación y desarrollo activa que ha logrado generar diferentes tipos de herramientas para la estimación del rendimiento de sistemas informáticos. 
+(2) El modelado y simulación de arquitecturas de software basadas en componentes, representa una alternativa atractiva para abordar este problema, pues es un enfoque en donde hay una comunidad de investigación y desarrollo activa que ha logrado generar diversos tipos de herramientas para la estimación del rendimiento de sistemas informáticos. 
 
 (3) La obtención de un modelo de rendimiento de una función en la nube (3), representaría un aporte relevante para SPE y FaaS porque significaría que existe una forma por medio de la cual evaluar el comportamiento de una función sin que esta esté necesariamente instalada en una plataforma FaaS y además permitiría que cambios futuros que necesite esa función puedan ser modelados \emph{a priori}, simularlos y obtener predicciones del impacto de los cambios.
 
 
 
 \section{Impacto}
-En distintos reportes sobre el estado de tecnologías \emph{serverless} en la industria \cite{dzone-cloud-2018,rightscale-2018,digital-ocean-2018,pivotal-june-2018} se señala que la adopción de este tipo de tecnologías va en franco aumento. En \cite{rightscale-2018} se reporta una tasa de crecimiento del 25\% en su adopción con respecto del 2017. Cloud Foundry Foundation \cite{pivotal-june-2018} indica que el 2017 ``la mayoría'' de sus encuestados no estaban usando tecnologías \emph{serverless} mientras que para el 2018, solamente 43\% \textbf{no} lo estaba haciendo. En el informe anual del estado de tecnologías en la nube de DZone\cite{dzone-cloud-2018} se notó un incremento del 14\% con respecto del 2017 en el uso de tecnologías \emph{serverless}.
+En distintos reportes sobre el estado de tecnologías \emph{serverless} en la industria \cite{dzone-cloud-2018,rightscale-2018,digital-ocean-2018,pivotal-june-2018} se señala que la adopción de este tipo de tecnologías va en franco aumento. En \cite{rightscale-2018} se reporta una tasa de crecimiento del 25\% en su adopción con respecto del 2017. Cloud Foundry Foundation \cite{pivotal-june-2018} indica que en el 2017 ``la mayoría'' de sus encuestados no estaban usando tecnologías \emph{serverless} mientras que para el 2018, solamente 43\% \textbf{no} lo estaba haciendo. En el informe anual del estado de tecnologías en la nube de DZone\cite{dzone-cloud-2018} se notó un incremento del 14\% con respecto del 2017 en el uso de tecnologías \emph{serverless}.
 
 Pese a que los niveles de adopción de esta tecnología van en aumento, estos mismos reportes señalan incovenientes tales como:
 \begin{enumerate}
-    \item Se tiene que depender de los niveles de servicio de un proveedor
+    \item Es necesario depender de los niveles de servicio de un proveedor
     \item Dificultad para monitorear y depurar
     \item Preocupación por parte de los desarrolladores por el ``cómo funciona'' la función en la plataforma FaaS: ¿se estarán asignando los recursos adecuados para mi función en la plataforma FaaS? ¿Cómo y cuándo se hace?
-    \item Límites de tiempo de espera: dependiendo del tiempo de ejecución una función en la nube podría llegar a ser cancelada por la propia plataforma FaaS
+    \item Límites de tiempo de espera: dependiendo del tiempo de ejecución una función en la nube podría llegar a ser cancelada por la propia plataforma FaaS.
 \end{enumerate}
 
 Lo anterior refleja que aún existe una especie de ``área gris'' alrededor del uso de las tecnologías \emph{serverless} y en particular funciones en la nube. Esto es lo que van Eyk et al.\cite{vanEyk:2018:SRC:3185768.3186308} llama brecha de la información: el usuario de FaaS no está consciente de los recursos de hardware en los que las funciones son ejecutadas, mientras que por otro lado, la plataforma de FaaS no tiene información acerca de los detalles de la implementación de la función.
@@ -39,7 +39,7 @@ Para lograr obtener un modelo de rendimiento de una función en la nube se plant
         \item Obtener métricas asociadas al rendimiento a partir de bitácoras de ejecución de la función
         \item Utilizar las métricas obtenidas para suministrarlas como entrada a una herramienta de extracción de modelos de rendimiento. La herramienta generará como resultado un modelo de rendimiento
     \end{itemize}
-    \item Diseñar experimentos y ejecutar simulaciones sobre el modelo obtenido con el fin de validar las estimaciones o determinar si es necesario calibrar el modelo.
+    \item Diseñar experimentos y ejecutar simulaciones sobre el modelo obtenido, con el fin de validar las estimaciones o determinar si es necesario calibrar el modelo.
     
 %     si los resultados obtenidos logran estimaciones adecuadas de la ejecución de la función o si por el contrario se necesita calibrar el modelo.
 \end{itemize}

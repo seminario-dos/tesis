@@ -7,7 +7,7 @@ Uno de los principales problemas de hacer ingeniería de rendimiento para softwa
     \item Flujos de trabajo dirigidos por eventos.
 \end{enumerate}
  
-Uno de las aplicaciones más comunes en \emph{serverless} es desencadenar acciones luego de que ocurre un evento (1), por ejemplo luego de la modificación de un registro en una base de datos o bien luego de que se publica un mensaje en una cola de mensajería. Esto puede provocar que se active una función Lambda\footnote{En la plataforma AWS Lambda } que toma como entrada el evento recién publicado para su posterior procesamiento. Este estilo de caso de uso encaja bien en ambientes híbridos: ambientes en donde tecnologías \emph{serverless} se aprovechan para realizar funciones específicas dentro de una aplicación (o aplicaciones) más grande.
+Uno de las aplicaciones más comunes en \emph{serverless} es desencadenar acciones luego de que ocurre un evento (1), por ejemplo después de la modificación de un registro en una base de datos o bien luego de que se publica un mensaje en una cola de mensajería. Esto puede provocar que se active una función Lambda\footnote{En la plataforma AWS Lambda } que toma como entrada el evento recién publicado para su posterior procesamiento. Este estilo de caso de uso encaja bien en ambientes híbridos: ambientes en donde tecnologías \emph{serverless} se aprovechan para realizar funciones específicas dentro de una aplicación (o aplicaciones) más grande(s).
 
 AWS ha publicado una serie de arquitecturas de referencia\cite{aws-lambda-ref-arch} para su plataforma FaaS, AWS Lambda. Dentro de estas arquitecturas se destaca el caso de uso de un manejador de imágenes (\emph{Image Handler})\cite{aws-lambda-image-handler}. 
 
@@ -19,18 +19,18 @@ AWS ha publicado una serie de arquitecturas de referencia\cite{aws-lambda-ref-ar
 \end{figure}
 
 \section{\emph{Manejador de imágenes}} \label{sec:manejador-imagenes-1}
-Sitios Web con imágenes grandes pueden experimentar tiempos de carga prolongados, es por esto que los desarrolladores proporcionan diferentes versiones de cada imagen para que se acomoden a distintos anchos de banda o diseños de página. Para brindar tiempos de respuesta cortos y disminuir el costo de la optimización, manipulación y procesamiento de las imágenes, AWS propone un manejador de imágenes \emph{serverless}, al cual se le pueda delegar tal trabajo como una función Lambda sobre la plataforma FaaS.
+Los sitios Web con imágenes grandes pueden experimentar tiempos de carga prolongados, es por esto que los desarrolladores proporcionan diferentes versiones de cada imagen para que se acomoden a distintos anchos de banda o diseños de página. A fin de brindar tiempos de respuesta cortos y disminuir el costo de la optimización, manipulación y procesamiento de las imágenes, AWS propone un manejador de imágenes \emph{serverless}, al cual se le puedan delegar trabajos tales como una función Lambda sobre la plataforma FaaS.
 
 
 A continuación se describe la arquitectura de la figura \ref{fig:serverless-image-handler-architecture}:
 \begin{enumerate}
     \item Amazon CloudFront provee una capa de \emph{cache} para reducir el costo del procesamiento de la imagen
     \item Amazon API Gateway brinda acceso por medio de HTTP a las funciones Lambda
-    \item AWS Lambda obtiene la imagen de un repositorio de Amazon Simple Storage Service (Amazon S3) y por medio de la implementación de la función se retorna una versión modificada de la imagen al API Gateway
+    \item AWS Lambda obtiene la imagen de un repositorio de Amazon Simple Storage Service (Amazon S3) y, por medio de la implementación de la función se retorna una versión modificada de la imagen al API Gateway
     \item El API Gateway retorna una nueva imagen a CloudFront para su posterior entrega a los usuarios finales
 \end{enumerate}
 
-Cabe mencionar que, en este contexto, una versión modificada de una imagen será cualquier imagen que haya presentado algún tipo de alteración con respeto de una imagen original como, por ejemplo, cambios de tamaño, color, metadatos, etc.
+Cabe mencionar que, en este contexto, una versión modificada de una imagen será cualquier imagen que haya presentado algún tipo de alteración con respecto de una imagen original como, por ejemplo, cambios de tamaño, color, metadatos, etc.
 
 \subsection{Manejador de imágenes para SPE} \label{sec:manejador-imagenes-spe}
 Para este estudio se proponemos implementar una variación del manejador de imágenes de la sección \ref{sec:manejador-imagenes-1}, que se muestra en la figura \ref{fig:serverless-image-handler-architecture-spe}.
@@ -38,11 +38,11 @@ Para este estudio se proponemos implementar una variación del manejador de imá
 \begin{figure}[h]
   \centering
   \includegraphics[width=15cm]{serverless-image-handler-architecture-spe}
-  \caption[Arquitectura del manejador de imágenes propuesto para el estudio]{Arquitectura del manejador de imágenes propuesto para el estudio.}
+  \caption[Arquitectura del manejador de imágenes propuesto para el estudio]{Arquitectura del manejador de imágenes propuesto para el estudio. Elaboración propia.}
   \label{fig:serverless-image-handler-architecture-spe}
 \end{figure}
 
-Se han dejado por fuera intencionalmente el AWS CloudFront y el AWS API Gateway. La razón de esto es porque se pretende ejercitar la función Lambda directamente. Se implementará una función Lambda que entregue a partir de una solicitud de redimensionamiento de una imagen almacenada, otra con dimensiones diferentes producida ``al vuelo'' como respuesta a la solicitud. Por ejemplo, si la imagen original mide 500 pixeles de ancho y alto, entregar una con dimensiones de 100 pixeles de ancho y alto. 
+Se han dejado por fuera intencionalmente el AWS CloudFront y el AWS API Gateway. La razón de esto es porque se pretende ejercitar la función Lambda directamente. Se implementará una función Lambda que entregue, a partir de una solicitud de redimensionamiento de una imagen almacenada, otra con dimensiones diferentes producida ``al vuelo'' como respuesta a la solicitud. Por ejemplo, si la imagen original mide 500 pixeles de ancho y alto, entregar una con dimensiones de 100 pixeles de ancho y alto. 
 
 Las actividades involucradas en el proceso de redimensionamientos de imágenes se muestran en la figura \ref{fig:serverless-image-handler-architecture-workflow}
 \begin{enumerate}
@@ -69,13 +69,13 @@ A la función Lambda se le realizarán pruebas con imágenes de entrada de disti
     \item 100 solicitudes de cambio de tamaño de una imagen pequeña. En la figura \ref{fig:serverless-image-handler-architecture-workflow}, \texttt{imagen-1.jpg} de tamaño menor o igual a 500Kb, representa una imagen pequeña.
 \end{enumerate}
 
-En principio las cargas de trabajo generadas serían \emph{cerradas}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto ayudará en principio a tener mejor trazabilidad de lo que ocurre con la función.
+En principio las cargas de trabajo generadas serían \emph{cerradas}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto ayudará en principio a tener mejor trazabilidad de lo que ocurre con la función. Cargas de trabajo separadas y secuenciales facilitan el control de los experimentos y el análisis de datos.
 
 \paragraph{¿Por qué este caso de uso se considera relevante?}
 A continuación se listan las características que hacen este caso de uso representativo e interesante:
 \begin{itemize}
     \item Sencillo de entender e implementar: se cuenta únicamente con una función la cual lleva a cabo una tarea muy específica.
-    \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y lógica asociadas a estas.
+    \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y, lógica asociadas a estas.
     \item Replicable en otros proveedores de servicios en la nube: varias de las arquitecturas de referencia para \emph{serverless} propuestas por Amazon, están compuestas por herramientas y servicios muy propios de su plataforma, lo cual hace muy difícil su reproducibilidad utilizando otros proveedores. Aunque en principio este trabajo plantea ser elaborado en la plataforma FaaS de Amazon Web Services, AWS Lambda, otros proveedores de servicios (ver sección \ref{sec:proveedores-faas}) en la nube cuentan con sus propias plataformas de FaaS y de almacenamiento, lo cual permitiría replicar lo aquí propuesto en ellos.
     \item Replicable en los lenguajes de programación soportados por plataformas FaaS: actualmente JavaScript, Java (y lenguajes basados en la \emph{Java Virtual Machine}), Python, C\# y Go son los principales lenguajes de programación soportados por las plataformas FaaS. El caso de uso propuesto, no presenta ningún tipo de característica que lo ate a un lenguaje de programación en particular. En todos ellos se cuentan con bibliotecas para manejo de imágenes tanto de forma nativa como por medio de soluciones de terceros. 
 \end{itemize}
@@ -95,7 +95,7 @@ Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redi
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
 \subsection{Función Lambda: \emph{Image-Handler} (IM-Simple)}\label{sec:image-handler}
-La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con la misma se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
+La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con ella se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
     \item Procesar la solicitud de redimiensionamiento (la entrada) que viene dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
@@ -103,16 +103,17 @@ La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler
         \item El nombre de la imagen original que reside en el servicio Amazon S3.
         \item Los parámetros de altura y ancho a los que se desea redimensionar la imagen original.
     \end{itemize}
-    \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicar la operación de redimiensionamiento sobre la misma de acuerdo a los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
+    \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicarle la operación de redimiensionamiento de acuerdo con los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
     \item Tomar la imagen redimensionada, codificarla en \texttt{Base64} y escribir el resultado en el flujo(\emph{stream}) de salida de la función Lambda.
 \end{enumerate}
  
 Un extracto de la clase \texttt{ImageHandler.java} se muestra en el listado \ref{lst:lambda-1}. En la línea \texttt{22} se procesa el evento de entrada que viene dado en formato JSON. Como resultado de esto se entrega un objeto \texttt{ImageRequest} el cual contiene la información de la solicitud de la imagen que se desea redimensionar y que se encuentra alojada en el servicio Amazon S3.
 
-En la línea \texttt{24} se llama al servicio \texttt{ImageService} con el fin de obtener la imagen   original (de acuerdo a la información presente en el \texttt{ImageRequest} proporcionado) y se aplica la operación de redimensionamiento.
+En la línea \texttt{24} se llama al servicio \texttt{ImageService} con el fin de obtener la imagen   original (de acuerdo con la información presente en el \texttt{ImageRequest} proporcionado) y se aplica la operación de redimensionamiento.
 
 Por último, en la línea \texttt{26}, \texttt{ImageHandlerResponseWriter.writeResponse()} toma la nueva imagen, con nuevas dimensiones de alto y ancho, la codifica en \texttt{Base64} y escribe el resultado en el \emph{stream} de salida de la función. 
 
+\renewcommand\lstlistingname{Listado}
 \begin{lstlisting}[linewidth=16.5cm, caption={Clase \texttt{ImageHandler.java}}, label={lst:lambda-1}]
 public class ImageHandler implements RequestStreamHandler {
 
@@ -236,14 +237,14 @@ La figura \ref{fig:secuencia-image-handler} muestra las principales interaccione
 
 \subsection{Versiones alternas de \emph{Image-Handler}}
 
-Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM a partir, y para la obtención de mediciones del rendimiento. 
+Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM y para la obtención de mediciones del rendimiento. 
 
-En la primer version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. La segunda versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
+En la primera version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. La segunda versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
 
 \subsubsection{Versión instrumentalizada para Kieker y PMX (IM-KP)} \label{sec:image-handler-kieker-pmx}
 
 Uno de los principales objetivos de este trabajo es el de obtener un modelo de rendimiento a partir 
-del código en ejecución de una función en la nube. A pesar que, el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación de un modelo que pueda incluir mayores niveles de detalle en cuanto a la estructura y estimaciones del comportamiento de un software. Además, debido a que se están dando los primeros pasos en el campo del modelado y simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a una herramienta(s) con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y ser propensa a errores. 
+del código en ejecución de una función en la nube. Aunque el modelo de rendimiento puede ser creado por los diseñadores e implementadores sin necesidad de una herramienta que ayude a su extracción, el uso de una herramienta especializada para esto contribuye a la generación sistemática de un modelo objetivo que pueda incluir mayores niveles de detalle en cuanto a la estructura y las estimaciones del comportamiento de un artefacto de software. Además, debido a que se están dando los primeros pasos en el campo del modelado y la simulación de rendimiento basado en componentes, es preferible delegar tareas de extracción y estimaciones a herramienta(s), con el fin de aprender de lo resultados obtenidos e ir introduciendo cambios paulatinamente; la creación manual de modelos de rendimiento puede llegar a ser muy compleja, consumir mucho tiempo y está propensa a errores. 
 
 Para lograr esto, se seleccionaron dos herramientas, Kieker y PMX, las cuales en conjunto proporcionan un marco de trabajo por medio del cual se puede obtener mediciones del rendimiento de una aplicación y luego, a partir de estas, extraer un modelo de rendimiento basado en PCM. La selección de estas herramientas y el enfoque de medición y extracción de modelos de rendimiento se seleccionó luego de estudiar el \emph{enfoque de ingeniería de rendimiento declarativo} propuesto en \cite{Walter:2018:TDP:3185768.3185777}.
 
@@ -252,10 +253,11 @@ Para lograr esto, se seleccionaron dos herramientas, Kieker y PMX, las cuales en
 
 Kieker se utiliza para el estudiar el comportamiento del rendimiento del sistema a partir de las entradas/rastros que se registran en una bitácora. Kieker ofrece adaptadores de monitoreo (\emph{monitoring adapters}) escritos en lenguaje Java (también ofrece adaptadores en otros lenguajes). Los dos principales componentes de Kieker son: \texttt{Kieker.Monitoring} y \texttt{Kieker.Analysis}. \texttt{Kieker.Monitoring} es el responsable de la instrumentación del código, recolección de datos y registro(\emph{logging}). El componente \texttt{Kieker.Analysis} es el responsable de leer, analizar y visualizar los datos monitoreados.
 
-En esta versión de \emph{Image-Handler} se modificó el código original para generar registros del rendimiento de la ejecución de la función utilizando las bibliotecas proporcionadas por Kieker, utilizando como referencia lo especificado en el manual de usuario de Kieker\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales son los que contienen la información acerca del rendimiento de una invocación sobre alguna parte del código.  En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos\\ \texttt{OperationExecutionRecord}.
+En esta versión de \emph{Image-Handler} se modificó el código original para generar registros del rendimiento de la ejecución de la función utilizando las bibliotecas proporcionadas por Kieker, utilizando como referencia lo especificado en el manual de usuario de Kieker\cite{kieker-user-guide}. Se crean objetos de tipo \texttt{OperationExecutionRecord} los cuales contienen la información acerca del rendimiento de una invocación sobre alguna parte del código.  En el listado \ref{lst:image-handler-kieker} se puede ver un extracto del código de la función instrumentalizada para que genere objetos\\ \texttt{OperationExecutionRecord}.
 
 Adicionalmente se configuró la biblioteca para que publique los objetos\\ \texttt{OperationExecutionRecord} a modo eventos a una cola de mensajería \emph{Java Message Service} (JMS), en lugar de una bitácora local.
 
+\begin{minipage}[c]{\linewidth}
 \begin{lstlisting}[caption={Extracto de la clase \texttt{ImageHandler.java} instrumentalizada con Kieker}, label={lst:image-handler-kieker}]
 public class ImageHandlerKieker implements RequestStreamHandler {
     private static final IMonitoringController MONITORING_CONTROLLER;
@@ -286,9 +288,9 @@ public class ImageHandlerKieker implements RequestStreamHandler {
     .
 }    
 \end{lstlisting}
+\end{minipage}
 
-
-\emph{Performance Model Extractor} (PMX), es una herramienta que automatiza la extracción de modelos de rendmiento a partir de mediciones. PMX utiliza como entrada las bitácoras basadas en Kieker y es capaz de crear modelos basados en \emph{Palladio Component Model} a partir de estas. 
+\emph{Performance Model Extractor} (PMX), es una herramienta que automatiza la extracción de modelos de rendimiento a partir de mediciones. PMX utiliza como entrada las bitácoras basadas en Kieker y es capaz de crear modelos basados en \emph{Palladio Component Model} a partir de estas. 
 
 %Esta es una herramienta creada y mantenida por el grupo de ingeniería de software de la Universidad Würzburg en Alemania.
 
@@ -345,16 +347,16 @@ public class ImageHandlerXRay implements RequestStreamHandler {
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{image-handler-xray}
-  \caption{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray}
+  \caption[\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray]{\emph{Image-Handler} publicando eventos de rendimiento al servicio AWS X-Ray. Elaboración propia}
   \label{fig:image-handler-xray}
 \end{figure}
 
-En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que es el recolecta estas trazas y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloces de los subsegmentos que componen la traza.
+En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que recolecta estas trazas, y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloses de los subsegmentos que componen la traza.
 
 
-\section{Estrategia de extracción de modelo de rendmiento para \emph{Image-Handler}} \label{sec:estrategia-de-extraccion-de-modelo}
+\section{Estrategia de extracción de modelo de rendimiento para \emph{Image-Handler}} \label{sec:estrategia-de-extraccion-de-modelo}
  
-Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y, sobre los cuales no se tiene ningún control, estrategias tradicionales en donde se crean bitácoras en la misma computadora en donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}) deben ser replanteadas. Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo en el cual se tenga control para acceder a los resultados y manipularlos.
+Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y sobre los cuales no se tiene ningún control, estrategias tradicionales en donde se crean bitácoras en la misma computadora donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}). Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo el cual se tenga control para acceder a los resultados y procesarlos.
 
 Para la extracción del modelo PCM a partir de las bitácoras de Kieker, se llevaron a cabo las siguientes actividades:
 \begin{enumerate}
@@ -390,13 +392,13 @@ A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 co
 
 Adicionalmente, como parte de las tareas de afinamiento en el modelo, se agregó un nuevo componente al llamado \texttt{AWS Lambda} por medio del cual se representó el efecto que la plataforma AWS Lambda tiene en la invocación a la función. Los detalles acerca de este componente se discuten en mayor detalle en la Sección \ref{sec:experimento-1}. 
 
-Cada uno de ellos expone su funcionalidad por medio de una interfaz. En el modelado y simulación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (Como por ejemplo \emph{BasicComponents}). 
+Cada uno de los componentes expone su funcionalidad por medio de una interfaz. En el modelado y simulación basado en componentes, los componentes se conciben como piezas intercambiables los cuales exponen sus operaciones por medio de interfaces y delegan los detalles de implementación a componentes concretos (como, por ejemplo, \emph{BasicComponents}). 
 
 Durante las pruebas realizadas al modelo generado por PMX, se percató que si bien el modelo representaba muy bien la intención detrás de los componentes del código fuente, no era detallado en las estimaciones del uso de cada componente. En PCM, a cada componente se le puede especificar su flujo de acciones, estimaciones de rendimiento e invocaciones a otros componentes, por medio de \emph{Service Effect Specifications} (SEFF). 
 
-En principio, las estimaciones incluidas en los SEFFs generados por PMX no lograron ser de utilidad para obtener predicciones representativas de lo observado en las ejecuciones de la función Lambda: mientras que en las invocaciones a \emph{Image-Handler} se entregaban tiempos de respuesta distintos, las simulaciones sobre el modelo entregan siempre un dato fijo. Las estimaciones de rendimiento de los SEFFs se basaban en tiempos de cómputo constantes lo que hacía que el motor de simulaciones generara una predicción del tiempo de respuesta que era el mismo para todos los casos.
+En principio, las estimaciones incluidas en los SEFFs generados por PMX no lograron ser de utilidad para obtener predicciones representativas de lo observado en las ejecuciones de la función Lambda: mientras que en las invocaciones a \emph{Image-Handler} se entregaban tiempos de respuesta distintos, las simulaciones sobre el modelo entregaban siempre un dato fijo. Las estimaciones de rendimiento de los SEFFs se basaban en tiempos de cómputo constantes, lo que hacía que el motor de simulaciones generara una predicción del tiempo de respuesta con el mismo valor para todos los casos.
 
-En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositorio en \emph{Palladio Component Model} obtenido a partir del proceso de extracción. En este modelo se muestran los tipos de datos, interfases y componentes de \emph{Image Handler}. Las interfases contienen la especificación del servicio que proporcionará el componente, mientras que el componente es el que contiene los detalles del cómo llevar a cabo dicha especificación.
+En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositorio en \emph{Palladio Component Model} obtenido a partir del proceso de extracción. En este modelo se muestran los tipos de datos, interfaces y componentes de \emph{Image Handler}. Las interfaces contienen la especificación del servicio que proporcionará el componente, mientras que el componente --propiamente- es el que contiene los detalles del cómo llevar a cabo dicha especificación.
 
 
 
@@ -444,28 +446,28 @@ En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositor
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{image-handler-kieker}
-  \caption{Publicando mediciones del rendimiento de la función Lambda.}
+  \caption[Publicando mediciones del rendimiento de la función Lambda.]{Publicando mediciones del rendimiento de la función Lambda. Elaboración propia}
   \label{fig:image-handler-kieker}
 \end{figure}
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{image-handler-pmx}
-  \caption{Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX.}
+  \caption[Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX.]{Convirtiendo una bitácora de Kieker a una instancia de PCM por medio de PMX. Elaboración propia.}
   \label{fig:image-handler-pmx}
 \end{figure}
 
 \subsubsection{Aporte de la versión IM-XRay a las simulaciones}\label{sec:image-handler-xray}
-Una actividad recurrente durante el modelado y simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un software en escenarios reales. 
+Una actividad recurrente durante el modelado y la simulación de arquitecturas de software, es la del afinamiento del modelo. Esta tarea es necesaria para que el modelo en cual se está trabajando pueda llegar a convertirse una representación cercana del comportamiento de un artefacto de software en escenarios reales. 
 
-Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker podría llegar a ser grande, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
+Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker podría llegar a ser sustancial, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
 
-Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS XRay ayuda a los desarrolladores a analizar y depurar aplicaciones en producción distribuidas, tal y como lo son las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando para identificar y resolver problemas de rendimiento y errores en general.
+Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS X-Ray ayuda a los desarrolladores a analizar y depurar aplicaciones distribuidas en producción, tales como las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando, con miras a identificar y resolver problemas de rendimiento y errores en general.
 
 AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y metadatos para analizar el comportamiento o identificar problemas.
 
 
-Las trazas recolectadas en AWS X-Ray fueron de gran utilidad para refinar las estimaciones de rendimiento que cada uno de los componentes identificados realizaba. En el experimento \#1, en la Sección \ref{sec:experimento-1}, se tomaron los datos de rendimiento de cada componente y se realizaron sobre los mismos análisis de frencuencias con el fin de conocer cómo se distribuían estos datos con respecto a sus probabilidades. Las probabilidades fueron introducidas en los \emph{SEFFs} de cada componente para la ejecución de simulaciones.   
+Las trazas recolectadas en AWS X-Ray fueron de gran utilidad para refinar las estimaciones de rendimiento que cada uno de los componentes identificados realizaba. En el experimento \#1, en la Sección \ref{sec:experimento-1}, se tomaron los datos de rendimiento de cada componente y, se realizaron análisis de frencuencias con el fin de conocer cómo se distribuían los datos con respecto de sus probabilidades. Las probabilidades fueron introducidas en los \emph{SEFFs} de cada componente para la ejecución de simulaciones.   
 
 
 
@@ -477,7 +479,7 @@ Las trazas recolectadas en AWS X-Ray fueron de gran utilidad para refinar las es
   \hspace{-33cm} 
   \centering
   \includegraphics[scale=1.0]{image-handler-extracted-repository-diagram.png}
-  \caption[\hspace{0.2cm} Modelo de repositorio en \emph{Palladio Component Model}]{Modelo de repositorio en \emph{Palladio Component Model}: tipos de datos, interfases y componentes producidos por PMX a partir de una bitácora Kieker.}
+  \caption[\hspace{0.2cm} Modelo de repositorio en \emph{Palladio Component Model}]{Modelo de repositorio en \emph{Palladio Component Model}: tipos de datos, interfaces y componentes producidos por PMX a partir de una bitácora Kieker. Elaboración propia.}
   \label{fig:image-handler-pcm-model}
 \end{figure}
 \end{landscape}
