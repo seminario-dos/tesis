@@ -1,11 +1,11 @@
 En esta sección se detallan los experimentos realizados para:
 \begin{itemize}
-    \item Validar si el modelo y la simulaciones sobre el mismo, logran caracterizar el comportamiento de la función \emph{Image Handler} en distintos escenarios. 
-    \item Estudiar el comportamiento de la función Lambda cuando es invocada con cargas de trabajo y
+    \item Validar si el modelo y la simulaciones sobre este, logran caracterizar el comportamiento de la función \emph{Image Handler} en distintos escenarios, 
+    \item Estudiar el comportamiento de la función Lambda cuando es invocada con cargas de trabajo, y
     \item Comparar los resultados de las invocaciones de la función Lambda con los de la herramienta SAM CLI.
 \end{itemize}
 
-\subsection{Utilizando \emph{Image-Handler} para redimensionar imágenes de distintos tamaños} \label{sec:experimento-1}
+\subsection{Utilización \emph{Image-Handler} para redimensionar imágenes de distintos tamaños} \label{sec:experimento-1}
 %Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se probó la función Lambda con dos imágines: una de tamaño pequeño ($\sim$100Kb) y otra de tamaño grande ($\sim$5Mb). El objetivo es comprobar cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
 
 Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} y se muestra en la figura \ref{fig:serverless-image-handler-architecture-workflow}. Se realizaron invocaciones a la función Lambda con tres grupos de imágenes:
@@ -14,14 +14,14 @@ Este es el caso que se menciona en la Sección \ref{sec:manejador-imagenes-spe} 
     \item Imágenes de tamaño mayor a 500Kb y menor a 1Mb.
     \item Imágenes de tamaño mayor a 1Mb y menor a 2Mb.
 \end{enumerate}
-Los rangos de tamaños de imágenes se seleccionaron tomando como referencia recomendaciones actuales para el manejo de imágenes para la Web. Las imágenes dentro del primer rango ($x \leq 500Kb$), representan los tamaños de imágenes de uso general sugeridos para contar con sitios Web de buen rendimiento. En los otros dos rangos se agrupan imágenes que tienen el potencial de ser utilizadas forma más especializada dentro de un sitio Web, como por ejemplo imágenes que suben los usuarios como parte de una red social o imágenes de mayor calidad para enriquecer un diseño, mostrar imágenes de mapas, entre otros.
+Los rangos de tamaños de imágenes se seleccionaron tomando como referencia recomendaciones actuales para el manejo de imágenes para la Web. Las imágenes dentro del primer rango ($x \leq 500Kb$), representan los tamaños de imágenes de uso general sugeridos para contar con sitios Web de buen rendimiento. En los otros dos rangos se agrupan imágenes que tienen el potencial de ser utilizadas en forma más especializada dentro de un sitio Web, por ejemplo aquellas imágenes que suben los usuarios como parte de una red social o imágenes de mayor calidad para enriquecer un diseño, mostrar imágenes asociadas a mapas, entre otros.
 
 
 En este experimento, el objetivo es comprobar por medio de mediciones directas y de simulaciones en un modelo, cómo los distintos tamaños de las imágenes influyen en el tiempo de respuesta de la función.
 
-Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menos tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
+Intuitivamente, se espera que, cuando se hagan solicitudes de redimensionamiento de imágenes de mayor tamaño, estas tomen mayor tiempo en ser procesadas y que lo contrario suceda con las imágenes de menor tamaño. Los resultados obtenidos brindan una referencia inicial para saber cómo es que los componentes de software asociados al redimensionamiento trabajan y qué posibles mejoras podrían realizarse.
 
-Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina. Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
+Las cargas de trabajo para este experimento son de tipo \emph{cerrada}, lo que quiere decir que una solicitud se ejecuta solamente hasta que la anterior se termina (es decir, las invocaciones son estrictamente secuenciales). Esto va orientado a tener mejor trazabilidad de lo que ocurre con la función.
 
 
 %%%%%%%%%%%%%%%%%%% 1
@@ -65,7 +65,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 		table[col sep=comma, y index=0] {datos/tamannos-cluster-a.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución del tamaño de imágenes $\leq 500Kb$}
+\caption[Distribución del tamaño de imágenes $\leq 500Kb$]{Distribución del tamaño de imágenes $\leq 500Kb$. Elaboración propia.}
 \label{fig:distribucion-tamanno-imagenes-hasta-500kb}
 \end{figure}
 
@@ -94,7 +94,7 @@ El \emph{script} cuenta con once tamaños para redimensionar las imágenes origi
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-simple.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en IM-Simple}
+\caption[Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en IM-Simple]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en IM-Simple. Elaboración propia.}
 \label{fig:distribucion-solicitudes-imagenes-hasta-500kb}
 \end{figure}
 
@@ -119,19 +119,19 @@ El \emph{script} cuenta con once tamaños para redimensionar las imágenes origi
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-500kb-palladio.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en las simulaciones de \emph{Palladio Workbench}}
+\caption[Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en las simulaciones de \emph{Palladio Workbench}]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$ en las simulaciones de \emph{Palladio Workbench}. Elaboración propia.}
 \label{fig:distribucion-simulacion-imagenes-hasta-500kb}
 \end{figure}
 
 En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb} se muestra la distribución de los tiempos de respuesta en las solicitudes de redimensionamiento en las imágenes de tamaño menor a 500Kb. Con excepción de la primera invocación, la cual tuvo una duración de 4 segundos, más del 97,5\% de las invocaciones no superó los 1,6 segundos.
 
-\paragraph{Mediciones para obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-KP y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
+\paragraph{Mediciones para la obtención de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-KP y IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
 
-En primera instancia se ejecutaron 1000 invocaciones a IM-KP para generar una bitácora de Kieker y a partir de la misma extraer un modelo de rendimiento PCM usando PMX. Tal y como se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Fue por esta razón que, para contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las  métricas de rendimiento, se introdujo IM-XRay. 
+En primera instancia se ejecutaron 1000 invocaciones a IM-KP para generar una bitácora de Kieker y a partir de ella extraer un modelo de rendimiento PCM usando PMX. Según se señala en la Sección \ref{sec:image-handler-xray}, las estimaciones hechas por PMX sobre el rendimiento de los componentes del modelo se basaban en valores constantes. Por ello se introdujo IM-XRAY, a fin de contar con una versión alternativa de \emph{Image Handler} que pudiera brindar otro nivel de detalle en las métricas de rendimiento. 
 
 Al igual que en caso anterior, se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. 
 
-Otro valor agregado que brindó IM-XRay a este estudio fue la capacidad de medir el efecto que la plataforma AWS Lambda tuvo sobre las invocaciones de redimensionamiento, especialmente durante las primeras invocaciones. Se pudo observar que en las primeras invocaciones de redimensionamiento X-Ray reportaba tiempos de ``inicialización'' y que, cuando esto se daba, la duración total de la invocación de redimensionamiento era mucho mayor al resto. Para incluir estos tiempos de inicialización, se creó un nuevo componente en el modelo con nombre \texttt{AWS Lambda} y, al igual que en los demás componentes, se tomaron los tiempos de inicialización reportados por AWS X-Ray, se exportaron en formato \texttt{.csv} a \texttt{R} para obtener una distribución de frecuencia de la probabilidad e incluirla en los \emph{SEEFs} del componente \texttt{AWS Lambda}. 
+Otro valor agregado que brindó IM-XRay a este estudio fue la capacidad de medir el efecto de la plataforma AWS Lambda sobre las invocaciones de redimensionamiento, especialmente durante las primeras invocaciones. Se pudo observar que en las primeras invocaciones de redimensionamiento X-Ray reportaba tiempos de ``inicialización'' y que, cuando esto se daba, la duración total de la invocación de redimensionamiento era mucho mayor al resto. Para incluir estos tiempos de inicialización, se creó un nuevo componente en el modelo con nombre \texttt{AWS Lambda} y, al igual que en los demás componentes, se tomaron los tiempos de inicialización reportados por AWS X-Ray, se exportaron en formato \texttt{.csv} a \texttt{R} para obtener una distribución de frecuencia de la probabilidad e incluirla en los \emph{SEEFs} del componente \texttt{AWS Lambda}. 
 
 
 Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
@@ -151,12 +151,12 @@ Por último se ejecutó una simulación en \emph{Palladio Workbench} con los sig
         \midrule
         Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
         Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
-        Varianza & 212206.961 & 216635 & -- \\
-        Mediana & 466.715ms & 680.482ms &. -- \\
+        Varianza & 212206.961 & 216635.000 & -- \\
+        Mediana & 466.715ms & 680.482ms & -- \\
         Coeficiente de variación & 0.987 & 0.683 & -- \\                       
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos: imágenes $\leq 500Kb$}
+    \caption[Resumen de datos estadísticos: imágenes $\leq 500Kb$]{Resumen de datos estadísticos: imágenes $\leq 500Kb$. Elaboración propia.}
     \label{table:datos-estadisticos-hasta-500kb}
 \end{table}
 
@@ -191,7 +191,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 	\legend{Simulaciones de Palladio, Solicitudes a IM-Simple}
 	\end{axis}
 \end{tikzpicture}
-\caption{IM-Simple \emph{vs} simulaciones en PCM: 1000 solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$.}
+\caption[IM-Simple \emph{vs} simulaciones en PCM: 1000 solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$.]{IM-Simple \emph{vs} simulaciones en PCM: 1000 solicitudes de redimensionamiento de imágenes de tamaño $\leq 500Kb$. Elaboración propia.}
 \label{fig:comparacion-imsimple-palladio-500kb}
 \end{figure}
 
@@ -220,16 +220,16 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
  
 \end{axis}
 \end{tikzpicture}
-\caption{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}}
+\caption[Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}]{Probabilidad acumulada en solicitudes de redimensionamiento en imágenes de tamaño $\leq 500Kb$ en \emph{Palladio Workbench}. Elaboración propia.}
 \label{fig:funcion-acumulada-palladio-500kb}
 \end{figure}
 
 \subsubsection{Análisis de resultados} 
-La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alentador. Las ejecuciones de las simulaciones en PCM presentan tiempos de respuesta muy similares a los que entrega IM-Simple. Hay una diferencia de 209,965ms en el tiempo promedio de los tiempos de respuesta de las simulaciones en PCM con respecto a los tiempos de IM-Simple. Preliminarmente, se valora que, debido a que la versión IM-XRay tiene activado el servicio de monitoreo AWS X-Ray y que fue esta versión de \emph{Image Handler} utilizada como referencia para generar los tiempos procesamiento estimados para cada componente del modelo, instrumentalizar la función Lambda con el servicio de monitoreo AWS X-Ray genera un costo adicional (\emph{overhead}) en el procesamiento de la función. Cabe mencionar que la estrategia de monitoreo utilizada fue muy agresiva, pues para obtener nuevas métricas para los componentes del modelo PCM, se habilitaron muchos puntos de monitoreo dentro del código fuente. Además, se configuró la función Lambda para que monitoreara el 100\% de las invocaciones a solicitudes de redimensionamiento. Esta configuración de monitoreo no es la habitual que se utiliza para las funciones Lambda en producción, pero, para el caso de este estudio se necesitó contar con mayores niveles de detalle en las mediciones por lo que fue necesario sacar el mayor provecho al monitoreo. Mientras menor sean utilizadas las opciones de monitoreo de AWS X-Ray en la función Lambda, menor será el \emph{overhead} experimentado, tal y como pasa con IM-Simple en donde no se experimenta \emph{overhead} por concepto de monitoreo.
+La Figura \ref{fig:comparacion-imsimple-palladio-500kb} muestra un panorama alentador. Las ejecuciones de las simulaciones en PCM presentan tiempos de respuesta muy similares a los que entrega IM-Simple. Hay una diferencia de 209,965ms en el tiempo promedio de los tiempos de respuesta de las simulaciones en PCM con respecto de los tiempos de IM-Simple. Preliminarmente, se valora que, debido a que la versión IM-XRay tiene activado el servicio de monitoreo AWS X-Ray y que fue esta versión de \emph{Image Handler} utilizada como referencia para generar los tiempos procesamiento estimados para cada componente del modelo, instrumentalizar la función Lambda con el servicio de monitoreo AWS X-Ray genera un costo adicional (\emph{overhead}) en el procesamiento de la función. Cabe mencionar que la estrategia de monitoreo utilizada fue muy agresiva, pues para obtener nuevas métricas para los componentes del modelo PCM, se habilitaron muchos puntos de monitoreo dentro del código fuente. Además, se configuró la función Lambda para que monitoreara el 100\% de las invocaciones a solicitudes de redimensionamiento. Esta configuración de monitoreo no es la habitual que se utiliza para las funciones Lambda en producción, pero, para el caso de este estudio se necesitó contar con mayores niveles de detalle en las mediciones, por lo que fue necesario sacar el mayor provecho al monitoreo. Mientras menos sean utilizadas las opciones de monitoreo de AWS X-Ray en la función Lambda, menor será el \emph{overhead} experimentado, como suced con IM-Simple en donde no se experimenta \emph{overhead} por concepto de monitoreo.
 
-Los resultados muestran desviaciones estándar de 460,569ms y 465,445ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es solamente 4,782ms mayor que la de IM-Simple, lo que sugiere que la agrupación de los datos con respecto a su media aritmética serán muy semejantes.
+Los resultados muestran desviaciones estándar de 460,569ms y 465,445ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es solamente 4,782ms mayor que la de IM-Simple, lo que sugiere que la agrupación de los datos con respecto de su media aritmética serán muy semejantes.
 
-Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500x, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5Kb será más rápido que una de tamaño de 490Kb.
+Los coeficientes de variación para IM-Simple y las simulaciones de PCM fue de 0.987 y 0.683 respectivamente. Estos resultados apuntan a una mayor heterogeneidad entre los tiempos de respuesta y a que el tiempo promedio de procesamiento no se considere representativo para este conjunto de datos. Esta variabilidad viene dada por las diferencias de los tamaños de las imágenes utilizadas para este experimento, como se muestra en la Figura \ref{fig:distribucion-tamanno-imagenes-hasta-500kb}: imágenes de tamaño $\leq 500Kb$, en donde existen diferencias de hasta 500x, por lo que, por ejemplo, el tiempo de procesamiento de una imagen de tamaño de 5Kb será significativamente más rápido que una de tamaño de 490Kb.
 
 Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $\leq 500Kb$ tome 1,6 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-500kb}). En IM-Simple, se obtuvo un 97,5\% de probabilidad para el mismo caso (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-500kb}). Para este caso en particular y, debido a la variabilidad de los tiempos de respuesta, se considera que el uso de esta probabilidad acumulada es más representativa a la hora de describir el comportamiento de la función Lambda.
 
@@ -253,7 +253,7 @@ Configuración para la obtención de datos de rendimiento
     \item \emph{Herramientas de medición:} Amazon X-Ray.
 \end{itemize}
 
-Para este experimento no se realizó ningún trabajo sobre la versión IM-KP porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Lo que sí fue necesario hacer, fue calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay.
+Para este experimento no se realizó ningún trabajo sobre la versión IM-KP porque no se necesita extraer ningún modelo. El modelo fue extraído y generado en el experimento anterior y debido a que se usa es el mismo código con los mismos puntos de monitoreo, un eventual proceso de extracción daría como resultado el mismo modelo del experimento anterior. Sí fue necesario calibrar el modelo existente con los resultados de las mediciones a solicitudes de redimensionamiento en imágenes de tamaño mayor a 500Kb y menor o igual 1Mb, utilizando la versión IM-XRay.
 
 Para la realización de este experimento, se obtuvieron 1000 imágenes aleatorias de tamaño mayor a 500Kb y menor o igual a 1Mb del servicio \emph{Lorem Picsum}. Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para acceder a la API de \emph{Lorem Picsum} para descargar de forma aleatoria 1000 imágenes cuyo tamaño fuera mayor a los 500Kb y menor o igual a 1Mb. La distribución del tamaño de las 1000 imágenes, en Kb, se aprecia en la figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}. El mismo grupo de imágenes se utilizó para realizar solicitudes de redimensionamiento sobre IM-Simple y IM-XRay.
 
@@ -276,7 +276,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 		table[col sep=comma, y index=0] {datos/tamannos-cluster-b.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución del tamaño de imágenes $500Kb \leq x \leq 1Mb$}
+\caption[Distribución del tamaño de imágenes $500Kb \leq x \leq 1Mb$]{Distribución del tamaño de imágenes $500Kb \leq x \leq 1Mb$. Elaboración propia.}
 \label{fig:distribucion-tamanno-imagenes-hasta-1mb}
 \end{figure}
 
@@ -303,7 +303,7 @@ Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejec
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-simple.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple}
+\caption[Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en IM-Simple. Elaboración propia.}
 \label{fig:distribucion-solicitudes-imagenes-hasta-1mb}
 \end{figure}
 
@@ -312,7 +312,7 @@ En la figura \ref{fig:distribucion-solicitudes-imagenes-hasta-1mb} se muestra la
 
 \paragraph{Mediciones para la calibración de modelo de rendimiento: 1000 invocaciones de redimensionamiento de imágenes en IM-XRay.} Se utilizó el mismo \emph{script} en \texttt{Bash} y la misma configuración para generar invocaciones a la función Lambda descrita en la sección anterior.
 
-Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
+Se ejecutaron 1000 invocaciones a IM-XRay y, por medio de un \emph{script} en \texttt{Bash}, se obtuvieron las trazas correspondientes a las 1000 invocaciones. Los nuevos datos fueron exportados a formato \texttt{.csv} e interpretados con el lenguaje \texttt{R}. En \texttt{R}, se calcularon distribuciones de frecuencia de la probabilidad en la que un componente lograba procesar una porción de la carga de trabajo total. Estos datos fueron incluidos en los \emph{SEEFs} de cada componente del modelo. Por último, se ejecutó una simulación en \emph{Palladio Workbench} con los siguientes parámetros:
 \begin{itemize}
     \item Generación de 1000 mediciones.
     \item Carga de trabajo: \emph{cerrada}. Se ejecuta una solicitud sobre el modelo hasta que la anterior termina. 
@@ -338,7 +338,7 @@ Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \t
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-hasta-1mb-palladio.csv};
 \end{axis}
 \end{tikzpicture}
-\caption{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio}
+\caption[Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$ en las simulaciones de Palladio. Elaboración propia.}
 \label{fig:distribucion-simulacion-imagenes-hasta-1mb}
 \end{figure}
 
@@ -368,7 +368,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
 	\end{axis}
 \end{tikzpicture}
-\caption{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$}
+\caption[Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $500Kb \leq x \leq 1Mb$. Elaboración propia.}
 \label{fig:comparacion-imsimple-palladio-1mb}
 \end{figure}
 
@@ -387,12 +387,12 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
         Coeficiente de variación & 0.473 & 0.462 & -- \\                      
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen estadístico: imágenes $500Kb \leq x \leq 1Mb$}
+    \caption[Resumen estadístico: imágenes $500Kb \leq x \leq 1Mb$]{Resumen estadístico: imágenes $500Kb \leq x \leq 1Mb$. Elaboración propia.}
     \label{table:datos-estadisticos-hasta-1mb}
 \end{table}
 
 \subsubsection{Análisis de resultados}
-A primera vista, la comparación de los tiempos de respuesta de IM-Simple y las simulaciones en PCM mostradas en la Figura \ref{fig:comparacion-imsimple-palladio-1mb} muestran gran similitud. Hay una diferencia de 274,428ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto a los tiempos de IM-Simple. En este experimento también se intuye que la estrategia de monitoreo de AWS X-Ray es la responsable de agregar este \emph{overhead} en el procesamiento.
+A primera vista, la comparación de los tiempos de respuesta de IM-Simple y las simulaciones en PCM mostradas en la Figura \ref{fig:comparacion-imsimple-palladio-1mb} muestran gran similitud. Hay una diferencia de 274,428ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto de los tiempos de IM-Simple. En este experimento también se intuye que la estrategia de monitoreo de AWS X-Ray es la responsable de agregar este \emph{overhead} en el procesamiento.
 
 Los resultados muestran desviaciones estándar de 1731.974ms y 1844.893ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es 112.919ms mayor que la de IM-Simple. Esto indica que la agrupación de los datos con respecto de su media aritmética es muy similar entre ambas muestras.
 
@@ -422,7 +422,7 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
 \draw[blue, dashed, thick](b |- current plot begin) -- (b);
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM}
+\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM. Elaboración propia.}
 \label{fig:funcion-acumulada-palladio-1mb}
 \end{figure}
 
@@ -469,7 +469,7 @@ Para la realización de este experimento, se obtuvieron 1000 imágenes aleatoria
 		table[col sep=comma, y index=0] {datos/tamannos-cluster-c.csv};
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Distribución del tamaño de imágenes de tamaño $1Mb \leq x \leq 2Mb$. Elaboración propia.}
 \label{fig:distribucion-tamanno-imagenes-hasta-2mb}
 \end{figure}
 
@@ -497,7 +497,7 @@ Se ejecutó el \emph{script} en \texttt{Bash} del experimento anterior para ejec
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-simple.csv};
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple}
+\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en IM-Simple. Elaboración propia.}
 \label{fig:distribucion-solicitudes-imagenes-hasta-2mb}
 \end{figure}
 
@@ -532,7 +532,7 @@ Se ejecutaron 1000 invocaciones a IM-XRay, y por medio de un \emph{script} en \t
 		table[col sep=comma, y index=0] {datos/tiempos-de-respuesta-mas-de-1mb-palladio.csv};
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio}
+\caption[\hspace{0.2cm} Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio]{Distribución de los tiempos de respuesta en solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$ en las simulaciones de Palladio. Elaboración propia.}
 \label{fig:distribucion-simulacion-imagenes-hasta-2mb}
 \end{figure}
 
@@ -562,7 +562,7 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
 	\legend{Simulaciones de Palladio, Solicitudes a \emph{Image Handler}}
 	\end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$. Elaboración propia.}
 \label{fig:comparacion-imsimple-palladio-2mb}
 \end{figure}
 
@@ -579,20 +579,20 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos: imágenes $1Mb \leq x \leq 2Mb$}
+    \caption[Resumen de datos estadísticos: imágenes $1Mb \leq x \leq 2Mb$]{Resumen de datos estadísticos: imágenes $1Mb \leq x \leq 2Mb$. Elaboración propia.}
     \label{table:datos-estadisticos-hasta-2mb}
 \end{table}
 
 \subsubsection{Análisis de resultados}
-Bajo esta carga de trabajo es en donde se pueden apreciar mayor similitud en los tiempos de procesamiento de las solicitudes de redimensionamiento entregados por IM-Simple y las simulaciones de PCM. Hay una diferencia de 257,773ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto a los tiempos de IM-Simple. Al igual que en los experimientos anteriores, se considera que la influencia del servicio de monitoreo de AWS X-Ray es el responsable de causar la diferencia en el tiempo de procesamiento.
+Bajo esta carga de trabajo es en donde se puede apreciar mayor similitud en los tiempos de procesamiento de las solicitudes de redimensionamiento entregados por IM-Simple y las simulaciones de PCM. Hay una diferencia de 257,773ms en el tiempo promedio de los tiempos de respuesta en las simulaciones PCM con respecto de los tiempos de IM-Simple. Al igual que en los experimientos anteriores, se considera que la influencia del servicio de monitoreo de AWS X-Ray es el responsable de causar la diferencia en el tiempo de procesamiento.
 
-Los resultados muestran desviaciones estándar de 1816,152ms y 1914.258ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es 98.106ms mayor que la de IM-Simple. Esto indica que la agrupación de los datos con respecto a su media aritmética es muy similar entre ambas muestras.
+Los resultados muestran desviaciones estándar de 1816,152ms y 1914.258ms para IM-Simple y las simulaciones de PCM respectivamente. La desviación estándar de las simulaciones de PCM es 98.106ms mayor que la de IM-Simple. Esto indica que el agrupamiento de los datos con respecto de su media aritmética es muy similar entre ambas muestras.
 
 Los coeficientes de variación de son de 0,221 para IM-Simple y de 0,230 para las simulaciones de PCM. Estos resultados son los menores de los tres experimentos y sugieren que los datos son homogéneos entre sí y que, para esta muestra se pueda considerar representativo utilizar el tiempo promedio de respuesta para caracterizar el comportamiento de la función Lambda.
 
 % se consideran heterogéneos, no muy similares entre si. Esto hace que el tiempo promedio de una solicitud pueda considerarse no tan representativo a la hora de caracterizar el comportamiento de la función Lambda bajo esta carga de trabajo. La variabilidad en los tiempos de respuesta bajó debido a que en los tamaños de las imágenes utilizadas (Figura \ref{fig:distribucion-tamanno-imagenes-hasta-1mb}) tienen una diferencia de hasta 2 veces: es decir, en este conjunto, la imagen más grande es el doble de grande que la imagen más pequeña.
 
-Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $1Mb \leq x \leq 2Mb$ tome 10,14 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-2mb}). En IM-Simple, al 100\% de las solicitudes le tomó 10 segundos o menos (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-2mb}). Para este caso, el uso del tiempo promedio de procesamiento de solicitud de redimensionamiento podría ser utilizado para caracterizar el comporamiento de la función Lambda, pero, como en los dos casos anteriores, se considera que, el uso de la probabilidad acumulada sea más adecuado para brindar una predicciones más acertada.
+Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% de probabilidad de que el tiempo de procesamiento de una solicitud de redimensionamiento de una imagen de tamaño $1Mb \leq x \leq 2Mb$ tome 10,14 segundos o menos (Figura \ref{fig:funcion-acumulada-palladio-2mb}). En IM-Simple, procesar el 100\% de las solicitudes tomó 10 segundos o menos (Figura \ref{fig:distribucion-solicitudes-imagenes-hasta-2mb}). Para este caso, el uso del tiempo promedio de procesamiento de solicitud de redimensionamiento podría ser utilizado para caracterizar el comporamiento de la función Lambda, pero, como en los dos casos anteriores, se considera que el uso de la probabilidad acumulada sea más adecuado para brindar predicciones más acertadas.
 
 %
 \begin{figure}
@@ -620,12 +620,12 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
 
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM}
+\caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$ en PCM. Elaboración propia.}
 \label{fig:funcion-acumulada-palladio-2mb}
 \end{figure}
 
-\subsubsection{Resultados Generales}
-En los tres experimentos propuestos, los resultados provenientes de las simulaciones lograron caracterizar en gran medida lo observado en IM-Simple. En \ref{fig-probabilidad-acumulada-3-casos} se muestran las 3000 simulaciones realizadas (1000 por cada caso). Las líneas punteadas verticales señalan en dónde se concentran el 95\% de los datos de las simulaciones: 1,6 segundos para las imágnes menores a 500Kb, 8 segundos para las imágenes de entre 500Kb a 1Mb y 10,14 segundos para las imágenes entre 1Mb y 2Mb. 
+\subsubsection{Resultados generales}
+En los tres experimentos propuestos, los resultados provenientes de las simulaciones lograron caracterizar en gran medida lo observado en IM-Simple. En \ref{fig-probabilidad-acumulada-3-casos} se muestran las 3000 simulaciones realizadas (1000 por cada caso). Las líneas punteadas verticales señalan en dónde se concentran el 95\% de los datos de las simulaciones: 1,6 segundos o menos para las imágnes menores a 500Kb, 8 segundos o menos para las imágenes de entre 500Kb a 1Mb y 10,14 segundos o menos para las imágenes entre 1Mb y 2Mb. 
 
 \begin{figure}
 \hspace{-2cm}
@@ -664,19 +664,19 @@ En los tres experimentos propuestos, los resultados provenientes de las simulaci
  
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas]{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas}
+\caption[\hspace{0.2cm} 3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas]{3000 Simulaciones: Función de probabilidad acumulada para los tres escenarios de pruebas. Elaboración propia.}
 \label{fig-probabilidad-acumulada-3-casos}
 \end{figure}
 
-En el Cuadro \ref{table:resumen-estadistico-general} se muestra un resumen estadístico de los tres experimentos llevados a cabo. En este resumen se evidencia los efectos del monitoreo de Amazon X-Ray en la versión IM-XRay de \emph{Image Handler} en el tiempo promedio de procesamiento de una solicitud de redimensionamiento. Las diferencias entre el tiempo promedio de procesamiento en IM-Simple y IM-XRay fue de 209.965ms, 274.428ms y 257.773 para el experimento \#1, \#2 y \#3 respectivamente. En promedio 247.389ms de diferencia. La desviación estándar de estos tres valores es de 33.463ms y el coeficiente de variación es de 0,13. Estos datos son muy similares entre sí, y esto hace que para el caso de las simulaciones en PCM se pueda argumentar que en promedio se puede esperar diferencia de 247.389ms en el tiempo de respuesta de las simulaciones \emph{versus} los reportados por IM-Simple.
+En el Cuadro \ref{table:resumen-estadistico-general} se muestra un resumen estadístico de los tres experimentos llevados a cabo. En este resumen se evidencian los efectos del monitoreo de Amazon X-Ray en la versión IM-XRay de \emph{Image Handler} en el tiempo promedio de procesamiento de una solicitud de redimensionamiento. Las diferencias entre el tiempo promedio de procesamiento en IM-Simple y IM-XRay fue de 209.965ms, 274.428ms y 257.773 para los experimentos \#1, \#2 y \#3, respectivamente. En promedio, hay 247.389ms de diferencia. La desviación estándar de estos tres valores es de 33.463ms y el coeficiente de variación es de 0,13. Estos datos son muy similares entre sí, por ello, para el caso de las simulaciones en PCM es verosímil esperar, en promedio,  diferencias de 247.389ms en los tiempos de respuesta de las simulaciones \emph{versus} los reportados por IM-Simple.
 
 Cabe destacar que las diferencias observadas entre los tiempos de respuesta de las simulaciones con IM-Simple fueron hechas con base en tres valores, los cuales fueron obtenidos a partir de 3000 mediciones bajo tres grupos distintos de imágenes. Por ello los consideramos representativos.
 
 Desde el punto de vista de la arquitectura de software, \emph{Image Handler} muestra mejores rendimientos cuando se prueba con imágenes iguales o menores a 500Kb que con aquellas mayores a ese tamaño. Dentro de las mediciones a los componentes de \emph{Image Handler}, el que experimentó una mayor variablidad en los tiempos de procesamiento fue el componente de redimensionamiento. Aunque es el componente más importante dentro de esta arquitectura, es también el cuello de botella. Este es el principal componente a ser modificado en aras de probar diferentes comportamientos de \emph{Image Handler}. 
 
-Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cambios en la biblioteca de redimensionamiento. Aunque puedan existir bibliotecas que logren disminuir en gran medida el trabajo de redimensionamiento de una imagen, se hace útil también el considerar otras herramientas o estrategias para mejorar los tiempos de respuesta de la función, por ejemplo:
+Varias otras optimizaciones podrían ser consideradas aparte de valorar cambios en la biblioteca de redimensionamiento. Aunque puedan existir bibliotecas que logren disminuir el trabajo de redimensionamiento de una imagen, se hace útil también el considerar otras herramientas o estrategias para mejorar los tiempos de respuesta de la función, por ejemplo:
 \begin{enumerate}
-    \item Limitar el tamaño de las imágenes a procesar: una vez conocido el rendimiento de la función, se podría en limitar las imágenes a procesar basado en su tamaño, por ejemplo, solamente imágenes menores a 500Kb.
+    \item Limitar el tamaño de las imágenes por procesar: una vez conocido el rendimiento de la función, se podría en limitar las imágenes por procesar con base en sus tamaños por ejemplo, solamente imágenes menores a 500Kb.
     \item Utilizar una memoria intermedia de acceso rápido, un \emph{caché}, para guardar copias de imágenes redimensionadas: después de una primera solicitud de redimensionamiento, se guarda la imagen resultante en un \emph{caché} y luego, entregar esta imagen en subsecuentes solicitudes de redimensionamiento. De esta forma las solicitudes repetitivas no llegarían a ser procesadas por la función Lambda. Esta estrategia se muestra en la Figura \ref{fig:serverless-image-handler-architecture}.
     \item Preprocesar imágenes de gran tamaño fuera de línea: en el caso en donde se cuente con las imágenes originales de antemano, podría ser muy útil ejecutar procesos fuera de línea para redimensionar estas imágenes a los tamaños requeridos y hacer que \emph{Image Handler} solamente sirva estas imágenes y no aplicar ningún tipo de lógica de redimensionamiento.
 \end{enumerate}
@@ -695,7 +695,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
         Tiempo promedio  & 583.842ms & 793.808ms & 209.965ms\\
         Desviación estándar & 460.659ms & 465.441ms & 4.782ms\\
         Varianza & 212206.961 & 216635.000 & -- \\
-        Mediana & 466.715ms & 680.482ms &. -- \\
+        Mediana & 466.715ms & 680.482ms & -- \\
         Coeficiente de variación & 0.987 & 0.683 & -- \\
         \toprule[1.5pt]
          \multicolumn{4}{c}{\textbf{Entre 500Kb a 1Mb}} \\
@@ -715,7 +715,7 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
         Coeficiente de variación & 0.221 & 0.230 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Resumen de datos estadísticos de los tres experimentos propuestos}
+    \caption[Resumen de datos estadísticos de los tres experimentos propuestos]{Resumen de datos estadísticos de los tres experimentos propuestos. Elaboración propia.}
     \label{table:resumen-estadistico-general}
 \end{table}
 
@@ -724,12 +724,12 @@ Varias otras optimizaciones podrían ser tomadas en cuenta aparte de valorar cam
 
 %%%%%%%%%%%%%% Experimento 2
 \newpage
-\subsection{Ejecución Secuencial Ininterrumpida de solicitudes de redimensionamiento}\label{sec:experimento-2}
+\subsection{Ejecución secuencial ininterrumpida de solicitudes de redimensionamiento}\label{sec:experimento-2}
 
 En el experimento de la Sección \ref{sec:experimento-1} se realizaron múltiples solicitudes de redimensionamiento con el fin de extraer y crear un modelo de rendimiento, ejecutar simulaciones sobre este modelo y comparar los resultados con lo observado en una versión de \emph{Image Handler} real.
 
 Una de las principales inquietudes durante la ejecución de funciones en la nube es determinar si la velocidad en la que se procesa una solicitud resulta ser baja y muestra una tendencia predecible. Los desarrolladores e implementadores necesitan evaluar esto para afinar el código fuente y la arquitectura para evitar cobros elevados por el uso de la plataforma.
-De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados: uno ``fría'' y una ``caliente''. En el estado frío, la plataforma que soporta la función en la nube debe aprovisionar los recursos necesarios para ejecutar la función. Durante esta fase se pueden experimentar los tiempos de respuesta más prolongados. La fase caliente se da luego de que la plataforma que soporta la función reconoce que la función está siendo invocada constantemente y que, debido a este uso, necesita proporcionarle mayores recursos computacionales para brindar mejores tiempos de respuesta. Se espera que, en una función que se esté invocando constantemente, solamente un porcentaje muy bajo del tiempo se encuentre en estado frío y la mayor parte (mientras continúe siendo invocada) estará en estado caliente.
+De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados: ``frío'' y ``caliente''. En el estado frío, la plataforma que soporta la función en la nube debe aprovisionar los recursos necesarios para ejecutar la función. Durante esta fase se pueden experimentar los tiempos de respuesta más prolongados. La fase caliente se da luego de que la plataforma que soporta la función reconoce que la función está siendo invocada constantemente y que, debido a este uso, necesita proporcionarle mayores recursos computacionales para brindar mejores tiempos de respuesta. Se espera que, en una función que se esté invocando constantemente, solamente un porcentaje muy bajo del tiempo se encuentre en estado frío y la mayor parte (mientras continúe siendo invocada) estará en estado caliente.
 
 \newpage
 
@@ -741,12 +741,12 @@ De acuerdo con \cite{8360324}, una función puede pasar por dos grandes estados:
 
 Para la realización de este experimento se contó con la siguiente configuración:
 \begin{itemize}
-    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño menor o igual a 500Kb alojadas en Amazon S3.
     \item \emph{Carga de trabajo:} 
     \begin{enumerate}
         \item 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
-        \item 1000 invocaciones secuenciales de redimensionamient de una sola imagen a IM-Simple.
+        \item 1000 invocaciones secuenciales de redimensionamiento de una sola imagen a IM-Simple.
     \end{enumerate}
     \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
@@ -782,7 +782,7 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 \end{axis}
 \end{tikzpicture}
 % Formato del caption para el índice de figuras %
-\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$.]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$.]{1000 solicitudes de redimensionamiento en imágenes $\leq 500Kb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen. Elaboración propia.}
 \label{fig:1000-ejecuciones-secuenciales-500kb}
 \end{figure}
 
@@ -793,12 +793,12 @@ En la figura \ref{fig:1000-ejecuciones-secuenciales-500kb} se muestran 1000 ejec
 
 Para la realización de este experimento se contó con la siguiente configuración:
 \begin{itemize}
-    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 500Kb y menor o igual a 1Mb alojadas en Amazon S3.
     \item \emph{Carga de trabajo:} 
     \begin{enumerate}
         \item 1000 invocaciones secuenciales de redimensionamiento de imágenes con dimensiones aleatorias a IM-Simple.
-        \item 1000 invocaciones secuenciales de redimensionamient de una sola imagen a IM-Simple.
+        \item 1000 invocaciones secuenciales de redimensionamiento de una sola imagen a IM-Simple.
     \end{enumerate}
     \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
@@ -831,18 +831,18 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
 
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{1000 solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen. Elaboración propia.}
 \label{fig:1000-ejecuciones-secuenciales-1mb}
 \end{figure}
 
-En la figura \ref{fig:1000-ejecuciones-secuenciales-1mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 750Kb. Los resultados de los tiempos de respuesta muestran una tendencia marcada: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
+En la figura \ref{fig:1000-ejecuciones-secuenciales-1mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 750Kb. Los resultados de los tiempos de respuesta muestran una tendencia marcada: la primera solicitud tomó mucho más tiempo que el resto. Una vez realizada la primera solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
 
 
 \subsubsection{Ejecución de invocaciones de redimensionamiento simultáneas para imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb}
 
 Para la realización de este experimento se contó con la siguiente configuración:
 \begin{itemize}
-    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple
+    \item \emph{Sujeto de prueba:} La función Lambda IM-Simple.
     \item \emph{Repositorio de imágenes:} \emph{Cluster} de 1000 imágenes de tamaño mayor a 1Mb y menor o igual a 2Mb alojadas en Amazon S3.
     \item \emph{Carga de trabajo:} 
     \begin{enumerate}
@@ -883,26 +883,26 @@ La ejecución de las 1000 solicitudes de redimensionamiento tomó 2 horas y 36 m
  
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen.}
+\caption[\hspace{0.2cm} 1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{1000 solicitudes de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$. La línea azul representa las solicitudes hechas utilizando imágenes aleatorias. La línea roja, las solicitudes utilizando una única imagen. Elaboración propia.}
 \label{fig:1000-ejecuciones-secuenciales-2mb}
 \end{figure}
 
-En la figura \ref{fig:1000-ejecuciones-secuenciales-2mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 1,4Mb. Los resultados de los tiempos de respuesta muestran una tendencia similar a los casos anteriores: la primer solicitud tomó mucho más tiempo que el resto. Una vez realizada la primer solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
+En la figura \ref{fig:1000-ejecuciones-secuenciales-2mb} se muestran 1000 ejecuciones secuenciales utilizando imágenes aleatorias (línea azul) y utilizando una sola imagen (línea roja). La imagen de la línea roja es de tamaño 1,4Mb. Los resultados de los tiempos de respuesta muestran una tendencia similar a los casos anteriores: la primera solicitud tomó mucho más tiempo que el resto. Una vez realizada la primera solicitud, los tiempos de respuesta de la función mejoraron considerablemente y, en el caso de las solicitudes de redimensionamiento en imágenes aleatorias, sí se logró observar un caso en el que el tiempo de respuesta fue similar al observado en la primera solicitud. En el caso de la imagen única no se observaron tiempos de respuesta que llegaran a ser similares al primero en posteriores invocaciones. 
 
 \subsubsection{Análisis de resultados}
-Luego de las invocaciones de redimensionamiento tanto en imágenes aleatorias como en una sola imagen, se pudo observar que, si bien en las primeras invocaciones se experimenta mayores tiempos de respuesta, los tiempos de respuesta entregados por la función Lambda lograron bajar significativamente y en los casos de las invocaciones de redimiensionamiento en una sola imagen, estos tiempos lograron mantenerse sumamente estables.
+Luego de las invocaciones de redimensionamiento tanto en imágenes aleatorias como en una sola imagen, se pudo observar que, si bien en las primeras invocaciones se experimentan mayores tiempos de respuesta, los tiempos de respuesta entregados por la función Lambda lograron bajar significativamente y, en los casos de las invocaciones de redimiensionamiento en una sola imagen, estos tiempos lograron mantenerse sumamente estables.
 
-Este comportamiento sugiere que en la invocación de una función Lambda en AWS, la plataforma subyacente primero necesita aplicar tareas de aprovisionamiento para poner a disposición la función y, una vez que esto se realiza, la función paulatinamente va pasando a un estado ``caliente'' conforme van arribando las invocaciones de redimensionamiento. Aunque la arquitectura del servicio AWS Lambda no se encuentra disponible públicamente, en árticulos en Internet y en proyectos paralelos como SAM Cli y \emph{AWS Lambda container image converter tool}\footnote{\url{https://github.com/awslabs/aws-lambda-container-image-converter}} se sugiere el uso de contenedores Docker que son provisionados con el código de la función y que se encargan de procesar las invocaciones entrantes. 
+Este comportamiento sugiere que en la invocación de una función Lambda en AWS, la plataforma subyacente primero necesita aplicar tareas de aprovisionamiento para poner a disposición la función y, una vez que esto se realiza, la función paulatinamente va pasando a un estado ``caliente'' conforme van arribando las invocaciones de redimensionamiento. Aunque la arquitectura del servicio AWS Lambda no se encuentra disponible públicamente, en árticulos en Internet y en proyectos paralelos como SAM Cli y \emph{AWS Lambda container image converter tool}\footnote{\url{https://github.com/awslabs/aws-lambda-container-image-converter}} se sugiere el uso de contenedores Docker que son provisionados con el código de la función y se encargan de procesar las invocaciones entrantes. 
 
-\paragraph{Relación con el modelo de rendimiento obtenido} El modelo de rendimiento obtenido y las simulaciones hechas son agnósticos a los estados ``frío'' o ``caliente'' que se muestran en las observaciones. El principal objetivo de los simuladores de PCM es el de obtener múltiples combinaciones de ejecuciones de una arquitectura de software dada y, a menos que un comportamiento o característica de esta logre ser introducido en el modelo es que su impacto debería de verse reflejado en las simulaciones.
+\paragraph{Relación con el modelo de rendimiento obtenido} El modelo de rendimiento obtenido y las simulaciones hechas son agnósticos a los estados ``frío'' o ``caliente'' que se muestran en las observaciones. El principal objetivo de los simuladores de PCM es el de obtener múltiples combinaciones de ejecuciones de una arquitectura de software dada y, a menos que un comportamiento o característica de esta logre ser introducido en el modelo es que su impacto debería reflejarse en las simulaciones.
 
 Si bien en el modelo obtenido no se introdujo esto explícitamente, las mediciones muestran que los tiempos de respuesta más prolongados se corresponden con el momento en que la función estaba en estado ``frío'', por ejemplo, durantes las primeras invocaciones. Si se toma como referencia el primer experimento ejecutado en la Sección \ref{sec:experimento-1}, invocaciones de redimensionamiento en imágenes menores o iguales a 500Kb, en la figura \ref{fig:comparacion-imsimple-palladio-500kb}, la primera medición a IM-Simple dió como resultado 4.1s y las subsecuentes 999 invocaciones bajaron a 1,6 segundos o menos; muchas de ellas incluso fueron menores a medio segundo. En los resultados de este experimento, existe un 95\% de probablidades que los tiempos de respuesta de las invocaciones sean de 1,6 segundos o menos, lo que, visto desde otro ángulo, quiere decir que existe un 5\% de probabilidad que los tiempos de respuesta de las  invocaciones tomen entre 1,6 y 4 segundos en ser procesadas. 
 
-Ahora bien, aunque 5\% parece ser una probabilidad muy alta y que no refleja lo visto en las mediciones, cuando se vuelve a los resultados de las simulaciones se observa que hay probabilidad mayor al 99\% de que una invocación de redimensionamiento tenga un tiempo de respuesta igual o menor a 2 segundos. Esto quiere decir que hay una probabilidad de menos del 1\% de que una invocación a la función Lambda tome entre 2 y 4 segundos en ser procesada. En el caso de las simulaciones de la Figura \ref{fig:comparacion-imsimple-palladio-500kb} solamente 6 casos muestran tiempos de respuesta de entre 2 y 4 segundos lo que representa un 0.006\% del total de las simulaciones realizadas.
+Ahora bien, aunque 5\% parece ser una probabilidad muy alta y que no refleja lo visto en las mediciones, cuando se vuelve a los resultados de las simulaciones se observa que hay probabilidad mayor al 99\% de que una invocación de redimensionamiento tenga un tiempo de respuesta igual o menor a 2 segundos. Esto quiere decir que hay una probabilidad de menos del 1\% de que una invocación a la función Lambda tome entre 2 y 4 segundos en ser procesada. En el caso de las simulaciones de la Figura \ref{fig:comparacion-imsimple-palladio-500kb} solamente 6 casos (de 1000) muestran tiempos de respuesta de entre 2 y 4 segundos lo que representa un 0.006\% del total de las simulaciones realizadas.
 
-Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones con los tiempos de respuesta más prolongados representan una cantidad muy pequeña de la totalidad de los casos y que, estos casos se pueden interpretar como potenciales escenarios de la función Lambda en estado frío. Las simulaciones muestran que a pesar del impacto que tienen estos escenarios en las invocaciones, estos realmente no llegan afectar el comportamiento general de la función Lambda. 
+Lo anterior señala que, para el caso de \emph{Image Handler}, las simulaciones con los tiempos de respuesta más prolongados representan una cantidad muy pequeña de la totalidad de los casos y que estos casos se pueden interpretar como potenciales escenarios de la función Lambda en estado frío. Las simulaciones muestran que, a pesar del impacto que tienen tales escenarios en las invocaciones, estos realmente no llegan afectar el comportamiento general de la función Lambda. 
 
-Con respecto a los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados tienen el potencial de caracterizar las ejecuciones de la función en estado ``frío''.
+Con respecto de los resultados de este experimento y su relación con los escenarios de invocaciones de redimiensionamiento en imágenes de tamaño de 500Kb y menor o igual a 1Mb, e imágenes de tamaño de 1Mb y menor a 2Mb, expuestas en la Sección \ref{sec:experimento-1}, se puede emplear un análisis similar: las simulaciones que reportan los tiempos de respuesta más prolongados tienen el potencial de caracterizar las ejecuciones de la función en estado ``frío''.
 
 %%%%%%%%%%%%%% Experimento 3
 \subsection{Variación del intervalo de las invocaciones de redimensionamiento}\label{sec:experimento-3}
@@ -910,7 +910,7 @@ Con respecto a los resultados de este experimento y su relación con los escenar
 Este experimento se plantea como una variante del expuesto en la Sección \ref{sec:experimento-2}, donde se evaluaba el efecto de las invocaciones simultáneas a la función Lambda. Acá se plantea variar el intervalo entre invocaciones a la función Lambda con el fin de valorar los efectos en el comportamiento de la función y si el modelo obtenido en la Sección \ref{sec:experimento-1} contribuye a explicar algo de lo observado; en particular si los intervalos entre las invocaciones hacen que el rendimiento de la función se considere ``fría'' o ``caliente'' en algún punto.
 
 \subsubsection{Estrategia de intervalo de invocaciones a \emph{Image Handler}}
-Para evaluar los efectos de los intervalos de lanzamiento en las invocaciones a \emph{Image Handler}, se propone la ejecución de un número de invocaciones secuencial (una ráfaga), luego entrar en un tiempo de espera y luego, aplicar otra ráfaga de invocaciones. 
+Para evaluar los efectos de los intervalos de lanzamiento en las invocaciones a \emph{Image Handler}, se propone la ejecución de un número de invocaciones secuencial (una ráfaga), luego entrar en un tiempo de espera y, seguidamente aplicar otra ráfaga de invocaciones. 
 
 El tiempo de espera entre ráfagas se irá incrementando al doble del tiempo de espera anterior. Por ejemplo, si el primer tiempo de espera es de 2 minutos, el siguiente será de 4 minutos, luego 8, 16, 32 minutos y así sucesivamente. Para este experimento se propone utilizar un tiempo de espera inicial de 10 minutos, para luego aumentarlo en subsecuentes ráfagas de invocaciones.
 
@@ -928,9 +928,9 @@ De acuerdo con lo observado en los experimentos anteriores, luego de la primera 
 
 A diferencia de los experimentos anteriores, se utiliza la versión de IM-XRay en lugar de IM-Simple. La razón es que se quiere sacar provecho a las herramientas de monitoreo de AWS X-Ray para determinar si la función pasa de un estado \emph{frío $\rightarrow$ caliente $\rightarrow$ frío} y determinar el impacto de este cambio en el tiempo de respuesta.
 
-\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $\leq 500Kb$}\label{sec:rafagas-hasta-500kb}
+\subsubsection{Variación del intervalo de las invocaciones de redimensionamiento en imágenes $\leq 500Kb$}\label{sec:rafagas-hasta-500kb}
 
-La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensionamiento en imágenes menores a 500Kb divididas en 100 ráfagas cada una. En la primer ráfaga la función se encuentra en estado ``frío'', sucede el aprovisionamiento inicial. Luego de esta primer invocación la función va entrando paulatinamente en estado ``caliente'' y se logra observar que para la mayoría de los casos las invocaciones de redimensionamiento no llegan a tomar más de 1,5 segundos. El tiempo promedio de ejecución de una ráfaga fue de 2 minutos y 45 segundos.
+La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensionamiento en imágenes menores a 500Kb divididas en 100 ráfagas cada una. En la primer ráfaga la función se encuentra en estado ``frío'', sucede el aprovisionamiento inicial. Luego de esta primer invocación la función va entrando paulatinamente en estado ``caliente'' y se logra observar que, para la mayoría de los casos las invocaciones de redimensionamiento no llegan a tomar más de 1,5 segundos. El tiempo promedio de ejecución de una ráfaga fue de 2 minutos y 45 segundos.
 
 \begin{figure}[h]
 \hspace{-1.0cm}
@@ -962,19 +962,19 @@ La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensiona
  
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $\leq 500Kb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primera ráfaga y la segunda. El segundo espacio delimitado por la línea punteada roja representa 20 minutos de inactividad entre la segunda y la tercera ráfagas. Elaboración propia}
 \label{fig:rafagas-hasta-500kb}
 \end{figure}
 
 En la segunda ráfaga, luego de 10 minutos, la función no experimenta un tiempo de respuesta inicial similar al de la primer ráfaga. Esto quiere decir que pasados 10 minutos de inactividad entre la primera y segunda ráfagas, la función continúa en estado caliente.
 
-En la tercera ráfaga, luego de 20 minutos de haberse ejecutado la última invocación de redimensionamiento de la ráfaga anterior, sí se llega observar un tiempo de respuesta inicial alto. AWS X-Ray reporta que en esta invocación inicial se tuvo que re-aprovisionar la función, lo que sugiere que, durante los 20 minutos de inactividad entre una ráfaga y otra, la función fue pasando progresivamente a un estado ``frío'' debido a que la plataforma pudo determinar que el nivel de actividad de la función (cantidad de invocaciones) fue decreciendo hasta un punto en donde no detectó actividad alguna.
+En la tercera ráfaga, luego de 20 minutos de haberse ejecutado la última invocación de redimensionamiento de la ráfaga anterior, sí se llega observar un tiempo de respuesta inicial alto. AWS X-Ray reporta que en esta invocación inicial se tuvo que re-aprovisionar la función, lo que sugiere que, durante los 20 minutos de inactividad entre una ráfaga y otra, la función fue pasando progresivamente a un estado ``frío'' pues, aparentemente la plataforma pudo determinar que el nivel de actividad de la función (cantidad de invocaciones) fue decreciendo hasta un punto en donde no detectó actividad alguna.
 
-La última ráfaga también experimentó un tiempo de respuesta inicial alto. Esta vez un poco mayor al de la ráfaga anterior pero menor a la de la primer ráfaga. Hubo 40 minutos de inactividad entre la tercera ráfaga y la cuarta. 
+La última ráfaga también experimentó un tiempo de respuesta inicial alto. Esta vez un poco mayor al de la ráfaga anterior pero menor a la de la primera ráfaga. Hubo 40 minutos de inactividad entre la tercera ráfaga y la cuarta. 
 
-\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}
+\subsubsection{Variación del intervalo de las invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$}
 
-Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La Figura \ref{fig:rafagas-hasta-1mb} muestra los resultados de la ejecución de 5 ráfagas de 100 invocaciones cada una. El tiempo promedio de ejecución de una ráfaga fue de 9 minutos y 15 segundos. En la primera invocación de la primer ráfaga se obtuvo un tiempo de respuesta alto (función en estado frío). En la segunda ráfaga no se observó tiempos de respuesta elevados debido a que la función se encontraba en estado ``caliente''. 
+Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}, ahora con imágenes entre 500Kb y 1Mb. La Figura \ref{fig:rafagas-hasta-1mb} muestra los resultados de la ejecución de 5 ráfagas de 100 invocaciones cada una. El tiempo promedio de ejecución de una ráfaga fue de 9 minutos y 15 segundos. En la primera invocación de la primera ráfaga se obtuvo un tiempo de respuesta alto (función en estado frío). En la segunda ráfaga no se observó tiempos de respuesta elevados debido a que la función se encontraba en estado ``caliente''. 
 
 \begin{figure}
 \hspace{-1cm}
@@ -1008,11 +1008,11 @@ Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}. La 
  
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 5 ráfagas de 100 invocaciones de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. De ahí en adelante, el espacio delimitado por líneas punteadas rojas corresponde a 20, 40 y 80 minutos de inactividad entre ráfagas. Elaboración propia.}
 \label{fig:rafagas-hasta-1mb}
 \end{figure}
 
-En la primera invocación de la tercera y cuarta ráfaga, AWS X-Ray reportó que en ambas hubo que re-aprovisionar la función. Es decir, el tiempo de inactividad entre la segunda ráfaga (20 minutos) y entre la tercera y la cuarta (40 minutos) fue suficiente para que la plataforma volviera a marcar la función como fría de nuevo. Lo interesante de estas dos primeras invocaciones, es que, a pesar que la plataforma tuvo que volver a re-aprovisionar la función, los tiempos de respuesta reportados fueron mucho más bajos que el de la invocación inicial de la primer ráfaga. En la Tabla \ref{table:rafagas-hasta-1mb-tiempos-primera-invocacion} se pueden ver los tiempos de respuesta de las primeras invocaciones de cada ráfaga.
+En la primera invocación de la tercera y cuarta ráfagas, AWS X-Ray reportó que en ambas hubo que re-aprovisionar la función. Es decir, el tiempo de inactividad entre la segunda ráfaga (20 minutos) y entre la tercera y la cuarta (40 minutos) fue suficiente para que la plataforma volviera a marcar la función como fría. Lo interesante de estas dos primeras invocaciones es que aunque la plataforma tuvo que volver a re-aprovisionar la función, los tiempos de respuesta reportados fueron mucho más bajos que el de la invocación inicial de la primera ráfaga. En la Tabla \ref{table:rafagas-hasta-1mb-tiempos-primera-invocacion} se pueden ver los tiempos de respuesta de las primeras invocaciones de cada ráfaga.
 
 \begin{table}
     \centering
@@ -1029,15 +1029,15 @@ En la primera invocación de la tercera y cuarta ráfaga, AWS X-Ray reportó que
         \#5  & 11s \\                                
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption{Tiempo de respuesta de la primer invocación de redimensionamiento en cada ráfaga.}
+    \caption[Tiempo de respuesta de la primera invocación de redimensionamiento en cada ráfaga.]{Tiempo de respuesta de la primera invocación de redimensionamiento en cada ráfaga. Elaboración propia.}
     \label{table:rafagas-hasta-1mb-tiempos-primera-invocacion}
 \end{table}
 
 En la quinta ráfaga, el tiempo de respuesta de la primera invocación se elevó de nuevo. El tiempo de inactividad entre la cuarta ráfaga y la quinta fue de 80 minutos. 
 
-Debido a que los tiempos iniciales de la tercera y cuarta ráfaga fueron bajos (aunque AWS X-Ray reporta que para cada uno de ellos fue necesaria re-aprovisionar la función), fue que se la ejecución de una quinta ráfaga se hizo necesaria con el fin de validar que, conforme los tiempos de inactividad entre ráfagas aumenta, el tiempo de respuesta de la primera invocación también aumenta. 
+Debido a que los tiempos iniciales de la tercera y cuarta ráfaga fueron bajos (aunque AWS X-Ray reporta que para cada uno de ellos fue necesaria re-aprovisionar la función), fue que la ejecución de una quinta ráfaga se hizo necesaria con el fin de validar que, conforme los tiempos de inactividad entre ráfagas aumenta, el tiempo de respuesta de la primera invocación también aumenta. 
 
-\subsubsection{Variando el intervalo de las invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}
+\subsubsection{Variación del intervalo de las invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$}
 
 Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minutos y 15 segundos. En la ejecución de cada ráfaga, AWS X-Ray reportó que fue necesario re-aprovisionar la función cuando se ejecutó la primera invocación de cada ráfaga. En la Figura \ref{fig:rafagas-hasta-2mb} se muestran los resultados de la ejecución de las cuatro ráfagas.
 
@@ -1069,35 +1069,37 @@ Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minuto
  
 \end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primer ráfaga y la segunda. El espacio delimitado por la línea punteada verde representa 20 minutos de inactividad entre la segunda y la tercera ráfaga.}
+\caption[\hspace{0.2cm} 4 ráfagas de 100 invocaciones de redimensionamiento en imágenes $1Mb \leq x \leq 2Mb$]{El espacio delimitado por la línea punteada roja representa 10 minutos de inactividad entre la primera ráfaga y la segunda. Luego de esto, el espacio delimitado por líneas punteadas rojas corresponde a 20, 40 y 80 minutos de inactividad entre ráfagas. Elaboración propia.}
 \label{fig:rafagas-hasta-2mb}
 \end{figure}
 
-Los tiempos de respuesta de las primeras invocaciones de cada ráfaga resultaron ser más similares entre sí y, también se pudo observar que cuando existen tiempos de inactivad más prolongados, como el que entre la ráfaga tres y la cuando que es de 40 minutos, a la siguiente invocación le toma un mayor tiempo de respuesta que la primer invocación de la ráfaga anterior.
+Los tiempos de respuesta de las primeras invocaciones de cada ráfaga resultaron ser más similares entre sí y también se pudo observar que cuando existen tiempos de inactividad más prolongados, como el que hay entre la ráfaga tres y la cuatro que es de 40 minutos, a la siguiente invocación le toma un mayor tiempo de respuesta que la primera invocación de la ráfaga anterior.
 
 \subsubsection{Análisis de resultados}
 La principal observación que arrojó este experimento es que conforme van aumentando los tiempos de inactividad en la función Lambda, también van aumentando los tiempos de respuesta entregados por la primera invocación luego de este tiempo de inactividad. 
 
-De acuerdo con \cite{cold-starts-aws-lambda-1}, una vez que una función ha sido instalada en la plataforma, la primera invocación debe pasar por el proceso de aprovisionamiento. Luego de que esta primer invocación es procesada, la función pasa a un estado activo o ``caliente'' y el contenedor que la soporta se puede reutilizar para subsecuentes invocaciones. Cuando se detecta que la función se vuelve inactiva o ``fría'', el contenedor que la soporta se vuelve candidato a ser ``reciclado'' para ser utilizado por otra función que lo necesite.
+De acuerdo con \cite{cold-starts-aws-lambda-1}, una vez que una función ha sido instalada en la plataforma, la primera invocación debe pasar por el proceso de aprovisionamiento. Después de procesar la primera invocación, la función pasa a un estado activo o ``caliente'' y el contenedor que la soporta se puede reutilizar para subsecuentes invocaciones. Cuando se detecta que la función se vuelve inactiva o ``fría'', el contenedor que la soporta se vuelve candidato a ser ``reciclado'' para que pueda ser utilizado por otra función que lo necesite.
 
-Si bien no hay un tiempo límite definido para decidir cuándo el contenedor va a ser reciclado o no, los resultados de este experimento y los expuestos en \cite{cold-starts-aws-lambda-1} y \cite{cold-starts-aws-lambda-2} demuestran que entre mayor sean los tiempos de inactividad de una función, mayor será la probabilidad de que el contenedor que la soporta sea reciclado y que, cuando se vuelva a invocar a la función, se experimente un tiempo de respuesta mayor al promedio debido al proceso de aprovisionamiento. 
+Si bien no es posible conocer con certeza la existencia de un tiempo límite definido para decidir cuándo el contenedor va a ser reciclado o no, los resultados de este experimento y los expuestos en \cite{cold-starts-aws-lambda-1} y \cite{cold-starts-aws-lambda-2} demuestran que entre mayores sean los tiempos de inactividad de una función, mayor será la probabilidad de que el contenedor que la soporta sea reciclado y que, cuando se vuelva a invocar a la función, se experimente un tiempo de respuesta mayor al promedio debido al proceso de aprovisionamiento. 
 
-Según las mediciones en \cite{cold-starts-aws-lambda-1}, el tiempo de vida de un contenedor no parece darse en forma determinística pero se estima que está entre los 25 a 65 minutos. Una contenedor inactivo casi siempre se mantiene vivo por 25 minutos, luego de eso la probabilidad de que sea desechado crece lentamente y llega a alcanzar el 100\% luego de alrededor de 1 hora luego de la última invocación.
+Según las mediciones en \cite{cold-starts-aws-lambda-1}, el tiempo de vida de un contenedor no parece darse en forma determinística pero se estima que está entre los 25 a 65 minutos. Un contenedor inactivo casi siempre se mantiene vivo por 25 minutos, luego de eso la probabilidad de que sea desechado crece lentamente y llega a alcanzar el 100\% luego de alrededor de 1 hora posterior a la última invocación.
 
-\paragraph{Relación con el modelo de rendimiento obtenido} En el experimento de la Sección \ref{sec:experimento-1} se obtuvo un modelo de rendimiento a partir una sola ráfaga invocaciones secuenciales de redimensionamiento. No se introdujo tiempos de inactividad. 
+\paragraph{Relación con el modelo de rendimiento obtenido} En el experimento de la Sección \ref{sec:experimento-1} se obtuvo un modelo de rendimiento a partir de una sola ráfaga de invocaciones secuenciales de redimensionamiento. No se introdujeron tiempos de inactividad. 
 
-Aquí, aunque se introducen tiempos de inactividad entre ráfagas, se presenta una tendencia que se ha repetido a lo largo de los tres experimentos ejecutados hasta este momento: las primeras invocaciones reportan mayores tiempos de respuesta, especialmente la primera invocación, y conforme la función va recibiendo más y más invocaciones, su tiempo de respuesta tiende a bajar considerablemente. Esta es una característica que el modelo obtenido logró reconocer y, de igual manera como en los experimentos anteriores, las invocaciones en donde los tiempos de respuesta fueron mayores representan un porcentaje muy bajo ($\approx$ 1\%) del total de invocaciones en una ráfaga, por lo que cuando el modelo reporte invocaciones con tiempos de respuesta alto se puede afirmar para el caso de \emph{Image Handler} que estas invocaciones serán muy pocas y que probablemente representen momentos en donde la función tuvo que pasar forzozamente de un estado ``frío'' a uno ``caliente''.
+Aquí, aunque se introducen tiempos de inactividad entre ráfagas, se presenta una tendencia que se ha repetido a lo largo de los tres experimentos ejecutados hasta este momento: las primeras invocaciones reportan mayores tiempos de respuesta, especialmente la primera invocación y, conforme la función va recibiendo más y más invocaciones, su tiempo de respuesta tiende a bajar considerablemente. Esta es una característica que el modelo obtenido logró reconocer y, de igual manera que en los experimentos anteriores, las invocaciones en donde los tiempos de respuesta fueron mayores representan un porcentaje muy bajo ($\approx$ 1\%) del total de invocaciones en una ráfaga. Cuando el modelo reporte invocaciones con tiempos de respuesta alto se puede afirmar, para el caso de \emph{Image Handler}, que estas serán muy pocas y que probablemente representen momentos en donde la función tuvo que pasar forzozamente de un estado ``frío'' a uno ``caliente''.
 
 
-En PCM, el comportamiento asociado a las invocaciones basadas en ráfagas y tiempos de inactividad podría llegar a ser introducido con un modelo de uso personalizado el cual pueda tomar en cuenta las particularidades del cómo es que una arquitectura de software puede ser potencialmente utilizada pero, la forma en la que PCM reporta los resultados de las simulaciones es la misma independientemente del modelo de uso (o de cualquier otro modelo) utilizado. Es por esto que, en términos de resultados, PCM siempre va a entregar resultados basados en la probabilidad de que una determinada simulación se ejecute en una arquitectura dada. Lo anterior se usa para aclarar que mientras se utilice PCM para ejecutar simulaciones mediante el esquema de ráfaga/tiempo de espera, los resultados obtenidos no vendrán dados de forma específica para cada ráfaga ejecutada, sino más bien serán presentados de forma general.
+En PCM, el comportamiento asociado a las invocaciones basadas en ráfagas y tiempos de inactividad podría llegar a ser introducido con un modelo de uso personalizado el cual pueda tomar en cuenta las particularidades del cómo es que una arquitectura de software puede ser potencialmente utilizada, pero la forma en la que PCM reporta los resultados de las simulaciones es la misma - independientemente del modelo de uso (o de cualquier otro modelo) utilizado. Es por esto que, en términos de resultados, PCM siempre va a entregarlos con base en la probabilidad de que una determinada simulación se ejecute en una arquitectura dada. Se indica lo anterior para aclarar que mientras se utilice PCM para ejecutar simulaciones mediante el esquema de ráfaga/tiempo de espera, los resultados obtenidos no vendrán dados de forma específica para cada ráfaga ejecutada, sino más bien serán presentados de forma general.
 
 %%%%%%%%%%%%%% Experimento 4
 \subsection{Comparación de \texttt{SAM CLI} con observaciones reales de AWS Lambda}\label{sec:experimento-4} 
-\emph{Serverless Application Model} o \texttt{SAM CLI} es la primera herramienta desarrollada por Amazon para probar funciones Lambda localmente. \texttt{SAM CLI} permite desarrollar funciones Lambda en cualquiera de los lenguajes de programación soportados por el servicio AWS Lambda y probarlos sin necesidad de instalarlos directamente en el servicio. Para emular el servicio, \texttt{SAM CLI}, hace uso de Docker para instalar y ejecutar el código de una función en un contenedor especializado para tal fin. 
+\emph{Serverless Application Model} o \texttt{SAM CLI} es la primera herramienta desarrollada por Amazon para probar funciones Lambda localmente, es decir, sin necesidad de probarlas en la plataforma AWS (en la nube de Amazon). \texttt{SAM CLI} permite desarrollar funciones Lambda en cualquiera de los lenguajes de programación soportados por el servicio AWS Lambda y probarlos sin necesidad de instalarlos directamente en el servicio. A fin de emular el servicio, \texttt{SAM CLI} hace uso de Docker para instalar y ejecutar el código de una función en un contenedor especializado para tal fin. 
 
-\texttt{SAM CLI} no es la primera herramienta desarrollada para probar, instalar y emular funciones Lambda en un entorno local, pero si es la primera desarrollada por Amazon por lo que se espera que mediante su uso se pueda tener una aproximación muy cercana del comportamiento que va a tener una función Lambda cuando esté en producción.
+\texttt{SAM CLI} no es la primera herramienta desarrollada para probar, instalar y emular funciones Lambda en un entorno local, pero sí es la primera desarrollada por Amazon por lo que se espera que mediante su uso se pueda tener una aproximación muy cercana del comportamiento que tendrá una función Lambda cuando esté en producción.
 
-En este experimento se propone explorar el comportamiento de \emph{Image Handler} cuando se ejecutan invocaciones de redimensionamiento en \texttt{SAM CLI} y, comparar lo obtenido con invocaciones de redimensionamiento efectuadas en el servicio de AWS Lambda en producción. Los resultados de este experimento permitirán determinar si las invocaciones hechas en \texttt{SAM CLI} entregan tiempos de respuesta similares a los del servicio AWS Lambda para que, de esta forma se pueda considerar \texttt{SAM CLI} como una herramienta confiable para simulación de invocaciones de rendimiento.
+En este experimento se propone explorar el comportamiento de \emph{Image Handler} cuando se ejecutan invocaciones de redimensionamiento en \texttt{SAM CLI} y comparar lo obtenido con invocaciones de redimensionamiento efectuadas en el servicio de AWS Lambda en producción. Los resultados de este experimento permitirán determinar si las invocaciones hechas en \texttt{SAM CLI} entregan tiempos de respuesta similares a los del servicio AWS Lambda para que, de esta forma, se pueda considerar \texttt{SAM CLI} como una herramienta confiable para simulación de invocaciones de rendimiento.
+
+La versión de \texttt{SAM CLI} utilizada para la realización de todos los experimentos descritos a continuación es \texttt{0.10.0}.
 
 \subsubsection{Estrategia de comparación de invocaciones de redimensionamiento en \texttt{SAM CLI} y AWS Lambda}
 
@@ -1113,7 +1115,7 @@ Para la realización de este experimento se utilizó la siguiente configuración
     \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
 
-Configuración para la realización del experiento en \texttt{SAM CLI}:
+Configuración para la realización del experimento en \texttt{SAM CLI}:
 \begin{itemize}
     \item \emph{Sujeto de prueba:} La función lambda IM-Simple.
     \item \emph{Ambiente:} \texttt{SAM CLI} instalado en máquina virtual alojada en el servicio AWS EC2\footnote{\url{https://aws.amazon.com/ec2/}}, de tipo \texttt{t2.large}\footnote{\url{https://aws.amazon.com/ec2/instance-types/t2/}}.
@@ -1135,6 +1137,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	ylabel={\small Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
 	tick label style={font=\footnotesize},
+	legend cell align={left},
 	scatter/classes={%
 		a={mark=square*,blue},%
 		b={mark=square*,red},%
@@ -1145,7 +1148,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$. Elaboración propia.}
 \label{fig:comparacion-sam-500kb}
 \end{figure}
 
@@ -1165,13 +1168,13 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Coeficiente de variación & 0.64 & 0.21 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption[AWS Lambda vs SAM CLI: imágenes $x \leq 500Kb$]{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $x \leq 500Kb$]{Resumen de datos estadísticos. Elaboración propia}
     \label{table:sam-datos-estadisticos-hasta-500kb}
 \end{table}
 
 \paragraph{Resultados:} La Figura \ref{fig:comparacion-sam-500kb}, muestra la comparación de los tiempos de respuesta de las 1000 invocaciones realizadas y en la tabla \ref{table:sam-datos-estadisticos-hasta-500kb} un resumen de los datos estadísticos obtenidos. A primera vista se puede ver que el conjunto de tiempos de respuesta de las invocaciones cuando se utilizó \texttt{SAM CLI} fue más homogéneo que las invocaciones en AWS Lambda. Esto también se refleja en los coeficientes de variación: 0.64 y 0.21 para las invocaciones en AWS Lambda y \texttt{SAM CLI} respectivamente, lo que claramente sugiere que el conjunto de tiempos de respuesta obtenido de las invocaciones de \texttt{SAM CLI} es más homogéneo que el de AWS Lambda. Esto también lo confirma una menor desviación estándar en el conjunto de tiempos de respuesta de las invocaciones hechas mediantes \texttt{SAM CLI}. 
 
-En la tabla \ref{table:sam-datos-estadisticos-hasta-500kb}, el tiempo promedio de las invocaciones realizadas en AWS Lambda fue más bajo que el de \texttt{SAM CLI}. En \texttt{SAM CLI}, el menor tiempo de respuesta fue de 545.74ms mientras que en los resultados obtenidos de AWS Lambda aproximadamente el 56\% de los resultados estuvo por debajo de los 545.74ms. Esto indica que a pesar que el conjunto de los tiempos de respuesta de \texttt{SAM CLI} es más homogéneo, los tiempos obtenidos de AWS Lambda muestran un mejor rendimiento.
+En la tabla \ref{table:sam-datos-estadisticos-hasta-500kb}, el tiempo promedio de las invocaciones realizadas en AWS Lambda fue más bajo que el de \texttt{SAM CLI}. En \texttt{SAM CLI}, el menor tiempo de respuesta fue de 545.74ms mientras que en los resultados obtenidos de AWS Lambda aproximadamente el 56\% de los resultados estuvo por debajo de los 545.74ms. Esto indica que, a pesar que el conjunto de los tiempos de respuesta de \texttt{SAM CLI} es más homogéneo, los tiempos obtenidos de AWS Lambda muestran un mejor rendimiento.
 
 \subsubsection{Ejecución de 1000 invocaciones de redimensionamiento para imágenes de tamaño $500Kb \leq x \leq 1Mb$}
 
@@ -1183,7 +1186,7 @@ Para la realización de este experimento se utilizó la siguiente configuración
     \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
 
-Configuración para la realización del experiento en \texttt{SAM CLI}:
+Configuración para la realización del experimento en \texttt{SAM CLI}:
 \begin{itemize}
     \item \emph{Sujeto de prueba:} La función lambda IM-Simple.
     \item \emph{Ambiente:} \texttt{SAM CLI} instalado en máquina virtual alojada en el servicio AWS EC2, de tipo \texttt{t2.large}.
@@ -1203,6 +1206,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
 	ylabel={\small Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
+	legend cell align={left},
 	tick label style={font=\footnotesize},
 	scatter/classes={%
 		a={mark=square*,blue},%
@@ -1214,11 +1218,11 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $500kb \leq x \leq 1Mb$. Elaboración propia.}
 \label{fig:comparacion-sam-1mb}
 \end{figure}
 
-\begin{table}
+\begin{table}[h]
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
@@ -1229,18 +1233,18 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Duración & 72min & 218min & -- \\
         Tiempo promedio  & 4345.80ms & 1969.49ms & 2376.31ms\\
         Desviación estándar & 1867.64ms & 524.95ms & 1342.69ms \\
-        Varianza & 3488063 & 275569.63 & -- \\
+        Varianza & 3488063.00 & 275569.63 & -- \\
         Mediana & 3898.82ms & 1851.99ms & -- \\
         Coeficiente de variación & 0.48 & 0.28 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption[AWS Lambda vs SAM CLI: imágenes $500Kb \leq x \leq 1Mb$]{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $500Kb \leq x \leq 1Mb$]{Resumen de datos estadísticos. Elaboración propia.}
     \label{table:sam-datos-estadisticos-hasta-1mb}
 \end{table}
 
 \paragraph{Resultados:} El 99.8\% del conjunto de los tiempos de respuesta en \texttt{SAM CLI} se agruparon entre los 1.1 y 3.1 segundos mientras que el 66.8\% del conjunto de los tiempos de respuesta en AWS Lambda estuvieron por encima de los 3.1 segundos. Los tiempos de respuesta de las mediciones hechas en \texttt{SAM CLI} se siguen mostrando mucho más homogéneos que los de AWS Lambda pero, al igual que en el experimento anterior, esto no es una indicación de similitud entre los dos conjuntos de datos. 
 
-En general, los resultados obtenidos de \texttt{SAM CLI} muestran mejor rendimiento que los de AWS Lambda pero no logran caracterizar lo visto en las observaciones en el ambiente de producción. Los tiempos promedios de 4345.80ms y 1969.49ms en AWS Lambda y \texttt{SAM CLI} respectivamente aunado con los valores de las desviaciones estándar de 1867.64ms y 524ms para el mismo caso, sugiere que estos conjuntos de datos tienen comportamientos diferentes entre sí.
+En general, los resultados obtenidos de \texttt{SAM CLI} muestran mejor rendimiento que los de AWS Lambda pero no logran caracterizar lo visto en las observaciones en el ambiente de producción. Los tiempos promedios de 4345.80ms y 1969.49ms en AWS Lambda y \texttt{SAM CLI}, respectivamente, aunados con los valores de las desviaciones estándar de 1867.64ms y 524ms para el mismo caso, sugieren que estos conjuntos de datos tienen comportamientos diferentes entre sí.
 
 Por último, a \texttt{SAM CLI} le tomó 218 minutos en procesar las 1000 invocaciones de redimensionamiento, mientras que a AWS Lambda le tomó 72 minutos. Individualmente, las invocaciones de redimensionamiento de \texttt{SAM CLI} muestran mejores tiempos, pero el proceso en general toma más tiempo. A \texttt{SAM CLI} le toma más tiempo aprovisionar sus recursos antes de cada invocación, pero en la bitácora solamente se reporta el tiempo de procesamiento de la invocación como tal. En las condiciones actuales no es posible observar el tiempo de aprovisionamiento en \texttt{SAM CLI}.
 
@@ -1255,7 +1259,7 @@ Para la realización de este experimento se utilizó la siguiente configuración
     \item \emph{Herramientas de medición:} Amazon Cloudwatch.
 \end{itemize}
 
-Configuración para la realización del experiento en \texttt{SAM CLI}:
+Configuración para la realización del experimento en \texttt{SAM CLI}:
 \begin{itemize}
     \item \emph{Sujeto de prueba:} La función lambda IM-Simple.
     \item \emph{Ambiente:} \texttt{SAM CLI} instalado en máquina virtual alojada en el servicio AWS EC2, de tipo \texttt{t2.large}.
@@ -1264,7 +1268,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
     \item \emph{Herramientas de medición:} Bitácoras de \texttt{SAM CLI}.
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[h]
 \hspace{-1cm}
 \begin{tikzpicture}
 	\begin{axis}[
@@ -1275,6 +1279,7 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	xlabel={\small Número de ejecución de solicitud de redimensionamiento},
 	ylabel={\small Milisegundos},
 	grid=major, grid style=dashed, label style={font=\small},
+	legend cell align={left},
 	tick label style={font=\footnotesize},
 	scatter/classes={%
 		a={mark=square*,blue},%
@@ -1286,11 +1291,11 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
 	\legend{Solicitudes a \emph{Image Handler}, Solicitudes en \texttt{SAM CLI}}
 	\end{axis}
 \end{tikzpicture}
-\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$}
+\caption[\hspace{0.2cm} Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$]{Solicitudes de redimensionamiento de imágenes de tamaño $1Mb \leq x \leq 2Mb$. Elaboración propia.}
 \label{fig:comparacion-sam-2mb}
 \end{figure}
 
-\begin{table}
+\begin{table}[h]
     \centering
     \begin{tabular}{l|r|r|r}
         \toprule[1.5pt]
@@ -1301,23 +1306,23 @@ Configuración para la realización del experiento en \texttt{SAM CLI}:
         Duración & 120min & 225min & -- \\
         Tiempo promedio  & 7113.377ms & 2840.91ms & 4272.464ms\\
         Desviación estándar & 1768.520ms & 494ms & 1268.523ms \\
-        Varianza & 3106479.237 & 244032.83 & -- \\
+        Varianza & 3106479.237 & 244032.830 & -- \\
         Mediana & 7785.15ms & 3053.72ms & -- \\
         Coeficiente de variación & 0.226 & 0.16 & -- \\                        
         \bottomrule[1.5pt]
     \end{tabular}
-    \caption[AWS Lambda vs SAM CLI: imágenes $1Mb \leq x \leq 2Mb$]{Resumen de datos estadísticos}
+    \caption[AWS Lambda vs SAM CLI: imágenes $1Mb \leq x \leq 2Mb$]{Resumen de datos estadísticos. Elaboración propia.}
     \label{table:sam-datos-estadisticos-hasta-2mb}
 \end{table}
 
-\paragraph{Resultados} En este experimento, los dos conjuntos obtenidos resultaron a ser los más disímiles entre sí. Solamente el 0,2\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se encontraron en el dentro del rango de tiempo de las invocaciones directas en AWS Lambda. Los datos de la tabla \ref{table:sam-datos-estadisticos-hasta-2mb} confirman que estos dos conjuntos de datos se comportan de manera muy diferente. 
+\paragraph{Resultados} En este experimento, los dos conjuntos obtenidos resultaron ser los más disímiles entre sí. Solamente el 0,2\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se encontraron en el dentro del rango de tiempo de las invocaciones directas en AWS Lambda. Los datos de la tabla \ref{table:sam-datos-estadisticos-hasta-2mb} confirman que estos dos conjuntos de datos se comportan de manera muy diferente. 
 
 La duración total de todas las invocaciones de redimensionamiento fue de 120 minutos cuando se utilizó la función Lambda de forma directa y de 225 minutos con \texttt{SAM CLI}, similar a los tiempos del experimento anterior. Los tiempos de respuesta obtenidos cuando se usó \texttt{SAM CLI} fueron mejores que las invocaciones directas pero estas no pueden ser utilizadas como una referencia para predecir el comportamiento de la función Lambda cuando se redimensionen imágenes de tamaño a 1Mb y menor o igual 2Mb.
 
 \subsubsection{\texttt{SAM CLI} como herramienta para la simulación en \emph{Image Handler}}
-Los resultados de los experimentos realizados no sugieren que el uso de \texttt{SAM CLI} sea adecuado como herramienta para tener algún grado de predicción del cómo se van a comportar las invocaciones de redimensionamiento a \emph{Image Handler} cuando esté ejecutándose en AWS Lambda.
+Los resultados de los experimentos realizados no sugieren que el uso de \texttt{SAM CLI} sea adecuado como herramienta para tener algún grado de predicción del cómo se van a comportar las invocaciones de redimensionamiento a \emph{Image Handler} cuando estén ejecutándose en AWS Lambda.
 
-El escenario que presentó mayor similitud fue con las invocaciones de redimensionamiento en imágenes menores a los 500Kb. En este caso, al menos el 100\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se ubicaron dentro del rango de los tiempos de respuesta cuando se usó AWS Lambda. Conforme se fue incrementando el tamaño de las imágenes a redimensionar, las diferencias en los tiempos de respuesta de un conjunto con respecto al otro se hicieron más notables. Esto hace que para el caso de \emph{Image Handler}, \texttt{SAM CLI} no se considere confiable para caracterizar el comportamiento de la función en un ambiente en producción. Pese a esto, no se pone en duda la utilidad de \texttt{SAM CLI} para la implementación, pruebas e instalación de funciones Lambda en AWS.
+El escenario que presentó mayor similitud fue con las invocaciones de redimensionamiento en imágenes menores a los 500Kb. En este caso, al menos el 100\% de las invocaciones realizadas por medio de \texttt{SAM CLI} se ubicaron dentro del rango de los tiempos de respuesta cuando se usó AWS Lambda. Conforme se fue incrementando el tamaño de las imágenes a redimensionar, las diferencias en los tiempos de respuesta de un conjunto con respecto del otro se hicieron más notables. Esto hace que para el caso de \emph{Image Handler}, \texttt{SAM CLI} no se considere confiable para caracterizar el comportamiento de la función en un ambiente en producción. Pese a esto, no se pone en duda la utilidad de \texttt{SAM CLI} para la implementación, pruebas e instalación de funciones Lambda en AWS.
 
 %% Para glosario y acronimos
 %Some \gls{unadeca}, \acrlong{gcd} \acrshort{gcd}

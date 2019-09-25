@@ -57,7 +57,7 @@ Las actividades involucradas en el proceso de redimensionamientos de imágenes s
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{serverless-image-handler-architecture-workflow-2}
-  \caption[Carga de trabajo sugerida para el manejador de imágenes]{Carga de trabajo sugerida para el manejador de imágenes}
+  \caption[Carga de trabajo sugerida para el manejador de imágenes]{Carga de trabajo sugerida para el manejador de imágenes. Elaboración propia.}
   \label{fig:serverless-image-handler-architecture-workflow}
 \end{figure}
 
@@ -75,7 +75,7 @@ En principio las cargas de trabajo generadas serían \emph{cerradas}, lo que qui
 A continuación se listan las características que hacen este caso de uso representativo e interesante:
 \begin{itemize}
     \item Sencillo de entender e implementar: se cuenta únicamente con una función la cual lleva a cabo una tarea muy específica.
-    \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y, lógica asociadas a estas.
+    \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y, la lógica asociadas a estas.
     \item Replicable en otros proveedores de servicios en la nube: varias de las arquitecturas de referencia para \emph{serverless} propuestas por Amazon, están compuestas por herramientas y servicios muy propios de su plataforma, lo cual hace muy difícil su reproducibilidad utilizando otros proveedores. Aunque en principio este trabajo plantea ser elaborado en la plataforma FaaS de Amazon Web Services, AWS Lambda, otros proveedores de servicios (ver sección \ref{sec:proveedores-faas}) en la nube cuentan con sus propias plataformas de FaaS y de almacenamiento, lo cual permitiría replicar lo aquí propuesto en ellos.
     \item Replicable en los lenguajes de programación soportados por plataformas FaaS: actualmente JavaScript, Java (y lenguajes basados en la \emph{Java Virtual Machine}), Python, C\# y Go son los principales lenguajes de programación soportados por las plataformas FaaS. El caso de uso propuesto, no presenta ningún tipo de característica que lo ate a un lenguaje de programación en particular. En todos ellos se cuentan con bibliotecas para manejo de imágenes tanto de forma nativa como por medio de soluciones de terceros. 
 \end{itemize}
@@ -107,7 +107,7 @@ La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler
     \item Tomar la imagen redimensionada, codificarla en \texttt{Base64} y escribir el resultado en el flujo(\emph{stream}) de salida de la función Lambda.
 \end{enumerate}
  
-Un extracto de la clase \texttt{ImageHandler.java} se muestra en el listado \ref{lst:lambda-1}. En la línea \texttt{22} se procesa el evento de entrada que viene dado en formato JSON. Como resultado de esto se entrega un objeto \texttt{ImageRequest} el cual contiene la información de la solicitud de la imagen que se desea redimensionar y que se encuentra alojada en el servicio Amazon S3.
+Un extracto de la clase \texttt{ImageHandler.java} se muestra en el listado \ref{lst:lambda-1}. En la línea \texttt{22} se procesa el evento de entrada que viene dado en formato JSON. Como resultado de esto se entrega un objeto \texttt{ImageRequest}, el cual contiene la información de la solicitud de la imagen que se desea redimensionar y que se encuentra alojada en el servicio Amazon S3.
 
 En la línea \texttt{24} se llama al servicio \texttt{ImageService} con el fin de obtener la imagen   original (de acuerdo con la información presente en el \texttt{ImageRequest} proporcionado) y se aplica la operación de redimensionamiento.
 
@@ -231,13 +231,13 @@ La figura \ref{fig:secuencia-image-handler} muestra las principales interaccione
 \begin{figure}[h]
   \centering
   \includegraphics[width=16.5cm]{secuencia-image-handler}
-  \caption{Secuencia de acciones llevadas a cabo por \emph{Image-Handler}}
+  \caption[Secuencia de acciones llevadas a cabo por \emph{Image-Handler}]{Secuencia de acciones llevadas a cabo por \emph{Image-Handler}. Elaboración propia.}
   \label{fig:secuencia-image-handler}
 \end{figure}
 
 \subsection{Versiones alternas de \emph{Image-Handler}}
 
-Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM y para la obtención de mediciones del rendimiento. 
+Aparte de la versión original de \emph{Image-Handler}, se crearon dos versiones alternas con el fin de instrumentalizar el código fuente para la extracción y generación de un modelo en PCM y, para la obtención de mediciones del rendimiento. 
 
 En la primera version, el código se modificó para generar rastros del rendimiento de la función Lambda y extraer a partir de estos un modelo de rendimiento en PCM. La segunda versión fue modificada para generar rastros de rendimiento pero, a diferencia de la versión anterior, los datos obtenidos en esta versión fueron de mayor utilidad para afinar las estimaciones de rendimiento de los componentes involucrados en la función.
 
@@ -351,12 +351,12 @@ public class ImageHandlerXRay implements RequestStreamHandler {
   \label{fig:image-handler-xray}
 \end{figure}
 
-En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que recolecta estas trazas, y con base en ellas se pueden obtener mapas de la interacción de los servicios que componen la función y desgloses de los subsegmentos que componen la traza.
+En la figura \ref{fig:image-handler-xray} se muestran los principales involucrados en la generación de trazas de rendimiento en AWS X-Ray. A la función \emph{Image-Handler} se le agrega la biblioteca de AWS X-Ray para crear las trazas. Estas trazas se envían al servicio AWS X-Ray que recolecta estas trazas, y con base en ellas, se pueden obtener mapas de la interacción de los servicios que componen la función y desgloses de los subsegmentos que componen la traza.
 
 
 \section{Estrategia de extracción de modelo de rendimiento para \emph{Image-Handler}} \label{sec:estrategia-de-extraccion-de-modelo}
  
-Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y sobre los cuales no se tiene ningún control, estrategias tradicionales en donde se crean bitácoras en la misma computadora donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}). Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo el cual se tenga control para acceder a los resultados y procesarlos.
+Debido a que las funciones Lambda se ejecutan en contenedores que son tanto inaccesibles como efímeros para los diseñadores e implementadores, y sobre los cuales no se tiene ningún control, deben replantearse las estrategias tradicionales en donde se crean bitácoras en la misma computadora donde se ejecuta la aplicación y se van monitoreando utilizando alguna herramienta especializada o simplemente mediante \emph{Secure Socket Channel}(\texttt{SSH}). Para este tipo de software, se hace necesario registrar los eventos asociados al comportamiento del rendimiento en una computadora o servicio externo el cual se tenga control para acceder a los resultados y procesarlos.
 
 Para la extracción del modelo PCM a partir de las bitácoras de Kieker, se llevaron a cabo las siguientes actividades:
 \begin{enumerate}
@@ -398,7 +398,7 @@ Durante las pruebas realizadas al modelo generado por PMX, se percató que si bi
 
 En principio, las estimaciones incluidas en los SEFFs generados por PMX no lograron ser de utilidad para obtener predicciones representativas de lo observado en las ejecuciones de la función Lambda: mientras que en las invocaciones a \emph{Image-Handler} se entregaban tiempos de respuesta distintos, las simulaciones sobre el modelo entregaban siempre un dato fijo. Las estimaciones de rendimiento de los SEFFs se basaban en tiempos de cómputo constantes, lo que hacía que el motor de simulaciones generara una predicción del tiempo de respuesta con el mismo valor para todos los casos.
 
-En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositorio en \emph{Palladio Component Model} obtenido a partir del proceso de extracción. En este modelo se muestran los tipos de datos, interfaces y componentes de \emph{Image Handler}. Las interfaces contienen la especificación del servicio que proporcionará el componente, mientras que el componente --propiamente- es el que contiene los detalles del cómo llevar a cabo dicha especificación.
+En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositorio en \emph{Palladio Component Model} obtenido a partir del proceso de extracción. En este modelo se muestran los tipos de datos, interfaces y componentes de \emph{Image Handler}. Las interfaces contienen la especificación del servicio que proporcionará el componente, mientras que el componente - propiamente- es el que contiene los detalles del cómo llevar a cabo dicha especificación.
 
 
 
@@ -446,7 +446,7 @@ En la figura \ref{fig:image-handler-pcm-model} se muestra el modelo de repositor
 \begin{figure}[h]
   \centering
   \includegraphics[width=17cm]{image-handler-kieker}
-  \caption[Publicando mediciones del rendimiento de la función Lambda.]{Publicando mediciones del rendimiento de la función Lambda. Elaboración propia}
+  \caption[Publicación de mediciones del rendimiento de la función Lambda.]{Publicación de mediciones del rendimiento de la función Lambda. Elaboración propia.}
   \label{fig:image-handler-kieker}
 \end{figure}
 
