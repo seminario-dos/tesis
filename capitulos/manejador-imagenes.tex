@@ -300,7 +300,11 @@ public class ImageHandlerKieker implements RequestStreamHandler {
 
 Los aspectos relacionados con la estrategia de cómo se obtuvo un modelo de rendimiento a partir de las bitácoras de Kieker y PMX se dan a conocer en la Sección \ref{sec:estrategia-de-extraccion-de-modelo}.
 
+
 \subsubsection{Versión instrumentalizada para AWS X-Ray (IM-XRay)}
+
+AWS X-Ray\footnote{\url{https://aws.amazon.com/xray/}} es la herramienta que pone a disposición el servicio de AWS para facilitar el análisis del comportamiento de aplicaciones. Se puede utilizar X-Ray para identificar cuellos de botella y detectar problemas en general. Esto lo logra por medio de la recolección y almacenamiento de datos sobre las invocaciones hechas en las aplicaciones para su posterior estudio mediante herramientas de visualización y estadística. El aporte de X-Ray en el proceso de análisis del comportamiento de \emph{Image Handler} se expone en la Sección \ref{sec:image-handler-xray}.
+
 La principal motivación detrás de esta nueva versión de \emph{Image-Handler} es la de contar con datos del rendimiento de la función Lambda que no pudieron llegar a ser estimados durante el proceso de extracción del modelo utilizando PMX. En la Sección \ref{sec:estrategia-de-extraccion-de-modelo} se brindan los detalles de lo observado durante el proceso de extracción del modelo con PMX y en dónde encajan los resultados arrojados por esta nueva versión en el modelo.
  
 Para esta versión, Se siguió un enfoque similar al de la Sección \ref{sec:image-handler-kieker-pmx} pero en lugar de utilizar la biblioteca de Kieker, se utilizó la biblioteca AWS SDK (\emph{Software Development Kit, SDK}) para crear las trazas y \emph{subsegmentos} de trazas, que son vistas más específicas del comportamiento de la aplicación. Con el uso AWS X-Ray se busca: 
@@ -462,7 +466,7 @@ Una actividad recurrente durante el modelado y la simulación de arquitecturas d
 
 Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker podría llegar a ser sustancial, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
 
-Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray\footnote{\url{https://aws.amazon.com/xray/}} para este fin. AWS X-Ray ayuda a los desarrolladores a analizar y depurar aplicaciones distribuidas en producción, tales como las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando, con miras a identificar y resolver problemas de rendimiento y errores en general.
+Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray para este fin. AWS X-Ray ayuda a los desarrolladores a analizar y depurar aplicaciones distribuidas en producción, tales como las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando, con miras a identificar y resolver problemas de rendimiento y errores en general.
 
 AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y metadatos para analizar el comportamiento o identificar problemas.
 
