@@ -1,4 +1,4 @@
-En este capítulo se introducen los actividades que permiten a una persona interesada en extraer modelos de rendimiento a partir de una función Lambda, de manera semejante a la expuesta en la Sección \ref{sec:experimento-1}. En general, se identificaron cinco apartados como los más representativos en la ejecución de este proceso, los cuales son:
+En este capítulo se introducen los actividades que permiten, a una persona interesada en extraer modelos de rendimiento a partir de una función Lambda, proceder de manera semejante a la expuesta en la Sección \ref{sec:experimento-1}. En general, se identificaron cinco apartados como los más representativos en la ejecución de este proceso, los cuales son:
 \begin{enumerate}
     \item Selección del caso de uso.
     \item Instrumentalización con Kieker.
@@ -18,7 +18,7 @@ En este capítulo se introducen los actividades que permiten a una persona inter
 \eIf{se cuenta con un modelo \texttt{PCM} existente}{
     utilizar este modelo para simulaciones y pruebas\;
 }{
- \eIf{lenguaje de la función está escrita en \texttt{Java}}{
+ \eIf{lenguaje en que está escrita la función es \texttt{Java}}{
     se puede utilizar la biblioteca(SDK) de \texttt{Kieker}\;
  }{
     implementar integración con \texttt{Kieker} explícitamente\;
@@ -33,7 +33,7 @@ En este capítulo se introducen los actividades que permiten a una persona inter
  }
 }
 
-\caption{Selección de caso de uso de función en la nube}
+\caption{Selección de caso de uso de función en la nube.}
 \end{algorithm}
 \end{singlespace}
 
@@ -43,11 +43,11 @@ La selección del lenguaje de programación se hace especialmente importante si 
 
 Esto lo que quiere decir es que actualmente Kieker cuenta con bibliotecas escritas en Java que pueden ser fácilmente incluidas en el proyecto que se está desarrollando y de esta forma lograr una integración con algún servicio de bitácoras de eventos de Kieker. Si bien se puede lograr la integración entre Kieker y otro lenguaje de programación aparte de Java, esta integración deberá ser proporcionada por el implementador de forma explícita. 
 
-La plataforma utilizada para la prueba e instalación de la función Lambda fue AWS Lambda. Tal y como se describió en el Capítulo \ref{cap:manejador-imagenes} y en la Sección \ref{sec:experimento-1}, se hizo uso de herramientas de gestión de bitácoras (CloudWatch) y de monitoreo (AWS X-Ray) para obtener mediciones alternativas de la función, que fueron de gran ayuda a la hora de refinar el modelo de rendimiento. Si se desea implementar un caso de uso similar a \emph{Image Handler} en algún otro proveedor de servicios \emph{FaaS} (Sección \ref{sec:proveedores-faas}), se deberá  tomar en consideración las herramientas y particularidades de dicha plataforma para la obtención de mediciones de rendimiento.
+La plataforma utilizada para la prueba e instalación de la función Lambda fue AWS Lambda. Como se describió en el Capítulo \ref{cap:manejador-imagenes} y en la Sección \ref{sec:experimento-1}, se hizo uso de herramientas de gestión de bitácoras (CloudWatch) y de monitoreo (AWS X-Ray) para obtener mediciones alternativas de la función, que fueron de gran ayuda a la hora de refinar el modelo de rendimiento. Si se desea implementar un caso de uso similar a \emph{Image Handler} en algún otro proveedor de servicios \emph{FaaS} (Sección \ref{sec:proveedores-faas}), se deberá  tomar en consideración las herramientas y particularidades de dicha plataforma para la obtención de mediciones de rendimiento.
 
-El enfoque de trabajo expuesto en este documento sigue una serie de actividades que se consideran útiles para la extracción y obtención de modelos de rendimiento de una función Lambda. Estas actividades fueron adoptadas luego de estudiar la literatura recomendada y, debido a que en este trabajo se está haciendo una exploración inicial del método de trabajo, se decidió seguir estas actividades de acuerdo con el orden sugerido.
+El enfoque de trabajo expuesto en este documento sigue una serie de actividades que se consideran útiles para la extracción y obtención de modelos de rendimiento de una función Lambda. Estas actividades fueron adoptadas luego de estudiar la literatura pertinente y, debido a que en el presente estudio se está haciendo una exploración inicial del método de trabajo, se decidió realizar actividades de acuerdo con el orden reportado.
 
-Implementadores con mayor experiencia en el modelado y la simulación basados en componentes podrían prescindir o modificar partes de las actividades expuestas con el fin de obtener resultados más directos de los aquí expuestos. En particular se podría:
+Implementadores con mayor experiencia en el modelado y la simulación basados en componentes podrían prescindir o modificar partes de las actividades indicadas con el fin de obtener resultados más directos de los aquí expuestos. En particular se podría:
 \begin{itemize}
     \item Proporcionar un modelo en PCM \emph{a priori} de una función Lambda y de esta forma saltarse el proceso de instrumentalización y extracción.
     \item Utilizar herramientas de medición alternas para la refinamiento del modelo.
@@ -70,20 +70,20 @@ Instrumentalizar la función Lambda con el \texttt{SDK} de \texttt{Kieker}\;
 Generar eventos de tipo \texttt{OperationExecutionRecord}\;
 Apuntar hacia la cola \texttt{JMS} del paso 4 como el destino de los eventos de rendimiento\;
 
-\While{que ingresen invocaciones de redimensionamiento}{
+\While{ingresen invocaciones de redimensionamiento}{
       (Función $\lambda$) Publica eventos de rendimiento en la cola \texttt{JMS}\;
       (\texttt{JMS}) Gestiona los mensajes entrantes\;
       (\texttt{Kieker}) Consume mensajes de la cola y los registra en una bitácora local\;
  }
- \caption{Pasos para instrumentalizar la función con Kieker}
+ \caption{Pasos para instrumentalizar la función con Kieker.}
 \end{algorithm}
 \end{singlespace}
 
-A partir de aquí se supone que la función Lambda en la que se va a trabajar está escrita en Java y será instalada en el servicio AWS Lambda. Se tiene que descargar Kieker de \url{http://kieker-monitoring.net/}, instalarlo y ejecutarlo en una computadora en donde se pueda tener acceso y control para manipular las bitácoras obtenidas. Se recomienda la lectura del manual de usuario de Kieker, disponible en \cite{kieker-user-guide}, para obtener mayores detalles en su instalación y configuración.
+A partir de aquí se supone que la función Lambda en la que se va a trabajar está escrita en Java y será instalada en el servicio AWS Lambda. Se tiene que descargar Kieker de \url{http://kieker-monitoring.net/}, instalarlo y ejecutarlo en una computadora en donde se pueda tener acceso y control para manipular las bitácoras obtenidas. Se recomienda la lectura del manual de usuario de Kieker, disponible en \cite{kieker-user-guide}, para obtener mayores detalles referentes a su instalación y configuración.
 
 Kieker permite varias formas de configuración y ejecución. Debido a que las funciones Lambda se ejecutan en ambientes que son inaccesibles por los implementadores, se optó por configurar Kieker para que escuche los eventos de la función por medio de una cola JMS. La cola JMS y el servicio de Kieker fueron instalados y configurados en una máquina virtual independiente.
 
-En la Sección \ref{sec:image-handler-kieker-pmx} se introduce la programación requerida para generar entradas en una bitácora de Kieker. Se generaron eventos de tipo \emph{OperationExecutionRecord} que son los tipos de registros más básicos que se pueden producir en Kieker y, además, se configuró la biblioteca de Kieker para que publicara los eventos de rendimiento a una cola JMS. El servicio de Kieker consume los eventos de la cola y los registra en una bitácora local.
+En la Sección \ref{sec:image-handler-kieker-pmx} se introdujo la programación requerida para generar entradas en una bitácora de Kieker. Se generaron eventos de tipo \emph{OperationExecutionRecord} que son los tipos de registros más básicos que se pueden producir en Kieker y, además, se configuró la biblioteca de Kieker para que publicara los eventos de rendimiento a una cola JMS. El servicio de Kieker consume los eventos de la cola y los registra en una bitácora local.
 
 %\begin{center}
 %Función Lambda $\rightarrow$ JMS $\rightarrow$ Kieker $\rightarrow$ Bitácora
@@ -116,7 +116,7 @@ Descargar e instalar \texttt{PMX}\;
     Revisar la instrumentalización de \texttt{Kieker}\;
     Revisar el manual de usuario de \texttt{Kieker}\;
 }
-\caption{Extracción de un modelo de rendimiento con PMX}
+\caption{Extracción de un modelo de rendimiento con PMX.}
 \end{algorithm}
 \end{singlespace}
 
@@ -153,7 +153,7 @@ Una vez dentro del directorio \texttt{pcmserver}, ejecutar los siguientes comand
 \begin{figure}[h]
   \centering
   \includegraphics[width=15cm]{pcmserver}
-  \caption{PMX-PCM Server. Tomado del Sitio Web de PMX}
+  \caption{PMX-PCM Server. Tomado del Sitio Web de PMX.}
   \label{fig:pcmserver}
 \end{figure}
 
@@ -179,7 +179,7 @@ Si PMX no entrega ningún resultado como parte del proceso de extracción, esto 
 \SetAlgoLined
 %\KwResult{Write here the result }
 % initialization\;
-\tcc{Se supone que se logrado obtener un modelo PCM por medio de PMX}
+\tcc{Se supone que se ha logrado obtener un modelo PCM por medio de PMX}
 Crear nuevo proyecto en \emph{Palladio Workbench}\;
 Importar archivos generados por \texttt{PMX}\;
 \eIf{archivos son compatibles con Palladio Workbench}{
@@ -187,11 +187,11 @@ Importar archivos generados por \texttt{PMX}\;
 }{
     Evaluar incompatibilidades y corregir\;
 }
-\caption{Importacio4n de archivos de PMX an \emph{Palladio Workbench}}
+\caption{Importación de archivos de PMX an \emph{Palladio Workbench}.}
 \end{algorithm}
 \end{singlespace}
 
-Si el proceso anterior se realizó con éxito, PMX  generará 5 archivos en formato XML que representan cada uno de los modelos con los que se puede trabajar en Palladio: modelo de componentes, asignación de recursos, ambiente, sistema y uso. También se generan archivos \texttt{*.csv} con estimaciones del uso de los componentes. El uso de las estimaciones contenidas en estos archivos es opcional, puesto que en la Sección X explicamos una alternativa que nos brindó mayor precisión.
+Si el proceso anterior se realizó con éxito, PMX  generará 5 archivos en formato XML que representan cada uno de los modelos con los que se puede trabajar en Palladio: modelo de componentes, asignación de recursos, ambiente, sistema y uso. También se generan archivos \texttt{*.csv} con estimaciones del uso de los componentes. El uso de las estimaciones contenidas en estos archivos es opcional, puesto que en la Sección \ref{sec:experimento-1} explicamos una alternativa que nos brindó mayor precisión.
 
 En \emph{Palladio Workbench} hay que crear un nuevo proyecto y ponerle un nombre.
 \begin{verbatim}
@@ -225,18 +225,20 @@ Un ajuste que ayudó a resolver estos problemas de compatibilidad, fue generar u
 % initialization\;
 \tcc{Se supone que se cuenta con modelo PCM válido}
 Ejecutar simulaciones con \emph{SimuBench}\;
-\Repeat{hasta que los resultados sean satisfactorios}{
+\Repeat{los resultados sean satisfactorios}{
     Modificar submodelos\;
     Obtener estimaciones de herramientas alternas a \texttt{PMX}\;
     Evaluar resultados\;
 }
-\caption{Ejecución de simulaciones y refinamiento del modelo}
+\caption{Ejecución de simulaciones y refinamiento del modelo.}
 \end{algorithm}
 \end{singlespace}
 
 Una vez que se cuenta con el modelo PCM, se puede iniciar la ejecución de simulaciones. Conforme se van dando las ejecuciones, el motor de simulaciones de PCM (en este caso SimuBench) entrega 6 tipos de visualización de resultados para cada uno de los componentes identificados. También incluye estimaciones de la demanda del procesador y del disco duro. En este trabajo fueron de particular utilidad las visualizaciones de resultados de tipo: \texttt{XY Plot}, histograma y función de distribución acumulada.
 
-Los resultados entregados por el motor de simulaciones vienen dados en tiempos de respuesta en segundos. En el caso en el que los resultados de las simulaciones estén muy alejados de los observados en invocaciones reales, se recomienda modificar el modelo en alguno de sus submodelos asociados. Una de las desventajas que se experimentó con el modelo obtenido por PMX fueron las estimaciones de las demandas de los recursos, esto se explica con mayor detalle en la Sección \ref{sec:experimento-1}, y para lidiar con esto, fue necesario hacer uso de herramientas alternas con el fin de afinar estas estimaciones, para luego repetir las simulaciones hasta que los resultados obtenidos se consideraron relevantes. En este estudio, la herramienta AWS X-Ray fue sumamente útil para llevar a cabo esta labor. También se realizaron modificaciones sobre el modelo de uso para generar cargas de trabajo con comportamientos similares a los hechos en las invocaciones reales.
+Los resultados entregados por el motor de simulaciones vienen dados en tiempos de respuesta en segundos. Si los resultados de las simulaciones están muy alejados de los observados en invocaciones reales, se recomienda modificar el modelo en alguno de sus submodelos asociados. Una de las desventajas que se experimentó con el modelo obtenido por PMX fueron las estimaciones de las demandas de los recursos, esto se explica con mayor detalle en la Sección \ref{sec:experimento-1}. Para lidiar con esto, fue necesario hacer uso de herramientas alternas con el fin de afinar estas estimaciones, para luego repetir las simulaciones hasta que los resultados obtenidos se consideraron relevantes. En este estudio, la herramienta AWS X-Ray fue sumamente útil para llevar a cabo tal labor. 
+
+%También se realizaron modificaciones sobre el modelo de uso para generar cargas de trabajo con comportamientos similares a los hechos en las invocaciones reales.
 
 La Sección \ref{sec:experimento-1} brinda un mayor detalle acerca de la estrategia de afinamiento del modelo de rendimiento para el caso de \emph{Image Handler} pero, en términos generales, una vez obtenido un modelo, todo dentro de él está sujeto a modificación y evaluación. La literatura consultada hace énfasis en esto y, para el caso de \emph{Image Handler} esto no fue la excepción. Llegado a este punto, se entra en un ciclo de prueba $\rightarrow$ validación $\rightarrow$ afinamiento del modelo hasta que los resultados obtenidos por medio de las simulaciones resulten significativas para el caso de estudio en particular.
 
