@@ -48,7 +48,7 @@ Las actividades involucradas en el proceso de redimensionamientos de imágenes s
 \begin{enumerate}
     \item Se envía una solicitud de redimensionamiento de imagen en formato \texttt{JSON} a la función Lambda con los datos acerca de la localización de la imagen y su nuevo tamaño.
     \item La solicitud de redimensionamiento llega a la función Lambda.
-    \item La función Lambda solicita al servicio de almacemiento AWS S3 la imagen.
+    \item La función Lambda solicita al servicio de almacenamiento AWS S3 la imagen.
     \item AWS S3 entrega a la función Lambda la imagen solicitada.
     \item La función Lambda inicia el redimensionamiento de la imagen de acuerdo a los parámetros solicitados.
     \item La nueva imagen modificada se entrega al cliente(s).
@@ -77,7 +77,7 @@ A continuación se listan las características que hacen este caso de uso repres
     \item Sencillo de entender e implementar: se cuenta únicamente con una función la cual lleva a cabo una tarea muy específica.
     \item Popular: sigue un patrón de procesamiento dirigido por eventos y, como se señala en \cite{serverless-architecture-patterns}, este es uno de los más populares que se ha empezado a adoptar para aplicaciones \emph{serverless}. Otra de las razones de la popularidad de este caso de uso es que permite a los desarrolladores crear una unidad de instalación independiente y especializada para el manejo de imágenes, liberando así a sus servidores y aplicaciones del manejo de las peticiones y, la lógica asociadas a estas.
     \item Replicable en otros proveedores de servicios en la nube: varias de las arquitecturas de referencia para \emph{serverless} propuestas por Amazon, están compuestas por herramientas y servicios muy propios de su plataforma, lo cual hace muy difícil su reproducibilidad utilizando otros proveedores. Aunque en principio este trabajo plantea ser elaborado en la plataforma FaaS de Amazon Web Services, AWS Lambda, otros proveedores de servicios (ver sección \ref{sec:proveedores-faas}) en la nube cuentan con sus propias plataformas de FaaS y de almacenamiento, lo cual permitiría replicar lo aquí propuesto en ellos.
-    \item Replicable en los lenguajes de programación soportados por plataformas FaaS: actualmente JavaScript, Java (y lenguajes basados en la \emph{Java Virtual Machine}), Python, C\# y Go son los principales lenguajes de programación soportados por las plataformas FaaS. El caso de uso propuesto, no presenta ningún tipo de característica que lo ate a un lenguaje de programación en particular. En todos ellos se cuentan con bibliotecas para manejo de imágenes tanto de forma nativa como por medio de soluciones de terceros. 
+    \item Replicable en los lenguajes de programación soportados por plataformas FaaS: actualmente JavaScript, Java (y lenguajes basados en la \emph{Java Virtual Machine}), Python, C\# y Go son los principales lenguajes de programación soportados por las plataformas FaaS. El caso de uso propuesto, no presenta ningún tipo de característica que lo ate a un lenguaje de programación en particular. La mayoría de los lenguajes de programación cuentan con bibliotecas para procesamiento de imágenes tanto de forma nativa como por medio de soluciones de terceros. Por ejemplo, en Java, se cuenta con: Java2D, \emph{imgscalr} \footnote{\url{https://github.com/rkalla/imgscalr}}, \emph{thumbnailator}\footnote{\url{https://github.com/coobird/thumbnailator}}, entre otras.
 \end{itemize}
 
 
@@ -90,7 +90,7 @@ Existen soluciones disponibles que se pueden estudiar para implementar un maneja
 
 A pesar que Amazon recomienda el uso de \emph{serverless-image-handler} sobre \emph{serverless-image-resizing}, ambas soluciones siguen un patrón sumamente similar en su codificación e instalación. 
 
-Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redimensionamiento en imágenes, es la \emph{Course\_LambdaResizer}, una función lambda usada como referencia en el curso \emph{``Serverless API on AWS for Java developers''} ofrecido en el sitio Web Udemy\footnote{\url{https://www.udemy.com/serverless-api-aws-lambda-for-java-developers}}. Esta función está escrita en lenguaje Java y utiliza la biblioteca \emph{imgscalr}\footnote{\url{https://github.com/rkalla/imgscalr}} para redimensionar imágenes.
+Otro ejemplo de una función en la nube encargada de ofrecer un servicio de redimensionamiento en imágenes, es la \emph{Course\_LambdaResizer}, una función lambda usada como referencia en el curso \emph{``Serverless API on AWS for Java developers''} ofrecido en el sitio Web Udemy\footnote{\url{https://www.udemy.com/serverless-api-aws-lambda-for-java-developers}}. Esta función está escrita en lenguaje Java y utiliza la biblioteca \emph{imgscalr} para redimensionar imágenes.
 
 Para este estudio, se implementó una función escrita en lenguaje Java. Esto motivado principalmente por la compatibilidad de este lenguaje con las herramientas para monitoreo de aplicaciones y extracción de modelos de rendimiento, Kieker y PMX respectivamente.
 
@@ -98,12 +98,12 @@ Para este estudio, se implementó una función escrita en lenguaje Java. Esto mo
 La función Lambda creada para este estudio lleva por nombre \emph{Image-Handler}. El código fuente y documentación relacionada con ella se encuentra disponible en GitHub.com, en el repositorio de código: \url{https://github.com/seminario-dos/image-handler}. El punto de entrada de la función Lambda es la clase \texttt{ImageHandler.java}. Esta función se encarga de realizar tres operaciones para procesar una solicitud de redimensionamiento de imagen:
 
 \begin{enumerate}
-    \item Procesar la solicitud de redimiensionamiento (la entrada) que viene dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
+    \item Procesar la solicitud de redimensionamiento (la entrada) que viene dada en formato JSON. Esta solicitud de redimensionamiento contiene entre otras cosas:
     \begin{itemize}
         \item El nombre de la imagen original que reside en el servicio Amazon S3.
         \item Los parámetros de altura y ancho a los que se desea redimensionar la imagen original.
     \end{itemize}
-    \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicarle la operación de redimiensionamiento de acuerdo con los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
+    \item Obtener la imagen del servicio Amazon S3 y posteriormente aplicarle la operación de redimensionamiento de acuerdo con los parámetros de altura y ancho especificados en la solicitud de redimensionamiento.
     \item Tomar la imagen redimensionada, codificarla en \texttt{Base64} y escribir el resultado en el flujo(\emph{stream}) de salida de la función Lambda.
 \end{enumerate}
  
@@ -303,7 +303,7 @@ Los aspectos relacionados con la estrategia de cómo se obtuvo un modelo de rend
 
 \subsubsection{Versión instrumentalizada para AWS X-Ray (IM-XRay)}
 
-AWS X-Ray\footnote{\url{https://aws.amazon.com/xray/}} es la herramienta que pone a disposición el servicio de AWS para facilitar el análisis del comportamiento de aplicaciones. Se puede utilizar X-Ray para identificar cuellos de botella y detectar problemas en general. Esto lo logra por medio de la recolección y almacenamiento de datos sobre las invocaciones hechas en las aplicaciones para su posterior estudio mediante herramientas de visualización y estadística. El aporte de X-Ray en el proceso de análisis del comportamiento de \emph{Image Handler} se expone en la Sección \ref{sec:image-handler-xray}.
+AWS X-Ray\footnote{\url{https://aws.amazon.com/xray/}} es la herramienta que pone a disposición AWS para facilitar el análisis del comportamiento de aplicaciones. Se puede utilizar X-Ray para identificar cuellos de botella y detectar problemas en general. Esto lo logra por medio de la recolección y almacenamiento de datos sobre las invocaciones hechas a las aplicaciones, para su posterior estudio mediante herramientas de visualización y estadística. El aporte de X-Ray en el proceso de análisis del comportamiento de \emph{Image Handler} se expone en la Sección \ref{sec:image-handler-xray}.
 
 La principal motivación detrás de esta nueva versión de \emph{Image-Handler} es la de contar con datos del rendimiento de la función Lambda que no pudieron llegar a ser estimados durante el proceso de extracción del modelo utilizando PMX. En la Sección \ref{sec:estrategia-de-extraccion-de-modelo} se brindan los detalles de lo observado durante el proceso de extracción del modelo con PMX y en dónde encajan los resultados arrojados por esta nueva versión en el modelo.
  
@@ -387,7 +387,7 @@ A partir de la bitácora proporcionada como entrada, PMX logró identificar 6 co
     \item \texttt{S3ImageService}: Contiene la lógica de:
         \begin{enumerate}
             \item Cómo obtener una imagen y
-            \item Cómo aplicar la redimiensión sobre la misma.
+            \item Cómo aplicar la redimensión sobre ella.
         \end{enumerate}
     \item \texttt{S3Dao}: El componente que sabe cómo obtener una imagen el servicio AWS S3
     \item \texttt{AmazonS3Client}: Contiene las operaciones de comunicación de bajo nivel con el servicio AWS.
@@ -466,7 +466,7 @@ Una actividad recurrente durante el modelado y la simulación de arquitecturas d
 
 Durante el trabajo con el modelo PCM obtenido en la Sección \ref{sec:image-handler-kieker-pmx} se notó que las estimaciones hechas por PMX no correspondían al comportamiento observado y que el esfuerzo necesario para obtener estas estimaciones a partir de las bitácoras de Kieker podría llegar a ser sustancial, principalmente porque el formato de las bitácoras de Kieker incluye muchos más datos que solo las estimaciones de rendimiento y porque se empezó a tener la sensación de que estos datos de alguna u otra forma no estaban ``contando toda la historia'' de lo que estaba pasando con la función Lambda. Por ejemplo, las datos de rendimiento de Kieker no podían explicar tiempos de retraso que se observaban al inicio de la ejecución de la función Lambda y, sin esos datos, se podía llegar a generar un modelo poco preciso.
 
-Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se elegió Amazon X-Ray para este fin. AWS X-Ray ayuda a los desarrolladores a analizar y depurar aplicaciones distribuidas en producción, tales como las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando, con miras a identificar y resolver problemas de rendimiento y errores en general.
+Por esta razón se comenzó a explorar herramientas alternativas para obtener mediciones del rendimiento de la función Lambda y se eligió Amazon X-Ray para este fin. AWS X-Ray ayuda a los desarrolladores a analizar y depurar aplicaciones distribuidas en producción, tales como las basadas en arquitecturas de microservicios. Con AWS X-Ray se puede ver cómo es que la aplicación y sus servicios asociados se están ejecutando, con miras a identificar y resolver problemas de rendimiento y errores en general.
 
 AWS X-Ray recolecta datos de las solicitudes que hacen a cada uno de los servicios de la aplicación y los agrupa en unas unidades llamadas trazas(\emph{traces}). Luego, utilizando estas trazas, es posible ver mapas de la interacción de los servicios, latencias y metadatos para analizar el comportamiento o identificar problemas.
 
