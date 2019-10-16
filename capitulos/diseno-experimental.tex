@@ -214,10 +214,10 @@ En este punto, se cuenta con 1000 mediciones hechas sobre IM-Simple y un modelo 
     grid style=dashed,
 ]
 
-\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+\addplot[mark=none,blue,smooth,ultra thick] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
 
 \coordinate (a) at (axis cs:1.6, 0.95);
-\draw[blue, dashed, thick](a |- current plot begin) -- (a);
+\draw[blue, dashed, ultra thick](a |- current plot begin) -- (a);
  
 \end{axis}
 \end{tikzpicture}
@@ -419,9 +419,9 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
     grid=major,
     grid style=dashed,
 ]
-\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+\addplot[mark=none,blue,smooth, ultra thick] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
 \coordinate (b) at (axis cs:8.0, 0.95);
-\draw[blue, dashed, thick](b |- current plot begin) -- (b);
+\draw[blue, dashed, ultra thick](b |- current plot begin) -- (b);
 \end{axis}
 \end{tikzpicture}
 \caption[\hspace{0.2cm} Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM]{Probabilidad acumulada de solicitudes de redimensionamiento en imágenes $500Kb \leq x \leq 1Mb$ en PCM. Elaboración propia.}
@@ -616,10 +616,10 @@ Por último, de acuerdo con los resultados de las simulaciones, existe un 95\% d
     grid style=dashed,
 ]
 
-\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
+\addplot[mark=none,blue,smooth, ultra thick] table [col sep=comma] {datos/mas-1mb-cdf.csv};
 
 \coordinate (b) at (axis cs:10.135, 0.95);
-\draw[blue, dashed, thick](b |- current plot begin) -- (b);
+\draw[blue, dashed, ultra thick](b |- current plot begin) -- (b);
 
 \end{axis}
 \end{tikzpicture}
@@ -650,9 +650,9 @@ En los tres experimentos propuestos, los resultados provenientes de las simulaci
     grid style=dashed,
 ]
 
-\addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
-\addplot[mark=none,green,smooth] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
-\addplot[mark=none,red,smooth] table [col sep=comma] {datos/mas-1mb-cdf.csv};
+\addplot[mark=none,blue,smooth, ultra thick] table [col sep=comma] {datos/hasta-500kb-cdf.csv};
+\addplot[mark=none,green,smooth, ultra thick] table [col sep=comma] {datos/hasta-1mb-cdf.csv};
+\addplot[mark=none,red,smooth, ultra thick] table [col sep=comma] {datos/mas-1mb-cdf.csv};
 
 \coordinate (a) at (axis cs:1.6, 0.95);
 \draw[blue, dashed, thick](a |- current plot begin) -- (a);
@@ -956,11 +956,11 @@ La Figura \ref{fig:rafagas-hasta-500kb} muestra 400 invocaciones de redimensiona
 ]
 
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-1.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-2.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-3.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-500kb-rafagas-bck-4.csv};
 
 %\legend{\small Imágenes aleatorias, \small Imagen única} 
@@ -1000,15 +1000,15 @@ Se hizo el mismo ejercicio que en la Sección \ref{sec:rafagas-hasta-500kb}, aho
 ]
 
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-1.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-2.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-3.csv};
 \addplot[color=black, mark=none, dashed, style={ultra thick}] coordinates {(260,8082)(260,14000)};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-4.csv};
 \addplot[color=black, mark=none, dashed, style={ultra thick}] coordinates {(434,9356)(434,14000)};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(535,0)(535,10000)(671,10000)(671,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(535,0)(535,10000)(671,10000)(671,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-1mb-rafagas-5.csv};
  
 \end{axis}
@@ -1065,11 +1065,11 @@ Para este caso, el tiempo promedio de ejecución de una ráfaga fue de 13 minuto
 ]
 
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-1.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(103,0)(103,10000)(117,10000)(117,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-2.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(223,0)(223,10000)(257,10000)(257,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-3.csv};
-\addplot[color=red, mark=none, dashed, opacity=0.5] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
+\addplot[color=red, mark=none, dashed, opacity=0.5, ultra thick] coordinates {(362,0)(363,10000)(429,10000)(429,0)};
 \addplot[mark=none,blue,smooth] table [col sep=comma] {datos/hasta-2mb-rafagas-4.csv};
  
 \end{axis}
